@@ -88,7 +88,7 @@ test('the frame\'s columns are laid out in the page\'s own pixels', async () => 
   const frame = hostFrame('280px 500px 400px')
   installed()
   await settle()
-  expect(columnsOf(frame)).toBe('224px 400px 320px')
+  expect(columnsOf(frame)).toBe('211.2px 400px 320px')
 })
 
 test('a frame whose right column is closed carries its sidebar the same way', async () => {
@@ -96,7 +96,7 @@ test('a frame whose right column is closed carries its sidebar the same way', as
   const frame = hostFrame('280px minmax(0px, 1fr) minmax(0px, 0px)')
   installed()
   await settle()
-  expect(columnsOf(frame)).toBe('224px minmax(0px, 1fr) minmax(0px, 0px)')
+  expect(columnsOf(frame)).toBe('211.2px minmax(0px, 1fr) minmax(0px, 0px)')
 })
 
 test('the record stands on the frame, so a second copy of the rule reads it too', async () => {
@@ -104,14 +104,14 @@ test('the record stands on the frame, so a second copy of the rule reads it too'
   const frame = hostFrame('280px 500px 400px')
   installed()
   await settle()
-  expect(columnsOf(frame)).toBe('224px 400px 320px')
+  expect(columnsOf(frame)).toBe('211.2px 400px 320px')
   // A hot reload mounts the new module before the old one is torn down: the
   // second copy reads the same frame, and must not divide what the first wrote.
   const second = installFrameColumns({ scale: drawnScale })
   after(second.stop)
   second.settle()
   await settle()
-  expect(columnsOf(frame)).toBe('224px 400px 320px')
+  expect(columnsOf(frame)).toBe('211.2px 400px 320px')
   expect(frame.hasAttribute(CARRY_ATTRIBUTE)).toBe(true)
 })
 
@@ -120,15 +120,15 @@ test('the scale changing under a carried frame reads the host\'s own numbers aga
   const frame = hostFrame('280px minmax(0px, 1fr) minmax(0px, 0px)')
   const rule = installed()
   await settle()
-  expect(columnsOf(frame)).toBe('224px minmax(0px, 1fr) minmax(0px, 0px)')
+  expect(columnsOf(frame)).toBe('211.2px minmax(0px, 1fr) minmax(0px, 0px)')
   drawnAt(0.8)
   rule.settle()
   await settle()
-  expect(columnsOf(frame)).toBe('350px minmax(0px, 1fr) minmax(0px, 0px)')
+  expect(columnsOf(frame)).toBe('330px minmax(0px, 1fr) minmax(0px, 0px)')
   drawnAt(1)
   rule.settle()
   await settle()
-  expect(columnsOf(frame)).toBe('280px minmax(0px, 1fr) minmax(0px, 0px)')
+  expect(columnsOf(frame)).toBe('264px minmax(0px, 1fr) minmax(0px, 0px)')
   expect(frame.hasAttribute(CARRY_ATTRIBUTE)).toBe(false)
 })
 
@@ -150,7 +150,7 @@ test('a frame mounted after the rule runs is found and converted', async () => {
   await settle()
   const frame = hostFrame('280px 500px 400px')
   await settle()
-  expect(columnsOf(frame)).toBe('224px 400px 320px')
+  expect(columnsOf(frame)).toBe('211.2px 400px 320px')
 })
 
 test('the teardown hands the host its own numbers back', async () => {
@@ -158,10 +158,10 @@ test('the teardown hands the host its own numbers back', async () => {
   const frame = hostFrame('280px 500px 400px')
   const rule = installFrameColumns({ scale: drawnScale })
   await settle()
-  expect(columnsOf(frame)).toBe('224px 400px 320px')
+  expect(columnsOf(frame)).toBe('211.2px 400px 320px')
   rule.stop()
   await settle()
-  expect(columnsOf(frame)).toBe('280px 500px 400px')
+  expect(columnsOf(frame)).toBe('264px 500px 400px')
   expect(frame.hasAttribute(CARRY_ATTRIBUTE)).toBe(false)
 })
 
@@ -180,9 +180,40 @@ test('the sidebar\'s own box and its handle stand at the width of the column the
   const handle = hostHandle('280px')
   installed()
   await settle()
-  expect(columnsOf(frame)).toBe('224px minmax(0px, 1fr) minmax(0px, 0px)')
-  expect(sidebar.style.width).toBe('224px')
-  expect(handle.style.left).toBe('224px')
+  expect(columnsOf(frame)).toBe('211.2px minmax(0px, 1fr) minmax(0px, 0px)')
+  expect(sidebar.style.width).toBe('211.2px')
+  expect(handle.style.left).toBe('211.2px')
+})
+
+test('the host\'s own default sidebar width is laid out at the contract minimum, at the scale too', async () => {
+  drawnAt(1)
+  const frame = hostFrame('280px minmax(0px, 1fr) minmax(0px, 0px)')
+  const sidebar = hostSidebar('280px')
+  const handle = hostHandle('280px')
+  const rule = installed()
+  await settle()
+  expect(columnsOf(frame)).toBe('264px minmax(0px, 1fr) minmax(0px, 0px)')
+  expect(sidebar.style.width).toBe('264px')
+  expect(handle.style.left).toBe('264px')
+  drawnAt(1.25)
+  rule.settle()
+  await settle()
+  // 264/1.25, rounded to two decimals by the carry.
+  expect(columnsOf(frame)).toBe('211.2px minmax(0px, 1fr) minmax(0px, 0px)')
+  expect(sidebar.style.width).toBe('211.2px')
+  expect(handle.style.left).toBe('211.2px')
+})
+
+test('a sidebar dragged away from the default keeps its width', async () => {
+  drawnAt(1)
+  const sidebar = hostSidebar('320px')
+  const handle = hostHandle('320px')
+  installed()
+  await settle()
+  expect(sidebar.style.width).toBe('320px')
+  expect(handle.style.left).toBe('320px')
+  await settle()
+  expect(sidebar.style.width).toBe('320px')
 })
 
 test('the host dragging the sidebar moves its box and its handle with the column', async () => {
@@ -206,14 +237,14 @@ test('a sidebar collapsed and opened again at the same width is carried again', 
   const sidebar = hostSidebar('280px')
   installed()
   await settle()
-  expect(sidebar.style.width).toBe('224px')
+  expect(sidebar.style.width).toBe('211.2px')
   // The collapsed rail drops the width; reopening writes the host's own number
   // again, which is the one the record held before the collapse.
   sidebar.style.removeProperty('width')
   await settle()
   sidebar.style.width = '280px'
   await settle()
-  expect(sidebar.style.width).toBe('224px')
+  expect(sidebar.style.width).toBe('211.2px')
 })
 
 test('the teardown hands the sidebar and its handle their own numbers back', async () => {
@@ -222,11 +253,11 @@ test('the teardown hands the sidebar and its handle their own numbers back', asy
   const handle = hostHandle('280px')
   const rule = installFrameColumns({ scale: drawnScale })
   await settle()
-  expect(sidebar.style.width).toBe('224px')
+  expect(sidebar.style.width).toBe('211.2px')
   rule.stop()
   await settle()
-  expect(sidebar.style.width).toBe('280px')
-  expect(handle.style.left).toBe('280px')
+  expect(sidebar.style.width).toBe('264px')
+  expect(handle.style.left).toBe('264px')
   expect(sidebar.hasAttribute(CARRY_ATTRIBUTE)).toBe(false)
   expect(handle.hasAttribute(CARRY_ATTRIBUTE)).toBe(false)
 })

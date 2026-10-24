@@ -1,0 +1,8 @@
+{
+  "group": "improvements",
+  "order": 2,
+  "at": "2026-10-24",
+  "external": false,
+  "zh": "侧边栏默认宽度改为官方允许的最小值：初次展开与收起后重新展开都以最小宽度打开，拖动过的宽度保持不变。",
+  "en": "The sidebar opens at the narrowest width the host allows: the first expansion and every reopen use it, and a width the reader dragged to stands."
+}
