@@ -172,6 +172,16 @@ export const HOME_LAYOUT_CLASSIC = 'classic'
 export const HOME_LAYOUT_STUDIO = 'studio'
 export const HOME_LAYOUTS = [HOME_LAYOUT_CLASSIC, HOME_LAYOUT_STUDIO] as const
 
+/**
+ * The conversation area's background: none, the DeepSeek site's static wash
+ * (gradients and soft light, drawn in CSS), or the same wash with a slow
+ * canvas drift under it.
+ */
+export const DEEPSEEK_BACKGROUND_OFF = 'off'
+export const DEEPSEEK_BACKGROUND_STATIC = 'static'
+export const DEEPSEEK_BACKGROUND_DYNAMIC = 'dynamic'
+export const DEEPSEEK_BACKGROUNDS = [DEEPSEEK_BACKGROUND_OFF, DEEPSEEK_BACKGROUND_STATIC, DEEPSEEK_BACKGROUND_DYNAMIC] as const
+
 /** Composer surfaces the restyle may cover, in settings order. */
 export const COMPOSER_SCOPE_OFF = 'off'
 export const COMPOSER_SCOPE_HERO = 'hero'
@@ -278,6 +288,7 @@ export const PREFS = {
   banLocale: { type: 'choice', values: BAN_LOCALES, default: BAN_LOCALE_EN },
   homeLayout: { type: 'choice', values: HOME_LAYOUTS, default: HOME_LAYOUT_STUDIO },
   homeRipple: { type: 'boolean', default: false },
+  deepseekBackground: { type: 'choice', values: DEEPSEEK_BACKGROUNDS, default: DEEPSEEK_BACKGROUND_STATIC },
   palette: { type: 'choice', values: PALETTES, default: PALETTE_CLAUDE },
   typeface: { type: 'choice', values: TYPEFACES, default: TYPEFACE_CLAUDE },
   conversationWidth: { type: 'choice', values: CONVERSATION_WIDTHS, default: CONVERSATION_WIDTH_FULL },

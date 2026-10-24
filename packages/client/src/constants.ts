@@ -111,6 +111,13 @@ export const PALETTE_ATTR = 'data-dsh-claude-palette'
  */
 export const PALETTE_CARD_ATTR = 'data-dsh-claude-palette-card'
 export const TYPEFACE_ATTR = 'data-dsh-claude-typeface'
+/**
+ * The conversation area's background mode (`features/deepseek-background/`):
+ * `static` or `dynamic` while one stands, gone while the choice is off. The
+ * feature's stylesheet reads the attribute on the layer's own column, not the
+ * body — the mirror carries it so a pass sees the mode the reader picked.
+ */
+export const DEEPSEEK_BACKGROUND_ATTR = 'data-dsh-claude-deepseek-background'
 export const MASCOT_ATTR = 'data-dsh-claude-mascot'
 export const SEARCH_STYLE_ATTR = 'data-dsh-claude-search-style'
 export const SIDEBAR_LAYOUT_ATTR = 'data-dsh-claude-sidebar-layout'

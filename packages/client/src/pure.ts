@@ -45,6 +45,8 @@ export { default as HOME_OVERVIEW_SHEET } from './features/home/home-overview.cs
 export { HOME_REFRESH_FLOOR_MS, HOME_REFRESH_MS, homeRefreshDue } from './features/home/usage-refresh'
 export type { HomeRefreshReason, HomeUsageAge } from './features/home/usage-refresh'
 export { createWaveField } from './features/home-ripple/ripple-wave'
+export { installDeepseekBackground } from './features/deepseek-background/deepseek-background'
+export { shouldAnimateDeepseekBackground, DEEPSEEK_DRIFT_MS } from './features/deepseek-background/motion-state'
 export { mascotLevel } from './features/mascot/mascot-signals'
 export type { MascotLevel, MascotReading } from './features/mascot/mascot-signals'
 export { EXTRA_MIN_MS, EXTRA_SPAN_MS, MIN_SHOW_MS, MOMENTS, REACTION_PRIORITY, SLEEP_AFTER_MS, decideStage, finishStage, freshStage, nextDecisionAt, switchSettles, takeMoment } from './features/mascot/mascot-stage'

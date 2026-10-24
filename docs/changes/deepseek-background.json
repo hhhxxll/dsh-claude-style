@@ -1,0 +1,8 @@
+{
+  "group": "new",
+  "order": 3,
+  "at": "2026-10-24",
+  "external": false,
+  "zh": "新增 DeepSeek 官网风格的对话区背景：默认静态的淡蓝渐变与柔光，可选缓慢流动的动态模式，随时关闭。",
+  "en": "Add a DeepSeek-site background for the conversation area: a static blue wash and glow by default, an optional slow dynamic drift, and off whenever it is not wanted."
+}

@@ -1,0 +1,7 @@
+{
+  "deepseekBackgroundTitle": { "zh": "DeepSeek 背景", "en": "DeepSeek background" },
+  "deepseekBackgroundDesc": { "zh": "对话区铺上 DeepSeek 官网的淡蓝底色；动态模式让柔光缓慢流动。", "en": "The conversation area wears the DeepSeek site's soft blue wash; the dynamic mode lets its light drift slowly." },
+  "deepseekBackgroundOff": { "zh": "关闭", "en": "Off" },
+  "deepseekBackgroundStatic": { "zh": "静态", "en": "Static" },
+  "deepseekBackgroundDynamic": { "zh": "动态", "en": "Dynamic" }
+}

@@ -1,0 +1,45 @@
+/* ---------- The conversation area's DeepSeek wash (features/deepseek-background) ---------- */
+/* One decoration layer inside the conversation column, above its background and
+   under its content; the column takes a stacking context of its own and the
+   layer the lowest local order (features/home-ripple's placement). It never
+   takes a press. The wash is the DeepSeek site's own: a light blue at the top
+   fading down into the canvas, a soft glow over it, no grid, no pointer
+   effects. Dark stands on the same shapes at a night brightness. */
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="center-column"]:has(> .dsh-claude-deepseek-layer) {
+  isolation: isolate;
+}
+
+body[data-dsh-claude-style] .dsh-claude-deepseek-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 55% at 50% -8%, var(--dsh-claude-deepseek-glow, rgba(120, 160, 220, 0.16)), transparent 70%),
+    radial-gradient(90% 40% at 18% -6%, var(--dsh-claude-deepseek-glow2, rgba(77, 107, 254, 0.07)), transparent 65%),
+    linear-gradient(180deg, var(--dsh-claude-deepseek-top, #9cc1e7) 0%, rgba(154, 193, 231, 0.35) 14%, rgba(250, 250, 250, 0) 46%);
+}
+
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-deepseek-layer {
+  --dsh-claude-deepseek-top: #1a2233;
+  --dsh-claude-deepseek-glow: rgba(90, 120, 190, 0.10);
+  --dsh-claude-deepseek-glow2: rgba(77, 107, 254, 0.06);
+  background:
+    radial-gradient(120% 55% at 50% -8%, var(--dsh-claude-deepseek-glow), transparent 70%),
+    radial-gradient(90% 40% at 18% -6%, var(--dsh-claude-deepseek-glow2), transparent 65%),
+    linear-gradient(180deg, var(--dsh-claude-deepseek-top) 0%, rgba(26, 34, 51, 0.4) 16%, rgba(19, 22, 29, 0) 48%);
+}
+
+/* The drift: the canvas the dynamic mode draws into, cleared and repainted on
+   its own slow timer. It sits over the gradients and under the content, and a
+   page that holds animation still simply never starts one — the wash above
+   keeps standing. */
+body[data-dsh-claude-style] .dsh-claude-deepseek-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
