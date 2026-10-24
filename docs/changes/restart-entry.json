@@ -1,0 +1,8 @@
+{
+  "group": "new",
+  "order": 0,
+  "at": "2026-10-24",
+  "external": false,
+  "zh": "新增账号菜单里的重启入口：桌面版一键关闭并重新打开整个应用，页面在新进程就绪后自动刷新；Web 版不显示。",
+  "en": "Add the restart entry in the account menu: the desktop app closes and reopens in one press and the page reloads once the new process serves it; the web build shows no entry."
+}

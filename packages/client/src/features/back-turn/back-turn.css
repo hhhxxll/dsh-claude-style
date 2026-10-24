@@ -1,0 +1,5 @@
+/* The header utilities' back control: the shared icon-button shape
+   (shared/icon-button.css); only the hidden state is this feature's own. */
+body[data-dsh-claude-style] [data-dsh-claude-back-turn] {
+  display: inline-flex;
+}

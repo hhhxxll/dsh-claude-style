@@ -1,0 +1,16 @@
+{
+  "restartRow": { "zh": "重启 DeepSeek Harness", "en": "Restart DeepSeek Harness" },
+  "restartTitle": { "zh": "重启按钮", "en": "Restart button" },
+  "restartDesc": { "zh": "账号菜单里的重启入口；桌面版关闭并重新打开整个应用", "en": "The restart entry in the account menu; the desktop app closes and reopens entirely" },
+  "confirmTitle": { "zh": "重启 DeepSeek Harness", "en": "Restart DeepSeek Harness" },
+  "confirmBody": { "zh": "桌面版会关闭并重新打开整个应用，正在进行的任务会中断（会话历史已保存）。", "en": "The desktop app closes and reopens entirely; running tasks are interrupted (session history is saved)." },
+  "cancel": { "zh": "取消", "en": "Cancel" },
+  "confirm": { "zh": "重启", "en": "Restart" },
+  "restarting": { "zh": "正在重启服务…", "en": "Restarting the service…" },
+  "restartingDesc": { "zh": "正在重新拉起后台进程，请稍候…", "en": "Bringing the background process back up, please wait…" },
+  "waited": { "zh": "已等待 {seconds} 秒", "en": "Waited {seconds} s" },
+  "timeout": { "zh": "重启超时：请查看 .debug/restart/ 下的重启日志，或手动重新打开", "en": "Restart timed out: check the restart log under .debug/restart/, or reopen the app manually" },
+  "failed": { "zh": "重启请求失败", "en": "Restart request failed" },
+  "reload": { "zh": "刷新页面", "en": "Reload page" },
+  "close": { "zh": "关闭", "en": "Close" }
+}

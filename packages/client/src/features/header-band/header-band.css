@@ -11,23 +11,13 @@
    transformed, clipped subtree, so this button stands in the header instead and
    presses that one (header-band.ts). Its `display` is the whole of its
    visibility and is written on the node by the pass — hidden here, shown while
-   the panel is open. */
+   the panel is open. The button's shared shape is the icon-button class
+   (shared/icon-button.css); these rules carry only what is this control's own:
+   the hidden base, the caption row's drag exemption, and the focus ring. */
 body[data-dsh-claude-style] .dsh-claude-rightbar-close {
   display: none;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--dsw-alias-label-secondary, #70686a);
-  cursor: pointer;
   -webkit-app-region: no-drag;
 }
-body[data-dsh-claude-style] .dsh-claude-rightbar-close:hover,
 body[data-dsh-claude-style] .dsh-claude-rightbar-close:focus-visible {
   color: var(--dsw-alias-label-primary, #161616);
   background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08));
