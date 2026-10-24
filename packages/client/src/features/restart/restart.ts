@@ -181,7 +181,6 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       type: 'button',
       'aria-label': copy('restartRow'),
       'data-dsh-claude-restart': '',
-      className: 'dsh-claude-icon-button',
       onClick: () => {
         void (async () => {
           // The boot the restart must replace, read at the moment of asking.

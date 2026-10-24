@@ -1,7 +1,0 @@
-{
-  "backTurnRow": { "zh": "回到上一个回答", "en": "Back to previous answer" },
-  "backTurnTitle": { "zh": "回退按钮", "en": "Back button" },
-  "backTurnDesc": { "zh": "会话标题栏一键回到上一个回答；连点继续往前，快捷键 Alt+↑ 相同", "en": "One press in the conversation header returns to the previous answer; repeated presses keep going back, the same as Alt+↑" },
-  "backTurnHint": { "zh": "回到上一个回答 (Alt+↑)", "en": "Back to previous answer (Alt+↑)" },
-  "backTurnFirst": { "zh": "已经是第一个回答了", "en": "Already at the first answer" }
-}

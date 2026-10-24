@@ -1,8 +1,0 @@
-{
-  "group": "new",
-  "order": 1,
-  "at": "2026-10-24",
-  "external": false,
-  "zh": "新增会话标题栏的回退按钮：一键回到上一个回答，连点继续往前，跳转走宿主自己的回合轨，快捷键 Alt+↑ 保持不变。",
-  "en": "Add the conversation header's back button: one press returns to the previous answer, repeated presses keep going back, the jump rides the host's own turn rail, and the Alt+↑ keys keep their place."
-}

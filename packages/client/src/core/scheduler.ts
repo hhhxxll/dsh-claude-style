@@ -39,7 +39,6 @@ export interface Handles {
   search: FeatureHandle
   sidebarPeek: FeatureHandle
   turnNav: FeatureHandle
-  backTurn: FeatureHandle
   restart: FeatureHandle
   chatFollow: FeatureHandle
   chatFold: ChatFoldHandle

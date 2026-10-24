@@ -1,7 +1,29 @@
 /* The footer entry as it stands on its own (a host page without the footer
-   takeover, or with it switched off): the shared icon-button shape
-   (shared/icon-button.css). The takeover path needs nothing here — the mirror
-   draws the entry as one row of the account popover. */
+   takeover, or with it switched off): a round icon button of the sidebar's own
+   proportion. The takeover path needs nothing here — the mirror draws the
+   entry as one row of the account popover, in the host menu's own shape. */
 body[data-dsh-claude-style] [data-dsh-claude-restart] {
   display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 100%;
+  background: transparent;
+  -webkit-app-region: no-drag;
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-restart] svg {
+  color: var(--dsw-alias-label-secondary, #70686a);
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-restart]:hover {
+  background: var(--dsh-claude-hover-bg);
+  cursor: pointer;
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-restart]:hover svg {
+  color: var(--dsw-alias-label-primary, inherit);
 }

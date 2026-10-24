@@ -305,10 +305,8 @@ export const PREFS = {
   turnNav: { type: 'boolean', default: true },
   viewTabs: { type: 'boolean', default: true },
   headerBand: { type: 'boolean', default: true },
-  /** The account popover's restart row; the desktop shell only, the browser half checks before registering. */
+  /** The account popover's restart row; the desktop shell alone offers it. */
   restartButton: { type: 'boolean', default: true },
-  /** The header's back-to-previous-turn button, driven by the host's turn rail. */
-  backTurnButton: { type: 'boolean', default: true },
   /** It held a choice before it became a switch again; every retired choice meant on bar `off`. */
   chatAnimations: { type: 'boolean', default: true, legacy: { [CHAT_ANIMATIONS_OFF]: false, enhanced: true, redraw: true } },
   chatWait: { type: 'boolean', default: true },
