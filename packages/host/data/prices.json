@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-10-24",
-  "capturedAt": "2026-10-24T06:29:06.377Z",
+  "capturedAt": "2026-10-24T08:05:04.745Z",
   "source": {
     "zh": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
     "en": "https://api-docs.deepseek.com/quick_start/pricing/"
@@ -526,7 +526,7 @@
     "deepseek-v4-flash-speed": "0.14 0.028 0.28",
     "deepseek-v4-flash-vision-exp": "0.2156 0.00686 0.6468",
     "deepseek-v4-flash:thinking": "0.14 0.0028 0.28",
-    "deepseek-v4-pro": "1.32 0.13 3.3",
+    "deepseek-v4-pro": "1.32 0.13 3.2",
     "deepseek-v4-pro-0423": "1.485 0.9 3.63",
     "deepseek-v4-pro-0813": "1.32 0.044 3.96",
     "deepseek-v4-pro-0813:thinking": "0.132 0.0042 0.396",
@@ -536,7 +536,7 @@
     "deepseek-v4-pro:0813": "0.66 0.022 1.98",
     "deepseek-v4-pro:thinking": "0.7 0.07 1.4",
     "deepseek-v4-pro@eu": "1.75 0.44 3.5",
-    "deepseek-v4.1-flash": "0.243123 0.006 1.0796",
+    "deepseek-v4.1-flash": "0.23592 0.006 1",
     "deepseek-v4.1-flash-1017": "0.3 0.006 1.2",
     "deepseek-v4.1-flash-1017-fast": "0.6 0.014 2.4",
     "deepseek-v4.1-flash-1017:peft:262144": "0.6 0.12 3.6",
@@ -926,7 +926,7 @@
     "glm-5v-turbo": "1.2 0.24 4",
     "glm-5v-turbo:thinking": "1.2 0.24 4",
     "glm-fast-latest": "2.1 0.39 6.6",
-    "glm-flash-latest": "0.088801 0.024099 0.32965",
+    "glm-flash-latest": "0.08375 0.02375 0.32125",
     "glm-latest": "0.6 0.1733 1.4",
     "glm-z1-9b-0414": "0.2 0.1 0.2",
     "glm-z1-airx": "0.7 0.35 0.7",

@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-23",
-  "group": "improvements",
-  "order": 1,
-  "external": false,
-  "zh": "改善紧凑底栏：工具栏上只显示费用、Token 总量与缓存命中百分比，费用取四位有效数字与四位小数中较短的写法，Token 按 123tok、1.1ktok、15.1Mtok、1.2Btok 显示，缓存命中不再带「缓存命中」四字。",
-  "en": "Improve the compact footer: the toolbar shows the cost, one session token total and the cache-hit percentage — the cost in the shorter of four significant digits and four decimals, the total as 123tok, 1.1ktok, 15.1Mtok or 1.2Btok, and the cache hit without its label."
-}

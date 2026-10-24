@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-23",
-  "group": "improvements",
-  "order": 2,
-  "external": false,
-  "zh": "改善紧凑底栏中上下文环的位置：它现在站在「收进上下文」所在的位置，即输入行内模型选择器之后，不再随数字浮到工具栏上。",
-  "en": "Improve where the compact footer draws the context ring: it stands where the Inside the context popover position draws it, after the model picker inside the composer row, instead of riding the toolbar with the figures."
-}

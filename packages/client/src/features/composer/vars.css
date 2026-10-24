@@ -7,6 +7,13 @@
 
 body[data-dsh-claude-style] {
   --dsh-composer-fade-h: 40px;
+  /* One box and one ink strength for the controls on the composer's bottom
+     line: their words share a control height and tail, and resolve to full
+     strength under the pointer instead of each taking a colour of its own. */
+  --dsh-claude-footer-control-height: 28px;
+  --dsh-claude-footer-control-pad: 2px;
+  --dsh-claude-footer-ink-opacity: 0.72;
+  --dsh-claude-footer-ink-hover-opacity: 1;
   /* The colour band a reading takes (features/context-stats/stats-ramp.ts): the
      band is semantic, so its values are the skin's own and not the host's
      tokens. Each tone keeps its hue and lightness at about three fifths of its

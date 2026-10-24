@@ -378,14 +378,14 @@ body[data-dsh-claude-style] .dsh-claude-effort-btn {
   /* The level keeps its words when the row is tight: the model's name is the
      one that shortens, since a level cut to a letter names nothing. */
   flex: none;
-  transition: color var(--dsh-claude-timing-feedback);
+  transition: opacity var(--dsh-claude-timing-feedback);
 }
-/* The level's own 2px on either side are the chip's tail, carried by the words
-   themselves: the seat box has no right padding, so the meter's reserved gap
-   stays the only space after them. */
+/* The level's words sit inside the seat box's own 2px tail, so both texts in
+   that box share one inner edge and the meter's reserved gap stays the only
+   space after them. */
 body[data-dsh-claude-style] .dsh-claude-effort-btn-label {
   display: block;
-  padding: 0 2px;
+  padding: 0;
 }
 /* The rung in force colours the label while the Composer tab's effort-accent
    row is on. The override writes the rung's place on a ramp (0 to 100) between

@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-23",
-  "group": "improvements",
-  "order": 0,
-  "external": false,
-  "zh": "改善紧凑底栏的间距：各数字之间改为与独立成行时一致，底栏整体收窄。",
-  "en": "Improve the compact footer's spacing: its figures stand apart exactly as they do on their own line, narrowing the footer."
-}

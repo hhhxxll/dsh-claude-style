@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-23",
-  "group": "fixes",
-  "order": 0,
-  "external": false,
-  "zh": "修复主窗口设置中输入区的上下文外显样式与数字夹在模型选择器各项之间的问题：它们现在与统计信息位置、底栏统计位置和计费币种排成一块。",
-  "en": "Fix Context display and Context display number sitting among the model picker's rows in Main window settings: they now stand in one block with Conversation statistics position, Footer alignment and Billing currency."
-}

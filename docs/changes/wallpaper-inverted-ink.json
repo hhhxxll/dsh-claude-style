@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-23",
-  "group": "fixes",
-  "order": 0,
-  "external": false,
-  "zh": "修复启用壁纸引擎后，用量面板热力图的日期提示、会话标题的提示以及品牌图片的清除按钮在透明画布上丢掉文字与记号的问题：这些反色底上的字与记号改用宿主自己的表面色。",
-  "en": "Fix the usage panel's day tip, the session title's tip and the brand picture's remove mark losing their ink over a wallpaper's cleared canvas: the words and marks on those inverted plates now take the host's own raised-surface tone."
-}

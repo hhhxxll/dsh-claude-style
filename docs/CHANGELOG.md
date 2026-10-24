@@ -2,6 +2,52 @@
 
 All notable changes to `dsh-claude-style` are documented here, newest first.
 
+## [0.19.1] - 2026-10-24
+
+[中文](#cn-0.19.1) | [English](#en-0.19.1)
+
+<h3 id="cn-0.19.1">体验优化</h3>
+
+- 合并重复的颜色标记：抬升面、活跃行墨色、会话标题墨色与水波墨色改用宿主的对应颜色，二级表头与浅色第二层面板取与悬停底板和画布相同的值，首页的数据蓝收敛为一个标记，各处属性回退的墨色与画布字面值按色阶统一。
+- 改善紧凑底栏的间距：各数字之间改为与独立成行时一致，底栏整体收窄。
+- 改善紧凑底栏在宽度充足时的信息展开：先由折叠总数展开为精确总数，再展开为输入与输出的 token 数；空间不足时才退为独立成行。
+- 改善对话输入区底部控件的对齐与文字层次：权限、统计、模型与推理强度共用 28px 控制盒和 2px 内边距，文字统一以半透明主文字色呈现，悬停时恢复到完全不透明。
+- 改善模型选择器里 Kimi K3.1 Pro 的描述：它读自己这条产品线的官方定位，不再沿用 K3 那一句。
+- 改善紧凑底栏：工具栏上只显示费用、Token 总量与缓存命中百分比，费用取四位有效数字与四位小数中较短的写法，Token 按 123tok、1.1ktok、15.1Mtok、1.2Btok 显示，缓存命中不再带「缓存命中」四字。
+- 改善紧凑底栏中上下文环的位置：它现在站在「收进上下文」所在的位置，即输入行内模型选择器之后，不再随数字浮到工具栏上。
+
+### 问题修复
+
+- 修复主窗口设置中输入区的上下文外显样式与数字夹在模型选择器各项之间的问题：它们现在与统计信息位置、底栏统计位置和计费币种排成一块。
+- 修复页面缩放为 1.25 或 1.5 倍时整页可以滚过内容末尾、露出一段空白的问题：缩放后的页面按窗口自身的尺寸绘制，窗口的边缘就是页面的边缘。
+- 修复 Kimi Code 的 K3、K3.1 Pro 与 K3.1 Pro Highspeed 会话不显示费用的问题：价格快照补上 K3.1 的两条目录价，模型标识解析覆盖 Kimi Code 的写法，人民币价目按厂商公布的价格作答。
+- 修复启用壁纸引擎后，用量面板热力图的日期提示、会话标题的提示以及品牌图片的清除按钮在透明画布上丢掉文字与记号的问题：这些反色底上的字与记号改用宿主自己的表面色。
+
+### 其他变更
+
+- 改善 `npm run verify` 的失败判定：超时、进程被系统终止、浏览器无法启动和测试套件未装载等基础设施问题记为「未判定」且不写入判定缓存，只有断言失败才记为失败并缓存；同一轮运行的冒烟与端到端通道按机器核心数分配固定的并发页数。
+
+<h3 id="en-0.19.1">Improvements</h3>
+
+- Consolidate the duplicated colour markers: the raised surface, the active row's ink, the session title's ink and the ripple's ink now take the host's own colours, the table head and the light second-level panel use the hover plate's and the canvas' values, the home page's data blue becomes one marker, and the property fallbacks spell one literal per ink and canvas step.
+- Improve the compact footer's spacing: its figures stand apart exactly as they do on their own line, narrowing the footer.
+- Improve how the compact footer expands when the toolbar has room: the folded token total becomes the exact count, then the input and output token figures; the line moves below only when even the folded form does not fit.
+- Improve the alignment and text hierarchy of the controls under the conversation composer: permission, statistics, model and effort now share a 28px control box and a 2px inset, their words use one translucent primary ink, and the ink returns to full opacity under the pointer.
+- Improve the model picker's description for Kimi K3.1 Pro: the row now reads its own model line's positioning instead of K3's.
+- Improve the compact footer: the toolbar shows the cost, one session token total and the cache-hit percentage — the cost in the shorter of four significant digits and four decimals, the total as 123tok, 1.1ktok, 15.1Mtok or 1.2Btok, and the cache hit without its label.
+- Improve where the compact footer draws the context ring: it stands where the Inside the context popover position draws it, after the model picker inside the composer row, instead of riding the toolbar with the figures.
+
+### Bug Fixes
+
+- Fix Context display and Context display number sitting among the model picker's rows in Main window settings: they now stand in one block with Conversation statistics position, Footer alignment and Billing currency.
+- Fix the page scrolling past the end of its content into an empty band at a page zoom of 1.25 or 1.5: the scaled page now draws at the window's own size, so the window's edge is the page's edge.
+- Fix K3, K3.1 Pro and K3.1 Pro Highspeed sessions on Kimi Code showing no cost: the price snapshot now carries K3.1's two catalogue lines, model-id resolution covers the Kimi Code spellings, and the CNY figures answer as the vendor publishes them.
+- Fix the usage panel's day tip, the session title's tip and the brand picture's remove mark losing their ink over a wallpaper's cleared canvas: the words and marks on those inverted plates now take the host's own raised-surface tone.
+
+### Chores
+
+- Improve how `npm run verify` judges a failure: a timeout, a process the system ended, a browser that would not start and a spec suite that did not load now answer unjudged without filing a verdict, only a failed assertion fails and is cached, and the smoke and end-to-end lanes of one run share a fixed page budget from the machine's core count.
+
 ## [0.19.0] - 2026-10-23
 
 [中文](#cn-0.19.0) | [English](#en-0.19.0)

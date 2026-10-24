@@ -30,12 +30,12 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 28px;
+  height: var(--dsh-claude-footer-control-height);
   min-width: 0;
-  /* The left end starts the row's rhythm; the right end lets the level's own
-     padding close the chip, so the meter's reserved gap (the cluster's margin,
-     features/composer/composer.ts) is the only space between the two. */
-  padding: 0 0 0 8px;
+  /* Both ends carry the same tail as the permission trigger, so the two texts
+     stand inside one control box while the meter's reserved gap (the cluster's
+     margin, features/composer/composer.ts) remains the space after it. */
+  padding: 0 var(--dsh-claude-footer-control-pad);
   border-radius: 7px;
   box-sizing: border-box;
   cursor: pointer;
@@ -54,7 +54,7 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model
 body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-effort-btn {
   display: inline-flex;
   align-items: center;
-  height: 28px;
+  height: var(--dsh-claude-footer-control-height);
   min-width: 0;
   padding: 0;
   border: none !important;
@@ -68,13 +68,8 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model
 body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-btn > .dsh-claude-model-tag {
   margin-left: 6px;
 }
-/* The text under the pointer takes the stronger ink; the plate is the box's. A
-   level that wears the accent ramp keeps it — the ramp is the level's own colour,
-   and the plate is what answers the pointer there. */
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-btn:hover,
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-effort-btn:not([data-tint]):hover {
-  color: var(--dsw-alias-label-primary);
-}
+/* The plate answers the pointer; the words keep one tone and recede through the
+   shared ink strength below. A level that wears the accent ramp keeps its hue. */
 body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-btn-label.dsh-claude-model-btn-loading {
   color: var(--dsw-alias-label-caption, #b2acad) !important;
 }
@@ -138,7 +133,25 @@ body[data-dsh-claude-style] [data-composer-card] [data-dsh-claude-part~="row"] .
   font-weight: 500;
   line-height: 20px;
   letter-spacing: normal;
-  color: var(--dsw-alias-label-secondary);
+  color: var(--dsw-alias-label-primary);
+}
+
+/* One ink strength for the bottom line's words. The neutral words share a
+   colour, and the figures keep their semantic hues under the same strength; the
+   pointer resolves it to full strength instead of each label taking a colour of
+   its own. */
+body[data-dsh-claude-style] .dsh-claude-inline-stats,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-btn,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-effort-btn,
+body[data-dsh-claude-style] [data-dsh-claude-context-meter] button > span {
+  opacity: var(--dsh-claude-footer-ink-opacity);
+  transition: opacity var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] .dsh-claude-inline-stats:hover,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat:hover > .dsh-claude-model-btn,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat:hover > .dsh-claude-effort-btn,
+body[data-dsh-claude-style] [data-dsh-claude-context-meter]:hover button > span {
+  opacity: var(--dsh-claude-footer-ink-hover-opacity);
 }
 
 /* The host renders two separate stat dialogs; hide them — their numbers are
@@ -248,8 +261,9 @@ body[data-dsh-claude-style] .dsh-claude-inline-stats {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  height: var(--dsh-claude-footer-control-height);
   overflow: clip;
-  color: var(--dsw-alias-label-secondary);
+  color: var(--dsw-alias-label-primary);
   font-family: var(--dsw-font-family);
   font-size: 13px;
   font-weight: 500;
@@ -264,6 +278,18 @@ body[data-dsh-claude-style] .dsh-claude-inline-figure {
   align-items: center;
   gap: 3px;
   flex: none;
+}
+/* The widest compact footer swaps the total for the two directions in the
+   total's old place: the cost keeps the lead and the cache closes the line. */
+body[data-dsh-claude-style] .dsh-claude-inline-stats[data-dsh-claude-footer-detail="directions"] > .dsh-claude-inline-seg:nth-child(3),
+body[data-dsh-claude-style] .dsh-claude-inline-stats[data-dsh-claude-footer-detail="directions"] > .dsh-claude-inline-seg:nth-child(4) {
+  order: 1;
+}
+body[data-dsh-claude-style] .dsh-claude-inline-stats[data-dsh-claude-footer-detail="directions"] > .dsh-claude-inline-seg:nth-child(4) {
+  order: 2;
+}
+body[data-dsh-claude-style] .dsh-claude-inline-stats[data-dsh-claude-footer-detail="directions"] > .dsh-claude-inline-seg:nth-child(7) {
+  order: 3;
 }
 /* A segment the session has no figure for yet, or one the ladder has given up:
    hidden rather than drawn empty. Named with the line in front of it so it

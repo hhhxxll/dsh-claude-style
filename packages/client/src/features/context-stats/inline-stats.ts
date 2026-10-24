@@ -1,6 +1,6 @@
 import { QUIET_ATTR, STATS_POSITION_FOOTER } from '../../constants'
 import { readPrefs } from '../../core/prefs'
-import { buildElement, writeTextInPlace } from '@dsh-claude-style/engine/dom'
+import { buildElement, setAttributeIfChanged, writeTextInPlace } from '@dsh-claude-style/engine/dom'
 import { findComposerCard, findComposerStats } from '@dsh-claude-style/engine/host'
 import { requestFrame } from '@dsh-claude-style/engine/frame'
 import { formatCompactTokens } from '../../shared/format'
@@ -42,6 +42,8 @@ import type { StatsReading } from './stats-count'
 export const INLINE_STATS_ATTR = 'data-dsh-claude-inline-stats'
 /** On the line's measuring twin, which a fit lays out of flow for one reading. */
 export const INLINE_PROBE_ATTR = 'data-dsh-claude-inline-probe'
+/** On the compact footer's line: which detail step it is showing. */
+const FOOTER_DETAIL_ATTR = 'data-dsh-claude-footer-detail'
 /**
  * On the meter while the line has given up its own reading: the ring stands,
  * the number beside it goes (the ladder's third step).
@@ -146,6 +148,12 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
   let probe: Line | null = null
   /** The ladder step in force, and what the last fit measured. */
   let level = 0
+  /**
+   * The compact footer's detail: a folded total (0), the exact total (1), or
+   * the two directions in its place (2). The widest step that fits the toolbar
+   * stands.
+   */
+  let detail = 0
   let fitted = false
   /** The card width the last fit answered for; -1 asks for one. */
   let fittedWidth = -1
@@ -291,6 +299,7 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
     const hostMeter = meter()
     if (hostMeter !== null) hostMeter.removeAttribute(METER_TIGHT_ATTR)
     level = 0
+    detail = 0
     fitted = false
     fittedWidth = -1
     fittedShape = -1
@@ -301,7 +310,7 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
   }
 
   /** Every figure that has data, in the words the host's templates give it, on ladder step `at`. */
-  function writeLine(shown: Line, at: number, chat: HostText, stats: HostSessionStatsProjection | null, usage: HostTokenUsageProjection | null, cost: number | null, billing: boolean, costPending: boolean, currency: Currency | null) {
+  function writeLine(shown: Line, at: number, chat: HostText, stats: HostSessionStatsProjection | null, usage: HostTokenUsageProjection | null, cost: number | null, billing: boolean, costPending: boolean, currency: Currency | null, footerAt = detail) {
     const counts = stats === null ? null : templateParts(chat, 'stats.counts', ['turns', 'steps'])
     const speedParts = templateParts(chat, 'message.tokensPerSecond', ['tps'])
     const tokenParts = templateParts(chat, 'message.turnUsage.count', ['count'])
@@ -323,12 +332,18 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
     if (!hasCounts && !hasSpeed && !hasTokens) return
 
     const footerMode = readPrefs().statsPosition === STATS_POSITION_FOOTER
+    if (footerMode) {
+      setAttributeIfChanged(shown.root, FOOTER_DETAIL_ATTR, footerAt === 0 ? 'compact' : footerAt === 1 ? 'exact' : 'directions')
+    } else if (shown.root.hasAttribute(FOOTER_DETAIL_ATTR)) {
+      shown.root.removeAttribute(FOOTER_DETAIL_ATTR)
+    }
+    const directions = footerMode && footerAt >= 2
     show(shown.counts, !footerMode && hasCounts && at < 2)
     show(shown.speed, !footerMode && hasSpeed)
     // The prompt tokens ride where the speed is; without a speed the room the
     // speed would have taken is theirs.
-    show(shown.input, !footerMode && hasInput && !merged)
-    show(shown.output, !footerMode && hasOutput && !merged)
+    show(shown.input, footerMode ? directions && hasInput : hasInput && !merged)
+    show(shown.output, footerMode ? directions && hasOutput : hasOutput && !merged)
     // The cost stands beside the written-back figure until the ladder needs
     // its room for the total. It stands whenever the line has tokens and the
     // reader keeps billing on, with a placeholder only while the figure is
@@ -336,9 +351,9 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
     // not fold and unfold around it. A route the price table cannot price has
     // nothing to wait for, and the segment goes.
     show(shown.cost, billing && hasTokens && (cost !== null || costPending) && at < 3)
-    // The compact footer carries one token total where the line of their own
-    // folds the two directions into it at the ladder's merged step.
-    show(shown.total, hasTokens && (footerMode || merged))
+    // The compact footer carries one token total while its room is narrow, and
+    // gives that segment up for the two directions on the widest footer step.
+    show(shown.total, footerMode ? footerAt < 2 && hasTokens : hasTokens && merged)
     show(shown.cache, hasCache)
     // The compact footer's cache figure carries its own percent sign alone: the
     // words before it would outweigh the figures beside them.
@@ -364,7 +379,11 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
       writeText(shown.cell.inputTail, tokenParts[1] ?? '')
       writeTextInPlace(shown.cell.output, readTokens(usage.outputTokens))
       writeText(shown.cell.outputTail, tokenParts[1] ?? '')
-      writeTextInPlace(shown.cell.total, footerMode ? `${formatCompactTokens(Math.round(total))}tok` : readTokens(total))
+      writeTextInPlace(shown.cell.total, footerMode
+        ? footerAt === 0
+          ? `${formatCompactTokens(Math.round(total))}tok`
+          : `${sessionStatsGrouped(Math.round(total), chat)}${tokenParts[1] ?? ' tok'}`
+        : readTokens(total))
       // A figure that is still coming keeps the segment's place with the
       // currency's own dash; the amount replaces it in the same width. A route
       // the table cannot price has nothing to wait for, so the segment is
@@ -463,6 +482,16 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
     return needed
   }
 
+  /** The width a compact footer detail step takes, read off the same twin. */
+  function probeFooterWidth(shown: Line, footerAt: number, chat: HostText, reading: StatsReading) {
+    const twin = ensureProbe()
+    writeLine(twin, 0, chat, reading.stats, reading.usage, reading.cost, reading.billing, reading.costPending, currency(), footerAt)
+    shown.root.before(twin.root)
+    const needed = inPagePixels(twin.root.getBoundingClientRect().width)
+    twin.root.remove()
+    return needed
+  }
+
   /**
    * Shorten the line until it fits the card it stands under, or, when it
    * already fits, give back every step whose roomier shape fits with
@@ -485,8 +514,18 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
     if (card === null || chat === null || goal === null) return level
     if (footerPosition) {
       setLevel(0)
+      const room = footer.room()
+      detail = 0
+      if (room !== null) {
+        for (const candidate of [2, 1]) {
+          if (probeFooterWidth(shown, candidate, chat, goal) <= room) {
+            detail = candidate
+            break
+          }
+        }
+      }
       const displayed = count.current()
-      writeLine(shown, 0, chat, displayed.stats, displayed.usage, displayed.cost, displayed.billing, displayed.costPending, currency())
+      writeLine(shown, 0, chat, displayed.stats, displayed.usage, displayed.cost, displayed.billing, displayed.costPending, currency(), detail)
       fitted = true
       fittedShape = lineShape(goal, chat)
       footer.sync(shown.root)
@@ -529,6 +568,7 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
       footerPosition = nextFooter
       fitted = false
       level = 0
+      detail = 0
     }
     const chat = chatText()
     if (chat === null) {

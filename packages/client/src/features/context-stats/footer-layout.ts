@@ -41,6 +41,27 @@ export function createFooterLayout() {
     setAttributeIfChanged(next, FOOTER_LINE_ATTR, '')
   }
 
+  /** The row edges the figures may use, in page pixels. */
+  function geometry() {
+    const card = findComposerCard()
+    const row = card?.querySelector<HTMLElement>('[data-dsh-claude-part~="trailing"]')?.parentElement
+    const stack = card?.closest<HTMLElement>(COMPOSER_STACK)
+    if (!row || !stack) return null
+    const tools = row.querySelector<HTMLElement>('[data-dsh-claude-part~="tools"]')
+    const trailing = row.querySelector<HTMLElement>('[data-dsh-claude-part~="trailing"]')
+    const rowBox = inPageBox(row.getBoundingClientRect())
+    const stackBox = inPageBox(stack.getBoundingClientRect())
+    const start = tools ? inPageBox(tools.getBoundingClientRect()).right + 12 : rowBox.left
+    const end = trailing ? inPageBox(trailing.getBoundingClientRect()).left - 12 : rowBox.right
+    return { rowBox, stackBox, start, end }
+  }
+
+  /** The pixels between the toolbar's controls, or null while the row is absent. */
+  function room() {
+    const view = geometry()
+    return view === null ? null : Math.max(0, view.end - view.start)
+  }
+
   function sync(root: HTMLElement) {
     if (readPrefs().statsPosition !== STATS_POSITION_FOOTER || !document.body.hasAttribute(COMPOSER_ATTR)) {
       clear()
@@ -51,16 +72,9 @@ export function createFooterLayout() {
     let measured: { mode: string, left: number, bottom: number, height: number } | null = null
     cancel = requestFrame({
       read() {
-        const card = findComposerCard()
-        const row = card?.querySelector<HTMLElement>('[data-dsh-claude-part~="trailing"]')?.parentElement
-        const stack = card?.closest<HTMLElement>(COMPOSER_STACK)
-        if (!row || !stack || !root.isConnected) return
-        const tools = row.querySelector<HTMLElement>('[data-dsh-claude-part~="tools"]')
-        const trailing = row.querySelector<HTMLElement>('[data-dsh-claude-part~="trailing"]')
-        const rowBox = inPageBox(row.getBoundingClientRect())
-        const stackBox = inPageBox(stack.getBoundingClientRect())
-        const start = tools ? inPageBox(tools.getBoundingClientRect()).right + 12 : rowBox.left
-        const end = trailing ? inPageBox(trailing.getBoundingClientRect()).left - 12 : rowBox.right
+        const view = geometry()
+        if (view === null || !root.isConnected) return
+        const { rowBox, stackBox, start, end } = view
         const width = inPageBox(root.getBoundingClientRect()).width
         const align = readPrefs().statsFooterAlign
         const left = align === 'left' ? start : align === 'right' ? end - width : (start + end - width) / 2
@@ -86,5 +100,5 @@ export function createFooterLayout() {
       },
     })
   }
-  return { sync, clear }
+  return { sync, clear, room }
 }

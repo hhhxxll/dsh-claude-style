@@ -1,8 +1,0 @@
-{
-  "group": "fixes",
-  "order": 0,
-  "at": "2026-10-23",
-  "external": false,
-  "zh": "修复 Kimi Code 的 K3、K3.1 Pro 与 K3.1 Pro Highspeed 会话不显示费用的问题：价格快照补上 K3.1 的两条目录价，模型标识解析覆盖 Kimi Code 的写法，人民币价目按厂商公布的价格作答。",
-  "en": "Fix K3, K3.1 Pro and K3.1 Pro Highspeed sessions on Kimi Code showing no cost: the price snapshot now carries K3.1's two catalogue lines, model-id resolution covers the Kimi Code spellings, and the CNY figures answer as the vendor publishes them."
-}

@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-23",
-  "group": "improvements",
-  "order": 0,
-  "external": false,
-  "zh": "合并重复的颜色标记：抬升面、活跃行墨色、会话标题墨色与水波墨色改用宿主的对应颜色，二级表头与浅色第二层面板取与悬停底板和画布相同的值，首页的数据蓝收敛为一个标记，各处属性回退的墨色与画布字面值按色阶统一。",
-  "en": "Consolidate the duplicated colour markers: the raised surface, the active row's ink, the session title's ink and the ripple's ink now take the host's own colours, the table head and the light second-level panel use the hover plate's and the canvas' values, the home page's data blue becomes one marker, and the property fallbacks spell one literal per ink and canvas step."
-}

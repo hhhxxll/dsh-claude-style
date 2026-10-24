@@ -57,12 +57,20 @@ async function upwardFromTheRow(t) {
     `the menu opens upward from its row (card ${card.top.toFixed(1)}–${card.bottom.toFixed(1)}, row ${row === null ? 'none' : `${row.y.toFixed(1)}–${(row.y + row.height).toFixed(1)}`})`)
 }
 
+/**
+ * Open the row's menu and wait for the card itself, not a fixed slice of time:
+ * the entrance transition settles once the card is mounted, and a platform that
+ * mounts it later is still the same page.
+ */
+async function openMenu(t) {
+  await accountRow(t.page).click()
+  await t.page.waitForFunction(selector => document.querySelector(selector) !== null, t.surface('account.menu'), { timeout: 10000 })
+  await t.settle()
+}
+
 export default spec({ page: 'desktop' }, ({ test }) => {
   test('the account menu opens above its row', async (t) => {
-    await accountRow(t.page).click()
-    // The card's entrance is a transition: its box settles a moment after it
-    // opens, and the placement is judged on the card the reader ends up with.
-    await t.page.waitForTimeout(500)
+    await openMenu(t)
     await aboveTheRow(t)
     t.expectThat.boxWithin(await cardBox(t), await windowBox(t), 'the menu stays inside the window at the page\'s own scale', 1)
   })
@@ -73,8 +81,7 @@ export default spec({ page: 'desktop' }, ({ test }) => {
     // that never reached the page would leave the placement at 100% and the
     // comparison would pass over a state nothing exercised.
     t.expectThat.equal(await t.read.attribute('body', t.surface.attribute('skin.page-zoom')), '1.25', 'the page is drawn at 125%')
-    await accountRow(t.page).click()
-    await t.page.waitForTimeout(500)
+    await openMenu(t)
     await upwardFromTheRow(t)
     t.expectThat.boxWithin(await cardBox(t), await windowBox(t), 'the menu stays inside the window at 125%', 1)
   })

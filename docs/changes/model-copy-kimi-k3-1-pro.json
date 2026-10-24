@@ -1,8 +1,0 @@
-{
-  "group": "improvements",
-  "order": 0,
-  "at": "2026-10-23",
-  "external": false,
-  "zh": "改善模型选择器里 Kimi K3.1 Pro 的描述：它读自己这条产品线的官方定位，不再沿用 K3 那一句。",
-  "en": "Improve the model picker's description for Kimi K3.1 Pro: the row now reads its own model line's positioning instead of K3's."
-}

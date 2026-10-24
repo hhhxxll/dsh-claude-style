@@ -766,7 +766,7 @@
       "prop": "margin",
       "verdict": "transient state"
     },
-    "body[data-dsh-claude-style][data-dsh-claude-composer-active] [data-dsh-claude-part~=trailing] .dsh-claude-model-seat>.dsh-claude-model-btn,body[data-dsh-claude-style][data-dsh-claude-composer-active] [data-dsh-claude-part~=trailing] .dsh-claude-model-seat>.dsh-claude-effort-btn{display:inline-flex;align-items:center;height:28px;min-width:0;padding:0;border:none!;background:transparent;white-space:nowrap;cursor:pointer}|border": {
+    "body[data-dsh-claude-style][data-dsh-claude-composer-active] [data-dsh-claude-part~=trailing] .dsh-claude-model-seat>.dsh-claude-model-btn,body[data-dsh-claude-style][data-dsh-claude-composer-active] [data-dsh-claude-part~=trailing] .dsh-claude-model-seat>.dsh-claude-effort-btn{display:inline-flex;align-items:center;height:var(--dsh-claude-footer-control-height);min-width:0;padding:0;border:none!;background:transparent;white-space:nowrap;cursor:pointer}|border": {
       "selector": "body[data-dsh-claude-style][data-dsh-claude-composer-active] [data-dsh-claude-part~=trailing] .dsh-claude-model-seat>.dsh-claude-model-btn,body[data-dsh-claude-style][data-dsh-claude-composer-active] [data-dsh-claude-part~=trailing] .dsh-claude-model-seat>.dsh-claude-effort-btn",
       "prop": "border",
       "verdict": "transient state"
@@ -1527,7 +1527,7 @@
       "prop": "transform",
       "verdict": "transient state"
     },
-    "body[data-dsh-claude-style] .dsh-claude-perm-btn{display:inline-flex;align-items:center;gap:4px;height:24px;max-width:132px;padding:0 6px;border-radius:6px;border:none!;font-family:var(--dsw-font-family);font-size:13px;font-weight:500;background:transparent;color:var(--dsw-alias-label-primary, #161616);cursor:pointer;user-select:none;transition:background-color var(--dsh-claude-timing-feedback)}|border": {
+    "body[data-dsh-claude-style] .dsh-claude-perm-btn{display:inline-flex;align-items:center;gap:4px;height:var(--dsh-claude-footer-control-height);max-width:132px;padding:0 var(--dsh-claude-footer-control-pad);border-radius:7px;border:none!;font-family:var(--dsw-font-family);font-size:13px;font-weight:500;line-height:20px;background:transparent;color:var(--dsw-alias-label-primary, #161616);cursor:pointer;user-select:none;transition:background-color var(--dsh-claude-timing-feedback)}|border": {
       "selector": "body[data-dsh-claude-style] .dsh-claude-perm-btn",
       "prop": "border",
       "verdict": "needed",

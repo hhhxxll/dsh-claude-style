@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-23",
-  "group": "fixes",
-  "order": 0,
-  "external": false,
-  "zh": "修复页面缩放为 1.25 或 1.5 倍时整页可以滚过内容末尾、露出一段空白的问题：缩放后的页面按窗口自身的尺寸绘制，窗口的边缘就是页面的边缘。",
-  "en": "Fix the page scrolling past the end of its content into an empty band at a page zoom of 1.25 or 1.5: the scaled page now draws at the window's own size, so the window's edge is the page's edge."
-}

@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-23",
-  "group": "chores",
-  "order": 0,
-  "external": false,
-  "zh": "改善 `npm run verify` 的失败判定：超时、进程被系统终止、浏览器无法启动和测试套件未装载等基础设施问题记为「未判定」且不写入判定缓存，只有断言失败才记为失败并缓存；同一轮运行的冒烟与端到端通道按机器核心数分配固定的并发页数。",
-  "en": "Improve how `npm run verify` judges a failure: a timeout, a process the system ended, a browser that would not start and a spec suite that did not load now answer unjudged without filing a verdict, only a failed assertion fails and is cached, and the smoke and end-to-end lanes of one run share a fixed page budget from the machine's core count."
-}
