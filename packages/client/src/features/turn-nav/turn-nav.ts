@@ -141,6 +141,10 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       currentMarks = -1
       current = -1
     }
+    // The rail moving to another slot strands the card over the old one: its
+    // rows and its seat belong to the conversation that was. A fresh
+    // pointerenter re-opens it over the new slot.
+    if (mounted.parentElement !== null && mounted.parentElement !== found.parentElement) closeCard()
     // The host's rail sits in its slot.
     if (mounted.parentElement !== found.parentElement) found.parentElement!.appendChild(mounted)
   }

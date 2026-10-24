@@ -169,6 +169,61 @@
       navOut.olderHost = { current: oldCurrent, mid: oldMid, first: oldPresses.slice() }
       oldPhase.remove()
 
+      // The narrow conversation: the host's own stylesheet hides its rail below
+      // a 900px container, and the skin answers by keeping the replaced rail
+      // laid out — the entry stays on the page, and the jump and the keys keep
+      // working. The container and the host's rule are modelled here at 600px.
+      var narrowContainer = document.createElement('div')
+      narrowContainer.setAttribute('data-dsh-claude-narrow', '')
+      narrowContainer.style.cssText = 'container-type:inline-size;width:600px;'
+      var narrowStyle = document.createElement('style')
+      narrowStyle.textContent = '@container (width <= 900px) { [data-dsh-claude-narrow] nav { display: none; } }'
+      document.head.appendChild(narrowStyle)
+      var narrowPhase = document.createElement('div')
+      narrowPhase.setAttribute('data-phase', 'active')
+      narrowPhase.innerHTML = '<div data-conversation-session="smoke-nav"><div data-conversation-scroll="" style="height:400px;overflow:auto">' +
+        '<div class="_slot_t_1" style="position:relative;height:300px"><nav class="_frame_t_1" style="position:absolute;right:12px;top:100px;width:28px">' +
+        '<div class="_scroller_t_1" style="position:relative;overflow:auto;max-height:200px"><div class="_marks_t_1" style="position:relative;height:52px">' + navMarks + '</div></div>' +
+        '<div role="tooltip">host preview</div></nav></div>' +
+        '<div data-chat-flow="" style="display:flex;flex-direction:column">' +
+        '<div data-chat-flow-kind="user" data-chat-turn="4">fourth question</div>' +
+        '<div data-chat-flow-kind="assistant-step" data-chat-turn="4">fourth answer</div>' +
+        '<div data-chat-flow-kind="user" data-chat-turn="5">fifth question</div></div></div></div>'
+      narrowContainer.appendChild(narrowPhase)
+      document.body.appendChild(narrowContainer)
+      var narrowRail = narrowPhase.querySelector('nav')
+      var narrowPresses = []
+      narrowRail.addEventListener('click', function (event) {
+        var mark = event.target.closest('button[data-index]')
+        if (mark !== null) narrowPresses.push(Number(mark.dataset.index))
+      })
+      await sleep(250)
+      var narrowSkin = narrowPhase.querySelector('.dsh-claude-turn-rail')
+      navOut.narrow = {
+        hostDisplay: getComputedStyle(narrowRail).display,
+        hostVisibility: getComputedStyle(narrowRail).visibility,
+        hostRects: narrowRail.getClientRects().length,
+        hostReplaced: narrowRail.hasAttribute('data-dsh-claude-turn-nav-replaced'),
+        skinRects: narrowSkin === null ? 0 : narrowSkin.getClientRects().length,
+      }
+      narrowSkin.dispatchEvent(new PointerEvent('pointerenter'))
+      await sleep(250)
+      var narrowCard = narrowPhase.querySelector('.dsh-claude-turn-nav')
+      var narrowRows = narrowCard === null ? [] : Array.prototype.slice.call(narrowCard.querySelectorAll('.dsh-claude-turn-nav-row'))
+      navOut.narrow.open = narrowCard === null ? null : narrowCard.getAttribute('data-open')
+      navOut.narrow.rows = narrowRows.length
+      if (narrowRows[3] !== undefined) narrowRows[3].click()
+      await sleep(120)
+      navOut.narrow.press = narrowPresses.slice()
+      narrowPresses.length = 0
+      if (narrowCard !== null) narrowCard.dispatchEvent(new MouseEvent('mouseleave'))
+      await sleep(250)
+      navOut.narrow.keyUp = pressKey('ArrowUp')
+      await sleep(100)
+      navOut.narrow.keyPresses = narrowPresses.slice()
+      narrowContainer.remove()
+      narrowStyle.remove()
+
       r.turnNav = navOut
     })
   })

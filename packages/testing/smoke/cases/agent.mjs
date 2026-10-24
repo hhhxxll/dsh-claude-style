@@ -305,6 +305,13 @@ export default {
     const older = nav.olderHost || {}
     check('a host that writes no place on its marks keeps the reading position and presses the mark at the row\'s place, the first row included',
       older.current === 4 && JSON.stringify(older.mid) === '[3]' && JSON.stringify(older.first) === '[3,0]', JSON.stringify(older))
+    const narrow = nav.narrow || {}
+    check('below the host\'s narrow breakpoint the replaced rail stays laid out and the skin\'s entry stands, with the card and the jump working',
+      narrow.hostDisplay === 'block' && narrow.hostVisibility === 'hidden' && narrow.hostRects > 0 &&
+        narrow.hostReplaced === true && narrow.skinRects > 0 &&
+        narrow.open === 'true' && narrow.rows === 5 && JSON.stringify(narrow.press) === '[3]' &&
+        narrow.keyUp === true && JSON.stringify(narrow.keyPresses) === '[3]',
+      JSON.stringify(narrow))
     commonChecks(r)
   },
 }

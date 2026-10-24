@@ -1,0 +1,8 @@
+{
+  "group": "improvements",
+  "order": 1,
+  "at": "2026-10-24",
+  "external": false,
+  "zh": "会话窗口变窄时保留右侧的轮次导航：入口与轮次列表在窄宽度下继续显示，点击与键盘跳转照常工作。",
+  "en": "Keep the conversation's turn navigator at a narrow width: the entry and its turn list stay available, and clicks and the keyboard jumps keep working."
+}

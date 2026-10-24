@@ -29,11 +29,14 @@ body[data-dsh-claude-style] .dsh-claude-turn-rail {
   pointer-events: auto;
   cursor: pointer;
 }
-/* The host hides its rail in a narrow conversation; the slot is the container
-   its rule asks, so the same rule hides this one. */
+/* The host hides its rail in a narrow conversation (its own 900px container
+   rule), and a jump presses its marks — the replaced rail must keep its layout
+   for the skin's entry to work. The skin's rail takes its seat from the host's
+   slot rules, which the same container rule hides: keep the replaced rail
+   displayed so both rails stand. */
 @container (width <= 900px) {
-  body[data-dsh-claude-style] .dsh-claude-turn-rail {
-    display: none;
+  body[data-dsh-claude-style] [data-conversation-scroll] nav[data-dsh-claude-turn-nav-replaced] {
+    display: block;
   }
 }
 body[data-dsh-claude-style] .dsh-claude-turn-rail[data-fade-top] {
