@@ -2,29 +2,33 @@
 /* The window carries the DeepSeek site's hero wash (`ds-hero-section`): a
    top-to-bottom sky gradient under the WebGL marble canvas, fixed across the
    whole layout frame so the sidebar, the Windows caption row, the conversation
-   header and the transcript share one continuous ground. The columns, the
-   phase wrapper, the header, the sticky disclosure header and the pinned
-   running row stand down their opaque fills and top edge fade while the wash is
-   active, and the wash reaches transparency above the sticky composer seat at
-   the bottom edge. Nothing here takes a pointer. */
+   header and the transcript share one continuous ground. While the sidebar
+   stands in its column (rather than peeking over the page on hover), its fill
+   and right border stand down; the columns, the phase wrapper, the header, the
+   sticky disclosure header, the pinned running row and the composer seat stand
+   down their opaque fills and edge fades while the wash is active. Nothing here
+   takes a pointer. */
 
 body[data-dsh-claude-style][data-dsh-claude-deepseek-background] [data-dsh-claude-part~="layout-frame"] {
   isolation: isolate;
 }
 
-body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"] :is([data-pane="sidebar"], [data-dsh-claude-part~="sidebar-column"], .dshDesktopSidebarSurface) {
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"]:not([data-dsh-claude-sidebar-peek]) :is([data-pane="sidebar"], [data-dsh-claude-part~="sidebar-column"], .dshDesktopSidebarSurface) {
   --dsw-specific-sidebar-fill: transparent;
   background: transparent;
+  border-right: none;
 }
 
-body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"] :is([data-pane="conversation"], [data-dsh-claude-part~="center-column"], [data-dsh-claude-part~="rightbar-column"], [data-dsh-claude-holds~="conversation-scroll"], [data-dsh-claude-part~="conversation-header"], [data-disclosure-header], [data-chat-running][data-chat-running][data-chat-running]) {
+body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"] :is([data-pane="conversation"], [data-dsh-claude-part~="center-column"], [data-dsh-claude-part~="rightbar-column"], [data-dsh-claude-holds~="conversation-scroll"], [data-dsh-claude-part~="conversation-header"], [data-disclosure-header], [data-composer-seat], [data-chat-running][data-chat-running][data-chat-running]) {
   background: transparent;
 }
 
-body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"][data-dsh-claude-holds~="sidebar-column"] > :is([data-dsh-claude-part~="sidebar-column"], [data-dsh-claude-part~="center-column"]) {
+body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"][data-dsh-claude-holds~="sidebar-column"]:not([data-dsh-claude-sidebar-peek]) > :is([data-dsh-claude-part~="sidebar-column"], [data-dsh-claude-part~="center-column"]) {
   box-shadow: none;
 }
 
+body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"] > [data-side="sidebar"]::before,
+body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"] [data-composer-seat][data-composer-seat]::before,
 body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="conversation-header"][data-dsh-claude-holds~="view-tabs"]::after {
   display: none;
 }
@@ -35,11 +39,11 @@ body[data-dsh-claude-style] .dsh-claude-deepseek-layer {
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  background: linear-gradient(180deg, #9cc1e7 0%, rgba(250, 250, 250, 0) 84%);
+  background: linear-gradient(180deg, #9cc1e7 0%, #bfd6f2 52%, #d8e6f8 100%);
 }
 
 body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-deepseek-layer {
-  background: linear-gradient(180deg, rgba(37, 56, 93, 0.72) 0%, rgba(19, 21, 26, 0) 84%);
+  background: linear-gradient(180deg, rgba(37, 56, 93, 0.72) 0%, rgba(28, 43, 72, 0.58) 52%, rgba(21, 32, 54, 0.46) 100%);
 }
 
 body[data-dsh-claude-style] .dsh-claude-deepseek-canvas {
@@ -49,5 +53,5 @@ body[data-dsh-claude-style] .dsh-claude-deepseek-canvas {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.88) 12%, transparent 84%);
+  opacity: 0.86;
 }
