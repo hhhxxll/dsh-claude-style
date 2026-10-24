@@ -4,6 +4,7 @@ import { SEGMENT_CLASS } from '../../shared/segment-control'
 import { loadModelCopy, onModelCopyLoaded } from '../model/model-copy'
 import { createHostAccountMenu } from '../account/host-menu'
 import { adoptSettingsForm, motionReduced, readPrefs, savePrefs, subscribePrefs } from '../../core/prefs'
+import { hostCtx } from '../../core/host-context'
 import { cacheFirstMatch, hostSlots } from '@dsh-claude-style/engine/host'
 import { motionMs } from '../../shared/motion'
 import { ClaudeStyleSegmentGroup, createSettingsControls, tabRows } from './settings-controls'
@@ -13,6 +14,8 @@ import { createSettingsMainWindowTab } from './settings-tab-main-window'
 import { createSettingsMotionTab } from './settings-tab-motion'
 import { createSettingsSidebarTab } from './settings-tab-sidebar'
 import { installThemeFlip } from './theme-flip'
+import { fontThemeOf, installFontPreferences } from './font-preferences'
+import { bindFontFace, bindFontContext } from './settings-tab-appearance'
 import type { Prefs } from '../../constants'
 import type { SettingsTabId } from '../../core/feature'
 import type { HostContext } from '@dsh-claude-style/engine/host'
@@ -149,6 +152,15 @@ export function ClaudeStyleSettingsSection(props: { embed?: boolean }) {
   const pageRef = React.useRef<HTMLDivElement>(null)
   const rowsRef = React.useRef<HTMLFieldSetElement>(null)
   const leavingRef = React.useRef<HTMLDivElement>(null)
+  /** The font face's re-render bump: a state the face's subscription moves. */
+  const fontBump = React.useState(0)
+  /**
+   * The client context the font face reads the theme service through: the
+   * module-level reference apply() set, kept in a ref so the face's effect
+   * has one stable read. A page rendered before apply's context arrived (a
+   * very old host) keeps the face unavailable.
+   */
+  const ctxRef = React.useRef<unknown>(hostCtx)
 
   /**
    * Open another tab, sliding the pages the way the strip reads: a tab to the
@@ -208,6 +220,26 @@ export function ClaudeStyleSettingsSection(props: { embed?: boolean }) {
       unsubscribe()
       if (unsubscribeCopy) unsubscribeCopy()
       if (usernameTimer.current) clearTimeout(usernameTimer.current)
+    }
+  }, [])
+
+  // The font rows' face: the host's theme service, heard through its own
+  // change event. The face lives outside React (the rows read it directly),
+  // so a change re-renders the page the way a preference change does — one
+  // counter in the page's own state, bumped by the face's subscription.
+  const fontTick = React.useRef<((n: number) => number) | null>(null)
+  React.useEffect(() => {
+    const ctx = ctxRef.current
+    const theme = ctx === null ? null : fontThemeOf(ctx as Parameters<typeof fontThemeOf>[0])
+    const face = installFontPreferences(theme)
+    bindFontFace(face)
+    bindFontContext(ctx)
+    const off = face.subscribe(() => { fontBump[1](n => n + 1) })
+    fontBump[1](n => n + 1)
+    return () => {
+      off()
+      face.stop()
+      bindFontFace(null)
     }
   }, [])
 

@@ -16,7 +16,7 @@ export default {
     check('the settings section registers with the settings dialog', settings.registered === true, JSON.stringify(settings.registered))
     const expected = {
       general: ['brand', 'username', 'pageZoom', 'autoPopover', 'sodium'],
-      appearance: ['brandLockup', 'brandInk', 'palette', 'paletteCards', 'typeface', 'deepseekBackground', 'homeLayout', 'homeRipple', 'mascot', 'mascotScope'],
+      appearance: ['brandLockup', 'brandInk', 'palette', 'paletteCards', 'typeface', 'deepseekBackground', 'homeLayout', 'homeRipple', 'mascot', 'mascotScope', 'fontSize', 'fontCodeSize', 'fontFamily', 'fontFamilyCode'],
       'main-window': ['turnNav', 'conversationWidth', 'viewTabs', 'headerBand', 'composerScope', 'composerBottomGap', 'modelPicker', 'modelDescriptions', 'effortAccent', 'quickProviders', 'peakrate', 'contextDisplay', 'contextNumbers', 'statsPosition', 'statsFooterAlign', 'billingCurrency', 'permissionsControl'],
       sidebar: ['collapseFooter', 'restartButton', 'banLocale', 'sidebarSearch', 'searchStyle', 'workspaceView', 'sidebarPeek', 'dockCards', 'sidebarLayout'],
       motion: ['motion', 'chatAnimations', 'chatWait', 'statusDetail', 'statusMotion', 'caretMotion', 'ongoingIndicator', 'chatReveal', 'chatSend', 'messageEnter'],

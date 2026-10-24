@@ -165,6 +165,30 @@ export interface HostConversationService {
   input: { for(ctx: HostServiceLookup): HostConversationInput }
 }
 
+/**
+ * The host's font role: the conversation content (`text`), the code blocks
+ * (`code`), or the sidebar terminal (`terminal`), as ui-theme's own table
+ * names them.
+ */
+export type HostFontRole = 'text' | 'code' | 'terminal'
+
+/** One role's integer px size, and the list the role's text is set in. */
+export interface HostFontSettings {
+  fontSizes: Record<HostFontRole, number>
+  fontFamilies: Record<HostFontRole, string>
+}
+
+/**
+ * The `theme` service (ui-theme): the font sizes and families it keeps, and
+ * the two writes the settings page needs. The snapshot's other fields are the
+ * host's own and stay untyped here; a change arrives as `theme/change`.
+ */
+export interface HostThemeService extends HostFontSettings {
+  getTheme(): { fontSizes: Record<HostFontRole, number>, fontFamilies: Record<HostFontRole, string>, revision: number }
+  setFontSize(role: HostFontRole, px: number): void
+  setFontFamily(role: HostFontRole, value: string): void
+}
+
 /** One session's composer input: its draft, and writing it back. */
 export interface HostConversationInput {
   state: HostSnapshotSource<{ draft: string }>

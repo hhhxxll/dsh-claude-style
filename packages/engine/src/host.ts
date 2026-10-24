@@ -1,5 +1,5 @@
 import { COMPOSER_CARD_SELECTOR, COMPOSER_INPUT_SELECTOR, COMPOSER_PLACEHOLDER_SELECTOR, COMPOSER_SELECTOR, COMPOSER_STACK_SELECTOR, COMPOSER_STATS_SELECTOR, COMPOSER_STAT_SELECTOR, COMPOSER_VARIANT_ATTRIBUTE, CONVERSATION_SCROLL_SELECTOR, CONVERSATION_SESSION_ATTRIBUTE, CONVERSATION_SESSION_SELECTOR, DIALOG_TRIGGER_SELECTOR, FOOT_AREA_SELECTOR, FOREGROUND_SELECTOR, MENU_ROLE_SELECTOR, PERMISSION_TRIGGER_SELECTOR, PHASE_ATTRIBUTE, RIGHTBAR_TOGGLE_SELECTOR, SIDEBAR_BRAND_SELECTOR, SIDEBAR_LOGO_ROW_SELECTOR, SIDEBAR_ROOT_SELECTOR, SIDEBAR_TOGGLE_SELECTOR, WINDOWS_MENU_SELECTOR } from '@dsh-claude-style/contracts/dom'
-import type { HostAccountService, HostAssistantStep, HostBundleListAnswer, HostChatSnapshot, HostChatTarget, HostConfigFormsService, HostConversationService, HostInventoryAnswer, HostLocaleService, HostModelDirectoriesService, HostPluginBundle, HostServiceLookup, HostOutlineTurn, HostRunningCall, HostSession, HostSessionsService, HostSessionRenameAnswer, HostShortcutsService, HostSlotsService, HostTurn, HostUiConversationService, HostUiSessionService, HostWorkspacesService } from '@dsh-claude-style/contracts/services'
+import type { HostAccountService, HostAssistantStep, HostBundleListAnswer, HostChatSnapshot, HostChatTarget, HostConfigFormsService, HostConversationService, HostInventoryAnswer, HostLocaleService, HostModelDirectoriesService, HostPluginBundle, HostServiceLookup, HostOutlineTurn, HostRunningCall, HostSession, HostSessionsService, HostSessionRenameAnswer, HostShortcutsService, HostSlotsService, HostThemeService, HostTurn, HostUiConversationService, HostUiSessionService, HostWorkspacesService } from '@dsh-claude-style/contracts/services'
 import { observeMatches, subscribeMutations } from './bus'
 import { closestFrom } from './dom'
 
@@ -401,6 +401,12 @@ export function hostModelDirectories(lookup: HostServiceLookup | null | undefine
 export function hostLocale(lookup: HostServiceLookup | null | undefined): HostLocaleService | null {
   const locale = lookup?.get('locale') as HostLocaleService | undefined
   return locale ?? null
+}
+
+/** The host's theme service: the font sizes and families, and their writes. */
+export function hostTheme(lookup: HostServiceLookup | null | undefined): HostThemeService | null {
+  const theme = lookup?.get('theme') as HostThemeService | undefined
+  return theme ?? null
 }
 
 /** One session's conversation service, the chat target's own reader. */

@@ -699,3 +699,43 @@ body[data-dsh-claude-style] .dsh-claude-quick-popover {
   gap: 6px !important;
   transform-origin: bottom right !important;
 }
+
+/* ---------- Settings: the font rows' stepper and family field ---------- */
+body[data-dsh-claude-style] .dsh-claude-settings-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-stepper-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.06));
+  color: var(--dsw-alias-label-primary, #161616);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-stepper-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-stepper-value {
+  min-width: 3ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--dsw-alias-label-primary, #161616);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-font-input {
+  width: min(280px, 100%);
+}

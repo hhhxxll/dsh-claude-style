@@ -1,0 +1,8 @@
+{
+  "group": "new",
+  "order": 4,
+  "at": "2026-10-24",
+  "external": false,
+  "zh": "外观设置新增字号与自定义字体：正文与代码的字号可增减，正文与代码可填写自定义字体，留空恢复默认；设置跟随宿主字体项保存。",
+  "en": "The appearance settings gain sizes and custom fonts: the text and code sizes step, both faces accept a custom stack, empty restores the default, and the values save with the host's own font settings."
+}
