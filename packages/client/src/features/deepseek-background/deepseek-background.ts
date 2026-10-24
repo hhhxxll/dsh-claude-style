@@ -1,6 +1,7 @@
 import { requestFrame } from '@dsh-claude-style/engine/frame'
 import type { FrameTask } from '@dsh-claude-style/engine/frame'
 import { buildElement } from '@dsh-claude-style/engine/dom'
+import { cacheFirstMatch } from '@dsh-claude-style/engine/host'
 import { motionReduced } from '../../core/prefs'
 import { DEEPSEEK_DRIFT_MS, shouldAnimateDeepseekBackground } from './motion-state'
 import type { HostContext } from '@dsh-claude-style/engine/host'
@@ -182,8 +183,8 @@ function drawDrift(mount: Mount, now: number) {
   }
 }
 
-/** The column the wash stands in, read from the part the engine marks. */
-const findColumn = () => document.querySelector<HTMLElement>('[data-dsh-claude-part~="center-column"]')
+/** The column the wash stands in, kept from the part the engine marks (D40): a query only when the host remounts it. */
+const findColumn = cacheFirstMatch<HTMLElement>('[data-dsh-claude-part~="center-column"]')
 
 export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   let mount: ReturnType<typeof installDeepseekBackground> | null = null

@@ -537,6 +537,10 @@
       ],
       "a host that writes no place on its marks keeps the reading position and presses the mark at the row's place, the first row included": [
         4
+      ],
+      "below the host's narrow breakpoint the replaced rail stays laid out and the skin's entry stands, with the card and the jump working": [
+        0,
+        5
       ]
     },
     "packages/testing/smoke/cases/chat.mjs": {

@@ -22,6 +22,16 @@ import type { HostFontRole, HostThemeService } from '@dsh-claude-style/contracts
 export const FONT_TEXT_RANGE = { min: 10, max: 22 } as const
 export const FONT_CODE_RANGE = { min: 10, max: 16 } as const
 
+/** The skin's font tokens each role's family is carried to, exported for the specs. */
+export const FAMILY_TOKENS: Record<HostFontRole, string[]> = {
+  text: ['--dsw-font-family', '--dsh-claude-font-prose'],
+  code: ['--dsh-claude-font-code'],
+  terminal: [],
+}
+
+/** The brand lockup's face token, which no custom family ever touches. */
+export const BRAND_FONT_TOKEN = '--dsh-claude-font-brand'
+
 const RANGES: Record<'text' | 'code', { min: number, max: number }> = {
   text: FONT_TEXT_RANGE,
   code: FONT_CODE_RANGE,
@@ -34,13 +44,6 @@ const RANGES: Record<'text' | 'code', { min: number, max: number }> = {
 export function fontSizeTarget(role: 'text' | 'code', current: number, delta: -1 | 1): number {
   const range = RANGES[role]
   return Math.min(range.max, Math.max(range.min, current + delta))
-}
-
-/** The skin's font tokens each role's family is carried to. */
-const FAMILY_TOKENS: Record<HostFontRole, string[]> = {
-  text: ['--dsw-font-family', '--dsh-claude-font-prose'],
-  code: ['--dsh-claude-font-code'],
-  terminal: [],
 }
 
 /** What an inline font token held before this module wrote it, by token. */
@@ -141,7 +144,7 @@ export function installFontPreferences(theme: HostThemeService | null) {
     subscribe(listener: () => void) {
       listeners.push(listener)
       return () => {
-        const at = listeners.indexOf(listener)
+        const at = listeners.lastIndexOf(listener)
         if (at !== -1) listeners.splice(at, 1)
       }
     },

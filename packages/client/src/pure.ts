@@ -47,7 +47,7 @@ export type { HomeRefreshReason, HomeUsageAge } from './features/home/usage-refr
 export { createWaveField } from './features/home-ripple/ripple-wave'
 export { installDeepseekBackground } from './features/deepseek-background/deepseek-background'
 export { shouldAnimateDeepseekBackground, DEEPSEEK_DRIFT_MS } from './features/deepseek-background/motion-state'
-export { fontSizeTarget, fontStepFace, installFontPreferences, FONT_TEXT_RANGE, FONT_CODE_RANGE } from './features/settings/font-preferences'
+export { fontSizeTarget, fontStepFace, installFontPreferences, FONT_TEXT_RANGE, FONT_CODE_RANGE, FAMILY_TOKENS, BRAND_FONT_TOKEN } from './features/settings/font-preferences'
 export { mascotLevel } from './features/mascot/mascot-signals'
 export type { MascotLevel, MascotReading } from './features/mascot/mascot-signals'
 export { EXTRA_MIN_MS, EXTRA_SPAN_MS, MIN_SHOW_MS, MOMENTS, REACTION_PRIORITY, SLEEP_AFTER_MS, decideStage, finishStage, freshStage, nextDecisionAt, switchSettles, takeMoment } from './features/mascot/mascot-stage'

@@ -10,20 +10,20 @@
  */
 import { afterEach, expect, test } from 'vitest'
 import { hostElement } from '../../fixtures/host-markup'
-import { surfaceAttribute } from '../../fixtures/surface'
+import { surfaceAttribute, surfaceClass } from '../../fixtures/surface'
 
 /** The conversation column's part mark, from the engine's parts table. */
 const PART_ATTRIBUTE = surfaceAttribute('skin.part')
 const CENTER_PART = 'center-column'
-/** The decoration layer's mark, which the feature's own stylesheet reads. */
-const LAYER_ATTRIBUTE = 'data-dsh-claude-deepseek-background'
-const CANVAS_CLASS = 'dsh-claude-deepseek-canvas'
+/** The decoration layer's mark, which the surface table carries for the specs. */
+const LAYER_ATTRIBUTE = surfaceAttribute('deepseek.layer')
+const CANVAS_CLASS = surfaceClass('deepseek.canvas')
 
 afterEach(() => { document.body.replaceChildren() })
 
 /** The conversation column, the way the parts walk marks it. */
 function centerColumn() {
-  const column = hostElement(`[data-dsh-claude-part~="${CENTER_PART}"]`)
+  const column = hostElement(`[${PART_ATTRIBUTE}~="${CENTER_PART}"]`)
   column.style.position = 'relative'
   const content = document.createElement('div')
   content.textContent = 'transcript'

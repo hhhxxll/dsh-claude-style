@@ -10,16 +10,12 @@
  * @risk The skin's own font token overrides the host's families so the custom choice never shows, a teardown strips the host's own styles, or a theme flip wipes the reader's fonts.
  */
 import { afterEach, expect, test } from 'vitest'
-import { hostElement } from '../../fixtures/host-markup'
-import { surfaceAttribute } from '../../fixtures/surface'
 
-/** The part mark of the element the spec builds the host's frame from. */
-const PART_ATTRIBUTE = surfaceAttribute('skin.part')
-
-/** The three tokens the skin's custom family is written to, and the brand token it must not touch. */
-const TEXT_TOKENS = ['--dsw-font-family', '--dsh-claude-font-prose']
-const CODE_TOKENS = ['--dsh-claude-font-code']
-const BRAND_TOKEN = '--dsh-claude-font-brand'
+/** The tokens the skin's custom family is carried to, and the brand token it must not touch — read off the module (D77). */
+const { FAMILY_TOKENS, BRAND_FONT_TOKEN } = await import('@dsh-claude-style/client/pure')
+const TEXT_TOKENS = FAMILY_TOKENS.text as string[]
+const CODE_TOKENS = FAMILY_TOKENS.code as string[]
+const BRAND_TOKEN: string = BRAND_FONT_TOKEN
 
 /** A test double of the host's theme service: writes land, and `change` answers. */
 function fakeTheme() {
@@ -82,7 +78,7 @@ test('an empty family hands the type back, and a theme flip keeps a standing fam
     expect(theme.fontFamilies.text).toBe('')
     prefs.setFamily('code', 'JetBrains Mono')
     theme.flipTheme()
-    expect(document.body.style.getPropertyValue('--dsh-claude-font-code')).toContain('JetBrains Mono')
+    expect(document.body.style.getPropertyValue(CODE_TOKENS[0])).toContain('JetBrains Mono')
   } finally {
     prefs.stop()
   }
@@ -91,12 +87,12 @@ test('an empty family hands the type back, and a theme flip keeps a standing fam
 test('the teardown hands the tokens back to whatever stood before, once', async () => {
   const { installFontPreferences } = await import('@dsh-claude-style/client/pure')
   const theme = fakeTheme()
-  document.body.style.setProperty('--dsw-font-family', '"Before"')
+  document.body.style.setProperty(TEXT_TOKENS[0], '"Before"')
   const prefs = installFontPreferences(theme)
   prefs.setFamily('text', '思源黑体')
   prefs.stop()
-  expect(document.body.style.getPropertyValue('--dsw-font-family')).toBe('"Before"')
-  expect(document.body.style.getPropertyValue('--dsh-claude-font-prose')).toBe('')
+  expect(document.body.style.getPropertyValue(TEXT_TOKENS[0])).toBe('"Before"')
+  expect(document.body.style.getPropertyValue(TEXT_TOKENS[1])).toBe('')
 })
 
 test('the host\'s write comes back through theme/change and sizes stay readable', async () => {
