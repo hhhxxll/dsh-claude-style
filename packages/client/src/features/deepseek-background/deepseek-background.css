@@ -3,9 +3,10 @@
    top-to-bottom sky gradient under the WebGL marble canvas, fixed across the
    whole layout frame so the sidebar, the Windows caption row, the conversation
    header and the transcript share one continuous ground. The columns, the
-   phase wrapper and the header stand down their opaque fills and top edge fade
-   while the wash is active, and the wash reaches transparency above the
-   sticky composer seat at the bottom edge. Nothing here takes a pointer. */
+   phase wrapper, the header, the sticky disclosure header and the pinned
+   running row stand down their opaque fills and top edge fade while the wash is
+   active, and the wash reaches transparency above the sticky composer seat at
+   the bottom edge. Nothing here takes a pointer. */
 
 body[data-dsh-claude-style][data-dsh-claude-deepseek-background] [data-dsh-claude-part~="layout-frame"] {
   isolation: isolate;
@@ -16,7 +17,7 @@ body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-dsh-claude-de
   background: transparent;
 }
 
-body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"] :is([data-pane="conversation"], [data-dsh-claude-part~="center-column"], [data-dsh-claude-part~="rightbar-column"], [data-dsh-claude-holds~="conversation-scroll"], [data-dsh-claude-part~="conversation-header"]) {
+body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"] :is([data-pane="conversation"], [data-dsh-claude-part~="center-column"], [data-dsh-claude-part~="rightbar-column"], [data-dsh-claude-holds~="conversation-scroll"], [data-dsh-claude-part~="conversation-header"], [data-disclosure-header], [data-chat-running][data-chat-running][data-chat-running]) {
   background: transparent;
 }
 
