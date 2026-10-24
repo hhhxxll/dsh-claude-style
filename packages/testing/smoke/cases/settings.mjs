@@ -17,8 +17,8 @@ export default {
     const expected = {
       general: ['brand', 'username', 'pageZoom', 'autoPopover', 'sodium'],
       appearance: ['brandLockup', 'brandInk', 'palette', 'paletteCards', 'typeface', 'homeLayout', 'homeRipple', 'mascot', 'mascotScope'],
-      'main-window': ['turnNav', 'conversationWidth', 'viewTabs', 'headerBand', 'composerScope', 'composerBottomGap', 'modelPicker', 'modelDescriptions', 'effortAccent', 'quickProviders', 'peakrate', 'contextDisplay', 'contextNumbers', 'statsPosition', 'statsFooterAlign', 'billingCurrency', 'permissionsControl'],
-      sidebar: ['collapseFooter', 'banLocale', 'sidebarSearch', 'searchStyle', 'workspaceView', 'sidebarPeek', 'dockCards', 'sidebarLayout'],
+      'main-window': ['turnNav', 'backTurnButton', 'conversationWidth', 'viewTabs', 'headerBand', 'composerScope', 'composerBottomGap', 'modelPicker', 'modelDescriptions', 'effortAccent', 'quickProviders', 'peakrate', 'contextDisplay', 'contextNumbers', 'statsPosition', 'statsFooterAlign', 'billingCurrency', 'permissionsControl'],
+      sidebar: ['collapseFooter', 'restartButton', 'banLocale', 'sidebarSearch', 'searchStyle', 'workspaceView', 'sidebarPeek', 'dockCards', 'sidebarLayout'],
       motion: ['motion', 'chatAnimations', 'chatWait', 'statusDetail', 'statusMotion', 'caretMotion', 'ongoingIndicator', 'chatReveal', 'chatSend', 'messageEnter'],
     }
     // The main window's two groups, the conversation side above the composer's,
@@ -26,7 +26,7 @@ export default {
     // Conversation and Composer tabs, and the statistics rows with the
     // composer's billing display.
     const mainWindowGroups = [
-      { label: 'Conversation', rows: ['turnNav', 'conversationWidth', 'viewTabs', 'headerBand'] },
+      { label: 'Conversation', rows: ['turnNav', 'backTurnButton', 'conversationWidth', 'viewTabs', 'headerBand'] },
       { label: 'Composer', rows: ['composerScope', 'composerBottomGap', 'modelPicker', 'modelDescriptions', 'effortAccent', 'quickProviders', 'peakrate', 'contextDisplay', 'contextNumbers', 'statsPosition', 'statsFooterAlign', 'billingCurrency', 'permissionsControl'] },
     ]
     // Greyed by the page itself rather than by a preference: the title-bar

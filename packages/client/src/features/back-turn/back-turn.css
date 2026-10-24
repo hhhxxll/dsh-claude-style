@@ -1,27 +1,5 @@
-/* The header utilities' back control: the shape of the skin's own right-panel
-   control beside it (features/header-band), over the host's label token. */
+/* The header utilities' back control: the shared icon-button shape
+   (shared/icon-button.css); only the hidden state is this feature's own. */
 body[data-dsh-claude-style] [data-dsh-claude-back-turn] {
   display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--dsw-alias-label-secondary, #70686a);
-  cursor: pointer;
-}
-
-body[data-dsh-claude-style] [data-dsh-claude-back-turn]:hover:not(:disabled) {
-  background: var(--dsh-claude-hover-bg);
-  color: var(--dsw-alias-label-primary, inherit);
-}
-
-body[data-dsh-claude-style] [data-dsh-claude-back-turn]:disabled {
-  opacity: 0.45;
-  cursor: default;
 }

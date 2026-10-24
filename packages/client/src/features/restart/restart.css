@@ -1,32 +1,7 @@
 /* The footer entry as it stands on its own (a host page without the footer
-   takeover, or with it switched off): an icon button the shape of the skin's
-   own header control, over the host's label token. The takeover path needs
-   nothing here — the mirror draws the entry as one row of the account
-   popover. */
+   takeover, or with it switched off): the shared icon-button shape
+   (shared/icon-button.css). The takeover path needs nothing here — the mirror
+   draws the entry as one row of the account popover. */
 body[data-dsh-claude-style] [data-dsh-claude-restart] {
   display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--dsw-alias-label-secondary, #70686a);
-  cursor: pointer;
-}
-
-body[data-dsh-claude-style] [data-dsh-claude-restart]:hover {
-  background: var(--dsh-claude-hover-bg);
-  color: var(--dsw-alias-label-primary, inherit);
-}
-
-/* The dialog's line under the Modal's own description seat. The Modal portals
-   to the body, which wears the skin's stamp. */
-body[data-dsh-claude-style] .dsh-claude-restart-line {
-  margin: 0;
-  line-height: 1.6;
 }

@@ -3,7 +3,6 @@ import type { FeatureManifest } from '../../core/feature'
 export default {
   id: 'backTurn',
   order: 182,
-  load: 'deferred',
   contracts: [
     'chat.scroller', 'chat.turn-attribute', 'conversation.session', 'conversation.session-attribute',
     'shell.foreground', 'turn.rail', 'turn.rail-current', 'turn.rail-inset', 'turn.rail-mark',

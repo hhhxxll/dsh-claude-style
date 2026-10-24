@@ -19,10 +19,8 @@ import type manifest from './back-turn.manifest'
  * the reach: a press in the header's utilities seat, next to the skin's own
  * right-panel control, where the reader's pointer already is.
  *
- * The button's own state is decided per press and per pass: hidden while the
- * rail is not laid out (a conversation with nothing to walk back through),
- * disabled at the first turn. A foreground overlay or a draft holds nothing
- * here — the press is the reader's own, never a key stolen from a field.
+ * The render reads the DOM alone; the session's turns and the reading
+ * position are read once per press, when the reader asks for the jump.
  */
 export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   /** The seat the button registers in, shared with the right-panel control (header-band). */
@@ -52,24 +50,23 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     })
   }
 
-  /** The button itself; the rail's state decides its own on each render. */
+  /** The button itself. The render reads the DOM alone — the rail's presence
+   * decides whether the button stands — because the turns and the reading
+   * position come through the host's session services, and a render that read
+   * them would do so on every frame of every conversation page. The press
+   * reads them once, when the reader asks for the jump. */
   function BackButton() {
     const rail = host.findRail()
-    const session = findConversationSession()
-    const sessionId = conversationSessionId(session)
-    const items = sessionId === null ? [] : host.turnItems(sessionId)
-    const shown = rail !== null && host.railShown(rail) && items.length > 1
-    const atFirst = shown && host.currentIndex(rail!, items) <= 0
+    if (rail === null || !host.railShown(rail)) return null
     return React.createElement(primitives.Tooltip, {
-      label: atFirst ? copy('backTurnFirst') : copy('backTurnHint'),
+      label: copy('backTurnHint'),
       side: 'bottom',
       delayMs: 500,
       children: React.createElement('button', {
         type: 'button',
         'aria-label': copy('backTurnRow'),
         'data-dsh-claude-back-turn': '',
-        disabled: atFirst,
-        style: { display: shown ? 'inline-flex' : 'none' },
+        className: 'dsh-claude-icon-button',
         onClick: press,
       }, React.createElement(primitives.IconChevronUpOutlineRegular, { size: 16 })),
     })

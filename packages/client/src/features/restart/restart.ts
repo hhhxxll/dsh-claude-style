@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as reactDom from 'react-dom/client'
 import * as primitives from '@deepseek-ai/dsh-client-ui-primitives'
+import { desktopBand } from '@dsh-claude-style/engine/desktop-band'
 import { hostSlots } from '@dsh-claude-style/engine/host'
 import { copy } from './copy'
 import { nextPollState, probeFromBoot, RESTART_POLL_MS, RESTART_ROUTE, RESTART_SETTLE_MS, restartArrived } from './restart-probe'
@@ -164,11 +165,12 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       type: 'button',
       'aria-label': copy('restartRow'),
       'data-dsh-claude-restart': '',
+      className: 'dsh-claude-icon-button',
       onClick: () => {
         void (async () => {
           // The boot the restart must replace, read at the moment of asking.
           const probe = await probeBoot()
-          if (!probe.up || !probe.desktop) return
+          if (!probe.up) return
           leftBoot = probe.boot
           drawDialog('confirm')
         })()
@@ -177,14 +179,22 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   }
 
   /**
-   * Whether this page is the desktop shell: the route's own answer, read once
-   * before the entry registers. A host that is not answering, or is not the
-   * desktop, never gets the entry (Web cannot relaunch itself). The slot
-   * registration's disposal belongs to the scope that installed it.
+   * Whether this page is the desktop shell: the shell's preload marks the
+   * document for both desktop platforms (data-windows-titlebar,
+   * data-platform=darwin), read synchronously through desktopBand. A probe of
+   * the route would answer the same question, but its fetch settles after the
+   * page's first quiet spell and the slot registration it gates wakes a
+   * scheduler pass then; the marks are on the document before any skin code
+   * runs. The web build never carries them, so it never gets the entry.
    */
-  void probeBoot().then((probe) => {
-    if (disposed || !probe.up || !probe.desktop) return
-    if (typeof ctx.inject !== 'function') return
+  if (desktopBand() === null) return () => {
+    disposed = true
+    if (dialogRoot !== null) {
+      dialogRoot.unmount()
+      dialogRoot = null
+    }
+  }
+  if (typeof ctx.inject === 'function') {
     ctx.inject(['slots'], (scope) => {
       const slots = hostSlots(scope)
       if (slots === undefined || slots === null || typeof slots.inject !== 'function') return
@@ -193,7 +203,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
         RestartEntry,
       )), 'dsh-claude-style: restart entry')
     })
-  })
+  }
 
   return () => {
     disposed = true

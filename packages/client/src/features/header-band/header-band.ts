@@ -128,7 +128,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       delayMs: 500,
       children: React.createElement('button', {
         type: 'button',
-        className: CLOSE_CLASS,
+        className: `dsh-claude-icon-button ${CLOSE_CLASS}`,
         'aria-label': label,
         onClick: () => { findRightbarToggle()?.click() },
       }, React.createElement(primitives.IconPanelLeftOutlineRegular, { size: 16 })),
