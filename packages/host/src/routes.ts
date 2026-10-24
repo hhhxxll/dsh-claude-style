@@ -27,6 +27,7 @@ import type { HdslReading } from './hdsl.js'
 import { packageRoot } from './package-root.js'
 import { createPeakRate } from './peakrate.js'
 import { createPrices } from './prices.js'
+import { restartRoute } from './restart.js'
 import { QUERY_MAX, createSessionSearch } from './search.js'
 import { createSessionCost } from './session-cost.js'
 import { createUsage } from './usage.js'
@@ -504,6 +505,8 @@ export function registerRoutes(ctx: DshContext, scope: DshScope) {
         sendPayload(res, sessionCost.get(sessionId).then(value => ({ value })))
       },
     })
+
+    register('restart', restartRoute(ctx))
 
     for (const { label, route } of brandRoutes(ctx)) register(label, route)
 

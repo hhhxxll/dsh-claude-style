@@ -74,3 +74,10 @@ export const PRICES_PATH = `${ROUTE_PREFIX}/prices`
  * another plugin being installed.
  */
 export const SESSION_COST_PATH = `${ROUTE_PREFIX}/session-cost`
+
+/**
+ * Desktop application restart. `GET` answers the boot identity and whether
+ * this host is the desktop shell; `POST` answers first and then relaunches
+ * the app through a detached helper, because the relaunch kills this process.
+ */
+export const RESTART_PATH = `${ROUTE_PREFIX}/restart`

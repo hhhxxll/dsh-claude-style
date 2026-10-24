@@ -375,6 +375,42 @@ async function hostHalf() {
       settled.status === 200 && JSON.parse(settled.body).ghost === false && realRegistry.archived.length === 0 &&
         same(realRegistry.unarchived, [{ id: scratchId, dirGone: true }]),
       JSON.stringify({ status: settled.status, body: settled.body, registry: realRegistry }))
+
+    // Desktop restart. The smoke's Node process is not the desktop shell, so
+    // GET reports desktop:false and POST is refused — the relaunch itself is
+    // the desktop walkthrough's, never the smoke's (D75).
+    const RESTART = '/dsh-claude-style/restart'
+    check('the restart route is registered', host.routes[RESTART] !== undefined)
+    for (const [label, headers] of [['cross-site page', crossSite], ['LAN peer', lanPeer], ['DNS-rebound page', rebound]]) {
+      const refused = await request(host, RESTART, 'POST', '', headers)
+      check(`${label}: restart refused`, refused.status === 401 || refused.status === 403, `HTTP ${refused.status}`)
+    }
+    const boot = JSON.parse((await request(host, RESTART, 'GET', '', browser)).body)
+    check('the boot route answers the boot identity and the host kind',
+      (await request(host, RESTART, 'GET', '', browser)).status === 200 && typeof boot.boot === 'string' && boot.boot.indexOf('-') !== -1 && boot.desktop === false,
+      JSON.stringify(boot))
+    check('restart answers 405 to a method it does not take',
+      (await request(host, RESTART, 'PUT', '', browser)).status === 405, 'HTTP PUT')
+    const restartRefused = await request(host, RESTART, 'POST', '', browser)
+    check('a non-desktop host refuses the restart', restartRefused.status === 409 && JSON.parse(restartRefused.body).error === 'desktop-only', `HTTP ${restartRefused.status}`)
+    // The helper source, as the desktop host would generate it: legal script,
+    // the hostile path held inside its literal, ids and port embedded. Read
+    // from the built module beside this plugin's own bundle (lib/), the same
+    // artifact the desktop runs.
+    const { getDesktopRestartHelperSource, servingPort } = await import(pathToFileURL(path.join(ROOT, 'lib', 'host', 'restart.js')).href)
+    check('the built restart module exports its helper generator and port reader',
+      typeof getDesktopRestartHelperSource === 'function' && typeof servingPort === 'function')
+    const hostile = "C:\\Program Files\\x'y\\app.exe"
+    const source = getDesktopRestartHelperSource(hostile, { host: 100, shell: 101 }, 58350, { out: 'a.log', err: 'b.log' })
+    let parsed = true
+    try { new Function(source) } catch { parsed = false }
+    check('the restart helper source parses with a hostile executable path', parsed)
+    check('the restart helper holds the executable inside its literal', source.indexOf(JSON.stringify(hostile)) !== -1)
+    const idsEmbed = getDesktopRestartHelperSource('app.exe', { host: 7, shell: -3 }, null, { out: 'a.log', err: 'b.log' })
+    check('the restart helper drops non-positive ids and holds a null port',
+      idsEmbed.indexOf('[7]') !== -1 && idsEmbed.indexOf('const PORT = null;') !== -1)
+    check('the serving port reads the Host header and refuses a malformed one',
+      servingPort('127.0.0.1:9999') === 9999 && servingPort('localhost') === null && servingPort(undefined) === null)
   }
 
   await hostUsage({ mod, fakeHost, request, browser, scratchHome, scratchCwd })
