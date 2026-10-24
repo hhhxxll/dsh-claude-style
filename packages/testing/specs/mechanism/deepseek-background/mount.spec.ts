@@ -32,7 +32,7 @@ function centerColumn() {
   return column
 }
 
-test('the static mode mounts one decoration layer under the content, past no pointer', async () => {
+test('the static mode mounts one texture under the content, past no pointer and with no frame timer', async () => {
   const { installDeepseekBackground } = await import('@dsh-claude-style/client/pure')
   const column = centerColumn()
   const background = installDeepseekBackground(column, 'static')
@@ -40,7 +40,9 @@ test('the static mode mounts one decoration layer under the content, past no poi
     const layer = column.querySelector(`[${LAYER_ATTRIBUTE}]`)
     expect(layer).not.toBeNull()
     expect(layer!.getAttribute(LAYER_ATTRIBUTE)).toBe('static')
-    expect(layer!.querySelector(`.${CANVAS_CLASS}`)).toBeNull()
+    const canvas = layer!.querySelector<HTMLCanvasElement>(`.${CANVAS_CLASS}`)
+    expect(canvas).not.toBeNull()
+    expect(canvas!.getContext('webgl2')).not.toBeNull()
     expect(getComputedStyle(layer as HTMLElement).pointerEvents).toBe('none')
     expect((layer as HTMLElement).style.zIndex).toBe('-1')
   } finally {
@@ -48,16 +50,17 @@ test('the static mode mounts one decoration layer under the content, past no poi
   }
 })
 
-test('switching to dynamic mounts a canvas and back to static removes it whole', async () => {
+test('the same texture switches between static and dynamic, and its loop stops on the way back', async () => {
   const { installDeepseekBackground } = await import('@dsh-claude-style/client/pure')
   const column = centerColumn()
   const background = installDeepseekBackground(column, 'static')
   try {
+    const canvas = column.querySelector(`.${CANVAS_CLASS}`)
     background.setMode('dynamic')
-    expect(column.querySelector(`.${CANVAS_CLASS}`)).not.toBeNull()
+    expect(column.querySelector(`.${CANVAS_CLASS}`)).toBe(canvas)
     expect(column.querySelector(`[${LAYER_ATTRIBUTE}]`)!.getAttribute(LAYER_ATTRIBUTE)).toBe('dynamic')
     background.setMode('static')
-    expect(column.querySelector(`.${CANVAS_CLASS}`)).toBeNull()
+    expect(column.querySelector(`.${CANVAS_CLASS}`)).toBe(canvas)
     expect(column.querySelector(`[${LAYER_ATTRIBUTE}]`)!.getAttribute(LAYER_ATTRIBUTE)).toBe('static')
   } finally {
     background.stop()
