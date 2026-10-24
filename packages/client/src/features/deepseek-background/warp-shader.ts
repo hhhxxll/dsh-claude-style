@@ -48,7 +48,7 @@ void main() {
   uv *= 0.0035 * resolution;
   uv = rotate(uv, -5.0 * 3.14159265358979323846 / 180.0);
   uv /= pixelRatio;
-  uv += vec2(1.15, 1.15);
+  uv += vec2(0.5, 1.15);
 
   float n1 = valueNoise(uv + t);
   float n2 = valueNoise(uv * 2.0 - t);
@@ -65,10 +65,10 @@ void main() {
   vec2 checks = uv * 0.85;
   float shape = 0.5 + 0.5 * sin(checks.x) * cos(checks.y);
   vec3 c1 = mix(vec3(0.541176, 0.639216, 0.839216), vec3(0.165, 0.255, 0.420), dark);
-  vec3 c2 = mix(vec3(0.840, 0.902, 0.976), vec3(0.090, 0.118, 0.165), dark);
-  vec3 c3 = mix(vec3(0.945, 0.969, 0.996), vec3(0.075, 0.082, 0.102), dark);
-  vec3 col = mix(c1, c2, smoothstep(0.0, 0.72, shape));
-  col = mix(col, c3, smoothstep(0.42, 1.0, shape));
+  vec3 c2 = mix(vec3(1.0), vec3(0.090, 0.118, 0.165), dark);
+  vec3 c3 = mix(vec3(1.0), vec3(0.075, 0.082, 0.102), dark);
+  vec3 col = mix(c1, c2, smoothstep(0.0, 0.7, shape));
+  col = mix(col, c3, smoothstep(0.3, 1.0, shape));
   color = vec4(col, 1.0);
 }`
 

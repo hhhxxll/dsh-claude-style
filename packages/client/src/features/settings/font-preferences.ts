@@ -95,14 +95,17 @@ interface ListenableTheme extends HostThemeService {
  * answers `available: false`, and the controls say so instead of keeping a
  * private configuration.
  */
-export function installFontPreferences(theme: HostThemeService | null) {
+export function installFontPreferences(
+  theme: HostThemeService | null,
+  onChange?: (listener: () => void) => (() => void) | undefined,
+) {
   const listeners: (() => void)[] = []
+  let offTheme: (() => void) | undefined
 
   /** Re-carry the families onto the tokens, once per real change. */
   function adopt() {
-    const snapshot = theme?.getTheme()
-    if (snapshot === undefined || snapshot === null) return
-    const families = snapshot.fontFamilies
+    const families = theme?.getTheme()?.fontFamilies
+    if (families === undefined || families === null) return
     if (lastFamilies !== null
       && families.text === lastFamilies.text
       && families.code === lastFamilies.code
@@ -122,8 +125,10 @@ export function installFontPreferences(theme: HostThemeService | null) {
   if (theme !== null) {
     adopt()
     const listenable = theme as ListenableTheme
-    listenable.listeners ??= []
-    listenable.listeners.push(notify)
+    if (Array.isArray(listenable.listeners)) {
+      listenable.listeners.push(notify)
+    }
+    offTheme = onChange?.(notify)
   }
 
   return {
@@ -131,14 +136,20 @@ export function installFontPreferences(theme: HostThemeService | null) {
     available: theme !== null,
     /** The settings as the host holds them right now; the defaults while it carries none. */
     snapshot() {
-      if (theme === null) {
-        return {
-          fontSizes: { text: 14, code: 11, terminal: 13 },
-          fontFamilies: { text: '', code: '', terminal: '' },
-          revision: 0,
-        }
+      const current = theme?.getTheme()
+      return {
+        fontSizes: {
+          text: current?.fontSizes?.text ?? 14,
+          code: current?.fontSizes?.code ?? 11,
+          terminal: current?.fontSizes?.terminal ?? 13,
+        },
+        fontFamilies: {
+          text: current?.fontFamilies?.text ?? '',
+          code: current?.fontFamilies?.code ?? '',
+          terminal: current?.fontFamilies?.terminal ?? '',
+        },
+        revision: current?.revision ?? 0,
       }
-      return theme.getTheme()
     },
     /** Hear the host's changes; the call returned takes this reader off. */
     subscribe(listener: () => void) {
@@ -152,18 +163,22 @@ export function installFontPreferences(theme: HostThemeService | null) {
     setFamily(role: HostFontRole, value: string) {
       if (theme === null) return
       theme.setFontFamily(role, value)
+      if (!Array.isArray((theme as ListenableTheme).listeners)) notify()
     },
     /** One role's size, written through the host. */
     setSize(role: HostFontRole, px: number) {
       if (theme === null) return
       theme.setFontSize(role, px)
+      if (!Array.isArray((theme as ListenableTheme).listeners)) notify()
     },
     /** Take the reader off and hand the tokens back. */
     stop() {
       listeners.splice(0)
+      offTheme?.()
+      offTheme = undefined
       if (theme !== null) {
         const own = (theme as ListenableTheme).listeners
-        if (own !== undefined) {
+        if (Array.isArray(own)) {
           const at = own.indexOf(notify)
           if (at !== -1) own.splice(at, 1)
         }

@@ -15,7 +15,7 @@ import { createSettingsMotionTab } from './settings-tab-motion'
 import { createSettingsSidebarTab } from './settings-tab-sidebar'
 import { installThemeFlip } from './theme-flip'
 import { fontThemeOf, installFontPreferences } from './font-preferences'
-import { bindFontFace, bindFontContext } from './settings-tab-appearance'
+import { bindFontFace, bindFontContext, readFontFace } from './settings-tab-appearance'
 import type { Prefs } from '../../constants'
 import type { SettingsTabId } from '../../core/feature'
 import type { HostContext } from '@dsh-claude-style/engine/host'
@@ -227,11 +227,16 @@ export function ClaudeStyleSettingsSection(props: { embed?: boolean }) {
   // change event. The face lives outside React (the rows read it directly),
   // so a change re-renders the page the way a preference change does — one
   // counter in the page's own state, bumped by the face's subscription.
-  const fontTick = React.useRef<((n: number) => number) | null>(null)
   React.useEffect(() => {
-    const ctx = ctxRef.current
-    const theme = ctx === null ? null : fontThemeOf(ctx as Parameters<typeof fontThemeOf>[0])
-    const face = installFontPreferences(theme)
+    const shared = readFontFace()
+    if (shared !== null) {
+      const off = shared.subscribe(() => { fontBump[1](n => n + 1) })
+      fontBump[1](n => n + 1)
+      return off
+    }
+    const ctx = ctxRef.current as HostContext | null
+    const theme = ctx === null ? null : fontThemeOf(ctx)
+    const face = installFontPreferences(theme, listener => ctx?.on?.('theme/change', listener))
     bindFontFace(face)
     bindFontContext(ctx)
     const off = face.subscribe(() => { fontBump[1](n => n + 1) })
@@ -403,6 +408,9 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   // The flip's transition suppression rides this page: both exist exactly
   // while this theme paints the page (D74).
   const stopThemeFlip = installThemeFlip()
+  const fontFace = installFontPreferences(fontThemeOf(ctx), listener => ctx.on?.('theme/change', listener))
+  bindFontFace(fontFace)
+  bindFontContext(ctx)
   // The settings services are up by now even when they were not at apply
   // time, so retry the official-form binding before choosing a seat. It is
   // idempotent.
@@ -426,7 +434,13 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     }
     quickProviderHandle = () => ui.quickProviders ?? null
   }
-  if (typeof ctx.inject !== 'function') return stopThemeFlip
+  if (typeof ctx.inject !== 'function') {
+    return () => {
+      stopThemeFlip()
+      fontFace.stop()
+      bindFontFace(null)
+    }
+  }
   const fiber = ctx.inject(['slots'], scope => {
     const slots = hostSlots(scope)
     if (slots === undefined || slots === null || typeof slots.inject !== 'function') return
@@ -463,6 +477,8 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   })
   return () => {
     stopThemeFlip()
+    fontFace.stop()
+    bindFontFace(null)
     hostSettings.stopSettingsDrive()
     if (ui && ui.settingsNav) {
       delete ui.settingsNav

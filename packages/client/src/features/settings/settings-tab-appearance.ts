@@ -33,7 +33,7 @@ export function bindFontContext(ctx: unknown) {
 }
 
 /** The face, or null on a page whose host carries no theme service. */
-function face() {
+export function readFontFace() {
   return fontFace
 }
 
@@ -68,39 +68,36 @@ function sizeStepper(role: 'text' | 'code') {
 }
 
 /**
- * One family field: the draft keeps the caret while the reader types, the
+ * One family field: the DOM input keeps the caret while the reader types, the
  * write lands on blur or Enter, Escape hands the host's value back, and a
- * change from outside fills an untouched field. The draft lives in a ref, so
- * the caret never moves under a re-render the face's change fires.
+ * change from outside updates the keyed default value.
  */
 function familyField(role: HostFontRole) {
   const face = fontFace
   const value = face?.snapshot().fontFamilies[role] ?? ''
-  const draftRef = React.useRef(value)
-  // A change from outside (the host's own row, another seat) fills an
-  // untouched field; one the reader is editing keeps its draft.
-  if (draftRef.current === value || draftRef.current === '') draftRef.current = value
   const unavailable = face === null || !face.available
   return React.createElement('input', {
+    key: `${role}:${value}`,
     type: 'text',
     className: 'dsh-claude-settings-input dsh-claude-settings-font-input',
-    value: draftRef.current,
+    defaultValue: value,
     disabled: unavailable,
     placeholder: copy('fontPlaceholder'),
     spellCheck: false,
     autoComplete: 'off',
     'aria-label': role === 'text' ? copy('fontFamilyTitle') : copy('fontFamilyCodeTitle'),
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => { draftRef.current = e.target.value },
-    onBlur: () => {
-      if (face !== null && draftRef.current !== face.snapshot().fontFamilies[role]) face.setFamily(role, draftRef.current)
+    onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+      const next = e.currentTarget.value
+      if (face !== null && next !== face.snapshot().fontFamilies[role]) face.setFamily(role, next)
     },
     onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         e.preventDefault()
-        if (face !== null && draftRef.current !== face.snapshot().fontFamilies[role]) face.setFamily(role, draftRef.current)
+        const next = e.currentTarget.value
+        if (face !== null && next !== face.snapshot().fontFamilies[role]) face.setFamily(role, next)
         e.currentTarget.blur()
       } else if (e.key === 'Escape') {
-        draftRef.current = value
+        e.currentTarget.value = value
         e.currentTarget.blur()
       }
     },
