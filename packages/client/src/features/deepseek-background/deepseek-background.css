@@ -42,6 +42,15 @@ body[data-dsh-claude-style] .dsh-claude-deepseek-layer {
   background: linear-gradient(180deg, #9cc1e7 0%, #bfd6f2 52%, #d8e6f8 100%);
 }
 
+/* Over the wash the Claude card's mid-grey ink reads washed out, and the
+   DeepSeek site sets its copy near-black: the light scheme's primary label
+   takes the ink the theme's own light fallback carries, and the secondary
+   steps come down with it. Dark keeps its own inks. */
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-dsh-claude-deepseek-background]:not([data-ds-dark-theme]) {
+  --dsw-alias-label-primary: #161616;
+  --dsw-alias-label-secondary: #44403c;
+}
+
 body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-deepseek-layer {
   background: linear-gradient(180deg, rgba(37, 56, 93, 0.72) 0%, rgba(28, 43, 72, 0.58) 52%, rgba(21, 32, 54, 0.46) 100%);
 }
