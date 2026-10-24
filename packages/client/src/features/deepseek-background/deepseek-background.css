@@ -42,16 +42,15 @@ body[data-dsh-claude-style] .dsh-claude-deepseek-layer {
   background: linear-gradient(180deg, #9cc1e7 0%, #bfd6f2 52%, #d8e6f8 100%);
 }
 
-/* Over the wash the Claude card's mid-grey ink ladder reads washed out, and
-   the DeepSeek site sets its copy near-black: the light scheme's label tokens
-   take the inks the host's own light theme carries (#0f1115 primary,
-   #61666b secondary, #81858c tertiary, #adb2b8 caption), so every tier of
-   copy steps darker together. Dark keeps its own inks. */
+/* Over the wash the Claude card's grey ink ladder reads washed out, and the
+   reader asked for plain black copy: the light scheme's label tokens all take
+   pure black, stepped only by opacity so the tiers keep their hierarchy.
+   Dark keeps its own inks. */
 body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-dsh-claude-deepseek-background]:not([data-ds-dark-theme]) {
-  --dsw-alias-label-primary: #161616;
-  --dsw-alias-label-secondary: #44403c;
-  --dsw-alias-label-tertiary: #61666b;
-  --dsw-alias-label-caption: #81858c;
+  --dsw-alias-label-primary: #000000;
+  --dsw-alias-label-secondary: #000000;
+  --dsw-alias-label-tertiary: #000000;
+  --dsw-alias-label-caption: #000000;
 }
 
 body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-deepseek-layer {
