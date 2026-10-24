@@ -25,7 +25,6 @@ interface Mount {
   layer: HTMLElement
   canvas: HTMLCanvasElement | null
   warp: DeepseekWarp | null
-  dark: boolean
   timer: number
   cancelFrame: (() => void) | null
   stopVisibility: () => void
@@ -52,7 +51,6 @@ export function installDeepseekBackground(column: HTMLElement, mode: 'static' | 
     layer,
     canvas,
     warp,
-    dark: document.body.hasAttribute('data-ds-dark-theme'),
     timer: 0,
     cancelFrame: null,
     stopVisibility: () => {},
@@ -60,7 +58,6 @@ export function installDeepseekBackground(column: HTMLElement, mode: 'static' | 
   }
 
   const onVisibility = () => { syncDrift(mount, mode) }
-  const onMotion = () => { syncDrift(mount, mode) }
   const onLost = (event: Event) => { event.preventDefault() }
   const onRestored = () => {
     mount.warp?.dispose()
@@ -76,10 +73,8 @@ export function installDeepseekBackground(column: HTMLElement, mode: 'static' | 
   }
   if (mode === 'dynamic') {
     document.addEventListener('visibilitychange', onVisibility)
-    document.addEventListener('dsh-claude-motion-change', onMotion)
     mount.stopVisibility = () => {
       document.removeEventListener('visibilitychange', onVisibility)
-      document.removeEventListener('dsh-claude-motion-change', onMotion)
     }
   }
   resizeCanvas(mount)
@@ -89,12 +84,9 @@ export function installDeepseekBackground(column: HTMLElement, mode: 'static' | 
     layer,
     setMode(next: 'static' | 'dynamic') {
       if (layer.parentElement !== column) return
-      const nextDark = document.body.hasAttribute('data-ds-dark-theme')
       if (next === mode) {
-        if (nextDark !== mount.dark) {
-          mount.dark = nextDark
-          mount.warp?.draw()
-        }
+        // The scheme's flip redraws through the scheduler's own pass; here a
+        // same-mode call only re-checks the drift's start conditions.
         syncDrift(mount, mode)
         return
       }
@@ -102,14 +94,11 @@ export function installDeepseekBackground(column: HTMLElement, mode: 'static' | 
       mount.stopVisibility()
       mount.stopVisibility = () => {}
       mode = next
-      mount.dark = nextDark
       layer.setAttribute(LAYER_ATTRIBUTE, mode)
       if (mode === 'dynamic') {
         document.addEventListener('visibilitychange', onVisibility)
-        document.addEventListener('dsh-claude-motion-change', onMotion)
         mount.stopVisibility = () => {
           document.removeEventListener('visibilitychange', onVisibility)
-          document.removeEventListener('dsh-claude-motion-change', onMotion)
         }
         syncDrift(mount, mode)
       } else {
@@ -141,7 +130,7 @@ function stopDrift(mount: Mount) {
   mount.warp?.park()
 }
 
-/** Size and redraw the texture after a column resize. */
+/** Size and redraw the texture after the layer's box moves. */
 function resizeCanvas(mount: Mount) {
   mount.warp?.resize()
   mount.warp?.draw()
@@ -162,7 +151,6 @@ function syncDrift(mount: Mount, mode: 'static' | 'dynamic') {
       write(now) {
         mount.cancelFrame = null
         if (mount.canvas === null) return
-        mount.dark = document.body.hasAttribute('data-ds-dark-theme')
         mount.warp?.draw(now)
         syncDrift(mount, mode)
       },
@@ -184,8 +172,11 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     if (mount !== null && (mount.layer.parentElement !== column || wanted === null)) stopMount()
     if (mount === null && column !== null && wanted !== null) {
       mount = installDeepseekBackground(column, wanted)
+      // The canvas is the viewport-sized element the texture draws into; the
+      // column's box only clips it. Sizing follows the canvas, so a window or
+      // column resize is one invalidation, not one per ancestor.
       resizeObserver = new ResizeObserver(() => { mount?.resize() })
-      resizeObserver.observe(column)
+      resizeObserver.observe(mount.layer)
     } else if (mount !== null && wanted !== null) {
       mount.setMode(wanted)
     }

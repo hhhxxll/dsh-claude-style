@@ -115,6 +115,11 @@ export function createDeepseekWarp(canvas: HTMLCanvasElement): DeepseekWarp {
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width
         canvas.height = height
+        // A larger drawing buffer leaves the previous frame stretched across
+        // it until the next draw; clear it so a resize never shows a smear.
+        gl.viewport(0, 0, width, height)
+        gl.clearColor(0.76, 0.84, 0.93, 1)
+        gl.clear(gl.COLOR_BUFFER_BIT)
       }
     },
     draw(now?: number) {
