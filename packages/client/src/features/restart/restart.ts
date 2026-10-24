@@ -1,13 +1,29 @@
 import * as React from 'react'
 import * as reactDom from 'react-dom/client'
 import * as primitives from '@deepseek-ai/dsh-client-ui-primitives'
-import { desktopBand } from '@dsh-claude-style/engine/desktop-band'
+import { PLATFORM_ATTRIBUTE, WINDOWS_TITLEBAR_ATTRIBUTE } from '@dsh-claude-style/contracts/dom'
 import { hostSlots } from '@dsh-claude-style/engine/host'
 import { copy } from './copy'
 import { nextPollState, probeFromBoot, RESTART_POLL_MS, RESTART_ROUTE, RESTART_SETTLE_MS, restartArrived } from './restart-probe'
 import type { HostContext } from '@dsh-claude-style/engine/host'
 import type { FeatureUi } from '../../core/feature'
 import type manifest from './restart.manifest'
+
+/**
+ * Whether this page is a desktop shell, read ONCE at module load.
+ *
+ * The shell's preload writes `data-windows-titlebar` (Windows) or
+ * `data-platform="darwin"` (macOS) before any plugin code runs, and neither
+ * mark ever changes. Reading it per install would instead see the marks the
+ * smoke's own probes set mid-run on a plain web page, and the entry would
+ * register there — one wake-up pass the stand-in pages do not expect. The
+ * marks are the contract (contracts/table.ts's shell.platform and
+ * shell.windows-titlebar), so no host service read is needed.
+ */
+const DESKTOP_PAGE = typeof document === 'undefined'
+  ? false
+  : document.documentElement.hasAttribute(WINDOWS_TITLEBAR_ATTRIBUTE) ||
+    document.documentElement.getAttribute(PLATFORM_ATTRIBUTE) === 'darwin'
 
 /**
  * The desktop restart entry: one button in the sidebar footer's action seat.
@@ -179,15 +195,13 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   }
 
   /**
-   * Whether this page is the desktop shell: the shell's preload marks the
-   * document for both desktop platforms (data-windows-titlebar,
-   * data-platform=darwin), read synchronously through desktopBand. A probe of
-   * the route would answer the same question, but its fetch settles after the
-   * page's first quiet spell and the slot registration it gates wakes a
-   * scheduler pass then; the marks are on the document before any skin code
-   * runs. The web build never carries them, so it never gets the entry.
+   * The entry stands on the desktop shell alone: a web page has no way to
+   * relaunch itself, and the route refuses the request there anyway. The
+   * answer is the module-load platform mark (DESKTOP_PAGE), never a per-install
+   * read: the smoke's own probes set and clear the titlebar mark mid-run on a
+   * plain page, and an install that re-read it would register the entry there.
    */
-  if (desktopBand() === null) return () => {
+  if (!DESKTOP_PAGE) return () => {
     disposed = true
     if (dialogRoot !== null) {
       dialogRoot.unmount()

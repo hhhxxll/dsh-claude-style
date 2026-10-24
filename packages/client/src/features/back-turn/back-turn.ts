@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as primitives from '@deepseek-ai/dsh-client-ui-primitives'
-import { hostSlots, conversationSessionId, findConversationSession } from '@dsh-claude-style/engine/host'
+import { hostSlots, conversationSessionId, findConversationSession, cacheFirstMatch } from '@dsh-claude-style/engine/host'
 import { holdReader } from '@dsh-claude-style/engine/scroll-owner'
 import { createTurnNavHost } from '../turn-nav/turn-nav-host'
 import { previousTurn } from './back-turn-step'
@@ -72,7 +72,18 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     })
   }
 
-  if (typeof ctx.inject !== 'function') return () => {
+  /**
+   * The seat exists only where the host draws a conversation header: a page
+   * without it (the home, a panel, a stand-in page) has nothing to put a
+   * button into, and a registration made there would still wake the
+   * scheduler once. The declaration's own anchor is the test — the slot
+   * render site carries `[data-slot="<key>"]`, and the host mounts it before
+   * the features install. Read through the engine's cached matcher, so a page
+   * whose structure settles later is answered once its marks arrive.
+   */
+  const seat = cacheFirstMatch<HTMLElement>(`[data-slot="${UTILITIES_SLOT}"]`)
+
+  if (typeof ctx.inject !== 'function' || seat() === null) return () => {
     disposed = true
     host.stop()
   }

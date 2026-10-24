@@ -12,6 +12,6 @@ export default {
     title: 'restartTitle',
     desc: 'restartDesc',
   }],
-  contracts: [],
+  contracts: ['shell.platform', 'shell.windows-titlebar'],
   cases: ['account'],
 } satisfies FeatureManifest
