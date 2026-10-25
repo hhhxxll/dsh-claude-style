@@ -118,6 +118,16 @@ export const TYPEFACE_ATTR = 'data-dsh-claude-typeface'
  * body — the mirror carries it so a pass sees the mode the reader picked.
  */
 export const DEEPSEEK_BACKGROUND_ATTR = 'data-dsh-claude-deepseek-background'
+/**
+ * Whether code takes the face's ligatures — `on` or `off`, and absent while the
+ * reader has not chosen (the shipped default is off). theme/typography.css folds
+ * `==` into one long mark when it is `on`, which reads badly for someone
+ * learning the language: `==` and `===` come out the same length.
+ */
+export const CODE_LIGATURES_ATTR = 'data-dsh-claude-code-ligatures'
+/** The attribute's two values: the face's ligatures kept, or turned off. */
+export const CODE_LIGATURES_ON = 'on'
+export const CODE_LIGATURES_OFF = 'off'
 export const MASCOT_ATTR = 'data-dsh-claude-mascot'
 export const SEARCH_STYLE_ATTR = 'data-dsh-claude-search-style'
 export const SIDEBAR_LAYOUT_ATTR = 'data-dsh-claude-sidebar-layout'

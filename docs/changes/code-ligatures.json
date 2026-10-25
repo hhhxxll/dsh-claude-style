@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-25",
+  "group": "new",
+  "order": 5,
+  "external": false,
+  "zh": "新增「代码连字」开关，默认关闭：关闭时等号、箭头等符号分开显示，`==` 与 `===` 的长度不再相同，光标可停在两字符之间；开启时恢复字体自带的连字。",
+  "en": "Add a code ligature switch, off by default: with it off, operators such as equals and arrows stand as separate marks, `==` and `===` no longer share a length and the caret can sit between two characters; on, the face's own ligatures return."
+}

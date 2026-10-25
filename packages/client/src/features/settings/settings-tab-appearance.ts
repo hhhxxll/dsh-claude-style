@@ -179,6 +179,18 @@ export function createSettingsAppearanceTab(): SettingsTab {
           familyField('code'),
         ),
       },
+      // The ligature switch closes the font rows: it belongs to the code face
+      // above it, and it is the one font question a reader answers by what they
+      // see rather than by a name — see theme/typography.css for the rule.
+      {
+        rank: 54,
+        node: controls.row(
+          'codeLigatures',
+          copy('codeLigaturesTitle'),
+          copy('codeLigaturesDesc'),
+          controls.toggle(prefs.codeLigatures, value => { write({ codeLigatures: value }) }),
+        ),
+      },
     ]
   }
   return { id: 'appearance', label: () => copy('tabAppearance'), rows }

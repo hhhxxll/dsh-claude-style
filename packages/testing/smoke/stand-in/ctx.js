@@ -19,10 +19,39 @@
   var slotRegistry = host.slotRegistry
 
   window.__permissionCommands = host.permissionCommands
+  /**
+   * The host's `theme` service, as far as the skin reads it: the sizes and
+   * families it stores, the two writes, and `theme/change` as the listeners on
+   * the service itself. The host keeps these in its settings document, so a
+   * write answers the same way a stored value does — the value moves, then every
+   * listener hears it.
+   */
+  var themeListeners = []
+  var themeState = {
+    fontSizes: { text: 14, code: 11, terminal: 13 },
+    fontFamilies: { text: '', code: '', terminal: '' },
+    revision: 0,
+  }
+  var themeService = {
+    listeners: themeListeners,
+    getTheme: function () { return themeState },
+    setFontSize: function (role, px) {
+      themeState.fontSizes[role] = px
+      themeState.revision += 1
+      for (var i = 0; i < themeListeners.length; i++) themeListeners[i]()
+    },
+    setFontFamily: function (role, value) {
+      themeState.fontFamilies[role] = value
+      themeState.revision += 1
+      for (var i = 0; i < themeListeners.length; i++) themeListeners[i]()
+    },
+  }
+  window.__dshSmokeHost.theme = themeService
   window.__ctx = {
     fiber: { entry: { id: 'ui-skin-claude-style' } },
     get: function (name) {
       if (name === 'configForms') return forms
+      if (name === 'theme') return themeService
       if (name === 'remote.account') return account
       if (name === 'remote.permissionPresets') return permissionPresets
       if (name === 'remote') return CASE === 'desktop' || CASE === 'session-title' ? remote : undefined

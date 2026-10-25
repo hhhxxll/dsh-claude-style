@@ -63,6 +63,10 @@
     { "id": "menuFold.group", "selector": "[data-menu-group]", "feature": "model-menu-fold", "sees": "one provider's group in the host's own model menu: the section its heading names and the model rows under that heading" },
     { "id": "menuFold.folded", "attribute": "data-dsh-claude-menu-group-folded", "feature": "model-menu-fold", "sees": "the folded state of one provider group in the host's model menu, written on that provider's heading" },
     { "id": "menuFold.row", "selector": "[data-menu-group] [role=\"menuitemradio\"]", "feature": "model-menu-fold", "sees": "one model of a provider group in the host's model menu, hidden from the page while its provider stands folded" },
-    { "id": "menuFold.seat", "selector": "[data-slot=\"conversation.input.model\"] [data-dsh-claude-part~=\"trigger\"]", "feature": "model-menu-fold", "sees": "the host's own model seat in the composer row, which opens the host's model menu when the skin's picker is switched off" }
+    { "id": "menuFold.seat", "selector": "[data-slot=\"conversation.input.model\"] [data-dsh-claude-part~=\"trigger\"]", "feature": "model-menu-fold", "sees": "the host's own model seat in the composer row, which opens the host's model menu when the skin's picker is switched off" },
+    { "id": "codeLigatures.mark", "attribute": "data-dsh-claude-code-ligatures", "feature": "settings", "sees": "whether code keeps the face's ligatures, written on the page by the Appearance tab's switch: `on` while the reader wants them, `off` while they stand apart" },
+    { "id": "codeLigatures.prose", "selector": "[data-dsh-claude-part~=\"markdown\"]", "feature": "settings", "sees": "a block of conversation prose, the element the skin's typography scopes to and the parent a code block hangs under" },
+    { "id": "codeLigatures.block", "selector": ".md-code-block pre", "feature": "settings", "sees": "the pre element of a code block in the conversation: the element whose ligature setting the switch decides" },
+    { "id": "codeLigatures.inline", "selector": "code:not(pre code)", "feature": "settings", "sees": "an inline code span in the conversation, which the switch also reaches" }
   ]
 }

@@ -325,6 +325,13 @@ export const PREFS = {
   chatReveal: { type: 'choice', values: CHAT_REVEAL_MODES, default: CHAT_REVEAL_OFF },
   caretMotion: { type: 'choice', values: CARET_MOTIONS, default: CARET_MOTION_TYPING },
   messageEnter: { type: 'choice', values: MESSAGE_ENTER_MODES, default: MESSAGE_ENTER_FLIGHT },
+  /**
+   * Whether code takes its face's ligatures. Off by default: a ligature folds
+   * `==` into one long mark and `===` into a longer one, so a reader still
+   * learning the language sees two operators of equal length, and the caret
+   * lands in the middle of a glyph the text has only one of.
+   */
+  codeLigatures: { type: 'boolean', default: false },
 } as const satisfies Record<string, PrefSpec>
 
 /** One preference's key. */

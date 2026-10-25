@@ -228,6 +228,16 @@ body[data-dsh-claude-style] .md-code-block pre code {
   font-weight: 500 !important;
 }
 
+/* Code takes its face's own ligatures only when the reader asks for them
+   (D9's settings row): a ligature folds `==` into one long mark and `===` into a
+   longer one, so the two operators come out the same length and the caret lands
+   inside a glyph the text has only one of. `font-variant-ligatures` is the only
+   switch that reaches Maple Mono's substitutions — its `calt`, `liga`, `clig`
+   and `dlig` features are all ignored by the browser when named one by one. */
+body[data-dsh-claude-style]:not([data-dsh-claude-code-ligatures="on"]) :is(pre, code) {
+  font-variant-ligatures: none;
+}
+
 /* One pixel below the surrounding copy; the inner <code> inherits rather than
    compounding the calc(). */
 body[data-dsh-claude-style] pre {

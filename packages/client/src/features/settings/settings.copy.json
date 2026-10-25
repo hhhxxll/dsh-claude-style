@@ -84,6 +84,8 @@
   "fontFamilyDesc": { "zh": "界面与会话正文的字体，多个候选用英文逗号分隔，留空恢复默认。", "en": "The interface and prose face; separate candidates with commas, empty restores the default." },
   "fontFamilyCodeTitle": { "zh": "代码字体", "en": "Code font" },
   "fontFamilyCodeDesc": { "zh": "代码块与行内代码的字体，留空恢复默认。", "en": "The face code blocks and inline code are set in; empty restores the default." },
+  "codeLigaturesTitle": { "zh": "代码连字", "en": "Code ligatures" },
+  "codeLigaturesDesc": { "zh": "开启后等号、箭头等符号合成连体字形；关闭时每个符号分开显示，更适合初学与逐字阅读。", "en": "On, operators such as equals and arrows merge into single ligature glyphs; off, each symbol stands on its own, which reads better while learning and while stepping through code character by character." },
   "fontUnavailable": { "zh": "当前宿主未提供字体设置服务。", "en": "This host carries no font settings service." },
   "fontPlaceholder": { "zh": "默认", "en": "Default" },
   "fontIncrease": { "zh": "增大字号", "en": "Increase the size" },
