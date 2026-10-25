@@ -29,6 +29,7 @@ export interface Handles {
   contextStats: FeatureHandle
   meterRing: MeterRingHandle
   model: ModelHandle
+  modelMenuFold: FeatureHandle
   peakrate: PeakRateHandle
   effort: FeatureHandle
   heroMenu: FeatureHandle

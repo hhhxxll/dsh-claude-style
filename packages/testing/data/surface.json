@@ -58,6 +58,11 @@
     { "id": "sessionTitle.field", "selector": ".dsh-claude-session-title", "feature": "session-title", "sees": "the field a press on the header's session title opens, standing over the words it renames with the name the session list carries" },
     { "id": "sessionTitle.tip", "selector": ".dsh-claude-session-title-tip", "feature": "session-title", "sees": "the tip the pointer over the session title raises under the words, naming what a press on the name does" },
     { "id": "deepseek.layer", "attribute": "data-dsh-claude-deepseek-background", "feature": "deepseek-background", "sees": "the conversation area's decoration layer and the mode it stands in: the static wash, or the same wash with the drift's canvas under it" },
-    { "id": "deepseek.canvas", "selector": ".dsh-claude-deepseek-canvas", "feature": "deepseek-background", "sees": "the drift's canvas inside the decoration layer, drawn only while the mode is dynamic" }
+    { "id": "deepseek.canvas", "selector": ".dsh-claude-deepseek-canvas", "feature": "deepseek-background", "sees": "the drift's canvas inside the decoration layer, drawn only while the mode is dynamic" },
+    { "id": "menuFold.heading", "selector": "[data-menu-group-heading]", "feature": "model-menu-fold", "sees": "a provider's name heading its group in the host's own model menu: the row a press folds, carrying the state a screen reader reads" },
+    { "id": "menuFold.group", "selector": "[data-menu-group]", "feature": "model-menu-fold", "sees": "one provider's group in the host's own model menu: the section its heading names and the model rows under that heading" },
+    { "id": "menuFold.folded", "attribute": "data-dsh-claude-menu-group-folded", "feature": "model-menu-fold", "sees": "the folded state of one provider group in the host's model menu, written on that provider's heading" },
+    { "id": "menuFold.row", "selector": "[data-menu-group] [role=\"menuitemradio\"]", "feature": "model-menu-fold", "sees": "one model of a provider group in the host's model menu, hidden from the page while its provider stands folded" },
+    { "id": "menuFold.seat", "selector": "[data-slot=\"conversation.input.model\"] [data-dsh-claude-part~=\"trigger\"]", "feature": "model-menu-fold", "sees": "the host's own model seat in the composer row, which opens the host's model menu when the skin's picker is switched off" }
   ]
 }

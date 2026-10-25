@@ -1,0 +1,42 @@
+/* ---------- The host's own model menu: provider groups folded ---------- */
+/* The heading a press folds. The host draws it as an inert line inside the
+   group's section; this sheet gives it the look and the pointer of a control
+   and the fold's own resting state. The row count is the heading's, worked out
+   by the feature (features/model-menu-fold/menu-groups.ts). */
+body[data-dsh-claude-style] [data-menu-group-heading] {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 6px;
+  transition: color var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] [data-menu-group-heading]:hover {
+  color: var(--dsw-alias-label-secondary, #70686a);
+}
+/* The disclosure mark: the same chevron the skin's own cards draw, turned to
+   point down while the group stands open. It is drawn before the name, so the
+   provider's own words stay where the host put them. */
+body[data-dsh-claude-style] [data-menu-group-heading]::before {
+  content: "";
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  transition: transform var(--dsh-claude-timing-feedback);
+  transform-origin: 40% 50%;
+}
+body[data-dsh-claude-style] [data-menu-group-heading][data-dsh-claude-menu-group-folded="true"]::before {
+  transform: rotate(90deg);
+}
+/* The reader's animation choice, resolved onto <body> (D40): reduced takes the
+   turn away and the mark lands where the state says. */
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] [data-menu-group-heading]::before {
+  transition: none;
+}
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] [data-menu-group-heading] {
+  transition: none;
+}

@@ -797,6 +797,12 @@
         0
       ]
     },
+    "packages/testing/smoke/cases/menu-fold.mjs": {
+      "a folded provider keeps its heading and hides every row it names": [
+        0,
+        2
+      ]
+    },
     "packages/testing/smoke/cases/model.mjs": {
       "the picker draws level 1 with the seat's own row under the list": [
         3

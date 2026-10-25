@@ -1,0 +1,5 @@
+{
+  "folded": { "zh": "该供应商的模型已收起，按回车展开", "en": "This provider's models are folded; press Enter to open them" },
+  "open": { "zh": "该供应商的模型已展开，按回车收起", "en": "This provider's models are open; press Enter to fold them" },
+  "groupToggleTitle": { "zh": "点击收起或展开该供应商的模型", "en": "Press to fold or open this provider's models" }
+}

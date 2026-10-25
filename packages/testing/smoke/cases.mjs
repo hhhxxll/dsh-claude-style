@@ -12,8 +12,9 @@ import agent from './cases/agent.mjs'
 import chat from './cases/chat.mjs'
 import mascot from './cases/mascot.mjs'
 import model from './cases/model.mjs'
+import menuFold from './cases/menu-fold.mjs'
 import peer from './cases/peer.mjs'
 
-const CASES = { ...shell, ...stats, ...settings, ...agent, ...chat, ...mascot, ...model, ...peer }
+const CASES = { ...shell, ...stats, ...settings, ...agent, ...chat, ...mascot, ...model, ...menuFold, ...peer }
 
 export { CASES }

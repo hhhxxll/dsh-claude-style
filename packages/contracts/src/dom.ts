@@ -319,6 +319,15 @@ export const FOREGROUND_SELECTOR = '[role="dialog"][aria-modal="true"], [role="m
 /** The host's menu card and its list, which the skin injects a row into. */
 export const MENU_ROLE_SELECTOR = '[role="menu"]'
 export const MENU_LIST_SELECTOR = '[role="presentation"]'
+/**
+ * One provider group of the host's model menu: the `section` its shared
+ * MenuGroup draws, carrying the heading beside the rows it names. The model
+ * menu is the one card the host groups (`ui-primitives`' MenuGroup); the
+ * command palettes draw headings of their own instead.
+ */
+export const MENU_GROUP_SELECTOR = '[data-menu-group]'
+/** The provider name a model menu group is headed with: the row the fold presses. */
+export const MENU_GROUP_HEADING_SELECTOR = '[data-menu-group-heading]'
 /** The host's account trigger in the sidebar footer. */
 export const ACCOUNT_TRIGGER_SELECTOR = '[aria-haspopup="menu"][data-signed-out]'
 /**

@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-25",
+  "group": "new",
+  "order": 4,
+  "external": false,
+  "zh": "新增宿主模型菜单的供应商折叠：关闭「重绘模型选择器」后，每个供应商的标题都可以按一下收起、再按一下展开，键盘的 Enter 与空格同样可用；菜单打开时停在当前模型所在的供应商，输入搜索词时全部展开。",
+  "en": "Add provider folding to the host's own model menu: with \"Redraw the model picker\" switched off, a press on a provider's name folds its models away and a second press brings them back, Enter and Space fold it from the keyboard, the menu opens on the provider holding the current model, and typing a search opens every provider."
+}

@@ -45,6 +45,7 @@ const STAND_IN_PARTS = [
   'sessions.js',
   'session-title.js',
   'model-directory.js',
+  'model-menu.js',
   'config-forms.js',
   'slots.js',
   'ctx.js',
@@ -83,6 +84,7 @@ const PROBE_PARTS = [
   'dock-cards.js',
   'sidebar-layout.js',
   'model-meter.js',
+  'menu-fold.js',
   'peer.js',
   'teardown.js',
 ]
@@ -464,8 +466,14 @@ function page(name, tier, cases, probe = PROBE) {
   // The context meter's own ring stands after that seat
   // (features/context-stats/meter-ring.ts), so the cases that read that row
   // carry the slot too.
-  var modelSeat = name === 'effort' || name === 'context-stats' || name === 'stats-compact' || name === 'stats-inline'
+  var modelSeat = name === 'effort' || name === 'context-stats' || name === 'stats-compact' || name === 'stats-inline' || name === 'menu-fold'
     ? '<div data-slot="conversation.input.model" style="display:contents"><div class="_root_m_1"><button type="button" class="_trigger_m_1">' + MODEL_SEAT_NAME + '</button></div></div>'
+    : ''
+  // The menu-fold page draws the host's own model menu over its seat, and the
+  // rows its query does not reach leave the layout the way the host's
+  // re-rendered list does; the mark is the page's own and dresses nothing.
+  var modelMenuStyle = name === 'menu-fold'
+    ? '<style>[data-filtered-out] { display: none !important; }</style>'
     : ''
   // The hint the host's editor draws on an empty draft, inside the grow wrapper
   // beside the field, which is where the host renders it; and the rail
@@ -510,6 +518,7 @@ ${boot}
 ${skinOwner}
 ${motionStub}
 ${sidebarStyle}
+${modelMenuStyle}
 <div data-slot="root">
 <div data-slot="sidebar">
   <div class="_root_x_1">
