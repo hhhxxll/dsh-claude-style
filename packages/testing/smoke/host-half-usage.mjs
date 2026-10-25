@@ -4,6 +4,7 @@
  */
 import fs from 'fs'
 import path from 'path'
+import { pathToFileURL } from 'url'
 import { ROOT, same, check } from './shared.mjs'
 
 /**
@@ -390,6 +391,53 @@ async function hostUsage({ mod, fakeHost, request, browser, scratchHome, scratch
       Date.now = realNow
     }
     fs.rmSync(home, { recursive: true, force: true })
+  }
+
+  // The two spellings a session id has: the usage pass reads a log by its
+  // logical id while the record and the directory keep the stored name. The
+  // mapping has to survive every id a plugin can generate, and the merge has to
+  // keep a folded day the ledger never recorded — the history before the cost
+  // meter was installed.
+  console.log('\nhost half — session id spellings and the days the ledger leaves out')
+  {
+    const names = await import(pathToFileURL(path.join(ROOT, 'lib', 'host', 'session-name.js')).href)
+    const ids = [
+      'im:slack:dm:user:token@example.com',
+      'a/../b',
+      '会话 id',
+      '~007E',
+      '.',
+      '..',
+      'plain-id_1.2',
+    ]
+    const bad = []
+    for (const id of ids) {
+      const stored = names.sessionDirectoryName(id)
+      const back = names.sessionIdFromDirectoryName(stored)
+      if (back !== id) bad.push(`${id} -> ${stored} -> ${back}`)
+    }
+    check('every logical id round-trips through its stored directory name',
+      bad.length === 0, bad.join('; '))
+
+    const summary = await import(pathToFileURL(path.join(ROOT, 'lib', 'host', 'usage-summary.js')).href)
+    const buckets = (input, sessionId) => ({
+      input, output: 0, cacheRead: 0, cacheWrite: 0, calls: 1, sessionIds: [sessionId],
+    })
+    const ledger = new Map([['2026-01-02', buckets(20, 'ledger-session')]])
+    const folded = new Map([['stored-a', {
+      days: new Map([
+        ['2026-01-01', buckets(1, 'folded-a')],
+        ['2026-01-02', buckets(2, 'folded-a')],
+        ['2026-01-03', buckets(3, 'folded-a')],
+      ]),
+    }]])
+    const merged = summary.mergeLedgerFold(ledger, folded)
+    check('a day the ledger never recorded survives before the ledger\'s newest day',
+      merged.days.get('2026-01-01')?.input === 1 && merged.days.get('2026-01-03')?.input === 3,
+      JSON.stringify([...merged.days.entries()].map(([date, day]) => [date, day.input])))
+    check('a day both accounts carry stays the ledger\'s',
+      merged.days.get('2026-01-02')?.sessionIds?.[0] === 'ledger-session',
+      JSON.stringify(merged.days.get('2026-01-02')))
   }
 }
 

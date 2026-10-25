@@ -16,12 +16,12 @@
  * does — a literal, case-insensitive, whitespace-flexible scan.
  *
  * Caching. Each session's corpus is kept in memory and in
- * `$DSH_HOME/cache/dsh-claude-style/search/<sessionId>.json` beside a change
- * token: the persistence revision for a stored log, the log length for a session
- * the host holds open. A warm start reads those files and re-reads only the
- * sessions whose token moved; a session the host holds open contributes only the
- * events appended since the last fold, because its log is in memory. The first
- * search on a machine with no cache reads every top-level session once.
+ * `$DSH_HOME/cache/dsh-claude-style/search/<sha256 of the id>.json` beside a
+ * change token: the persistence revision for a stored log, the log length for a
+ * session the host holds open. A warm start reads those files and re-reads only
+ * the sessions whose token moved; a session the host holds open contributes only
+ * the events appended since the last fold, because its log is in memory. The
+ * first search on a machine with no cache reads every top-level session once.
  *
  * Everything here runs only while the reader has the search box switched on:
  * the route is called by the palette alone, so a corpus is never built for a
@@ -111,6 +111,7 @@ interface CachedSession {
 }
 
 import { PACKAGE_NAME } from '@dsh-claude-style/contracts/package'
+import { createHash } from 'node:crypto'
 import type { DshContext } from '@dsh-claude-style/engine/node/dsh'
 import { cachePath, readJsonDocument, writeJsonDocument } from './cache-file.js'
 import { readEvents } from '@dsh-claude-style/engine/node/session-events'
@@ -199,9 +200,15 @@ export function createSessionSearch(ctx: DshContext) {
   /** The stored sessions' id → revision, and when it was last listed. */
   let stored: Map<string, string> | null = null
   let listedAt = 0
+  /** Set by dispose: a pass that outlives its routes must not write a cache file. */
+  let disposed = false
 
+  /**
+   * The cache file for one session: its id hashed, because an id can carry `:`,
+   * `/` or `..` and the entry has to stay one file inside this directory.
+   */
   function cacheFile(sessionId: string) {
-    return cachePath(ctx, 'search', `${sessionId}.json`)
+    return cachePath(ctx, 'search', `${createHash('sha256').update(sessionId).digest('hex')}.json`)
   }
 
   /** One session's corpus from its cache file, or null when there is none this build can read. */
@@ -222,6 +229,9 @@ export function createSessionSearch(ctx: DshContext) {
 
   /** Hold one session's corpus in memory and, at the write interval, on disk. */
   function adopt(sessionId: string, entry: CachedSession, force: boolean) {
+    // A corpus rebuilt after the routes left belongs to no page: it must not
+    // write the cache file of a plugin that is no longer installed.
+    if (disposed) return
     cache.set(sessionId, entry)
     lower.set(sessionId, entry.messages.map(message => message.text.toLowerCase()))
     const now = Date.now()
@@ -237,6 +247,7 @@ export function createSessionSearch(ctx: DshContext) {
 
   /** Drop one session's corpus from memory and from disk. */
   function forget(sessionId: string) {
+    if (disposed) return
     cache.delete(sessionId)
     lower.delete(sessionId)
     writtenAt.delete(sessionId)
@@ -246,12 +257,16 @@ export function createSessionSearch(ctx: DshContext) {
   /** Fold one session's complete log into a corpus. */
   async function rebuild(sessionId: string, revision: string) {
     const events = await readEvents<LogEvent>(ctx, PACKAGE_NAME, sessionId, 'content search')
-    const messages = events === null ? [] : messagesOf(events)
+    if (disposed) return
+    // A null is a log the host would not hand back this pass: adopt nothing, so
+    // the entry already held stands and the next pass retries, rather than an
+    // empty corpus frozen at the current revision.
+    if (events === null) return
     // The next seq to read, off the log itself: a fold that stopped at the last
     // message would re-read the events after it on every live tail read.
-    const last = events === null ? undefined : events[events.length - 1]
+    const last = events[events.length - 1]
     const lastSeq = typeof last?.seq === 'number' ? last.seq + 1 : 0
-    adopt(sessionId, { revision, lastSeq, messages }, false)
+    adopt(sessionId, { revision, lastSeq, messages: messagesOf(events) }, false)
   }
 
   /**
@@ -384,6 +399,7 @@ export function createSessionSearch(ctx: DshContext) {
    * serve it: a reloaded plugin builds a fresh one from the cache files.
    */
   function dispose() {
+    disposed = true
     cache.clear()
     lower.clear()
     writtenAt.clear()

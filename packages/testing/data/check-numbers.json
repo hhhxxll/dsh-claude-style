@@ -891,10 +891,10 @@
       "every switched feature is on by default": [
         5
       ],
-      "the host dropping the section heading takes the workspace control and the archived list off the page with it": [
+      "the host dropping the section heading takes the workspace control off the page with it, leaving the host's own tree where it stands": [
         0
       ],
-      "the heading coming back seats both in the section again": [
+      "the heading coming back seats the control in the section again": [
         0
       ],
       "a feature switched off before the page loads never installs": [

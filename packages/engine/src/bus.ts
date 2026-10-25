@@ -36,6 +36,12 @@ export interface MutationOptions {
   subtree?: boolean
   /** Leave out the skin's own quiet writes (skin().quiet): they are no page change. */
   skipQuiet?: boolean
+  /**
+   * Run in the observer's callback even when the batch is large and the rest
+   * waits for the next task: the callback writes what the same frame's paint
+   * reads (the workspace rows' parts), not an idempotent scan.
+   */
+  beforePaint?: boolean
 }
 
 interface MutationSubscription {
@@ -157,22 +163,36 @@ function dispatchSlices() {
   }
 }
 
+/** Hand one subscription the records it selects, isolating its failure from the rest (D12). */
+function deliver(subscription: MutationSubscription, records: MutationRecord[]) {
+  const selected = records.filter(record => selects(subscription, record))
+  if (selected.length === 0) return
+  try { subscription.callback(selected) } catch (error) { reportError(error) }
+}
+
 function routeRecords(records: MutationRecord[], audience: MutationSubscription[] = mutationSubscriptions.slice()) {
   // A batch a session switch mounts is scanned after the paint: its callbacks
   // are idempotent passes, and nothing the reader is looking at in that frame
-  // is drawn by them.
+  // is drawn by them. A subscription whose writes the paint reads asks for
+  // `beforePaint` and runs now (D40's consequence names both timings).
   if (batchWeight(records) > SYNC_BATCH_WEIGHT) {
-    deferredBatches.push({ records, audience, cursor: 0 })
-    scheduleDispatch()
+    const deferred: MutationSubscription[] = []
+    for (const subscription of audience) {
+      // A subscription an earlier callback in this batch removed hears nothing more.
+      if (!mutationSubscriptionSet.has(subscription)) continue
+      if (subscription.options.beforePaint === true) deliver(subscription, records)
+      else deferred.push(subscription)
+    }
+    if (deferred.length > 0) {
+      deferredBatches.push({ records, audience: deferred, cursor: 0 })
+      scheduleDispatch()
+    }
     return
   }
   for (const subscription of audience) {
     // A subscription an earlier callback in this batch removed hears nothing more.
     if (!mutationSubscriptionSet.has(subscription)) continue
-    const selected = records.filter(record => selects(subscription, record))
-    if (selected.length === 0) continue
-    // One subscriber's error must neither stop the others nor vanish (D12).
-    try { subscription.callback(selected) } catch (error) { reportError(error) }
+    deliver(subscription, records)
   }
 }
 

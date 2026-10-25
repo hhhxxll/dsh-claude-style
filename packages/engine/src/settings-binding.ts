@@ -166,8 +166,9 @@ export function createSettingsBinding(options: SettingsBindingOptions) {
      * Write a partial change through the official form: one `set()` per field,
      * chained, because the controller owns the write queue and takes its
      * revision fence from the last settlement. The fields stay held until the
-     * answer lands, and the host's answer is read back then, so a refusal ends
-     * on the stored value rather than on the value we hoped for.
+     * answer lands — a rejection counts as the answer — and the host's value is
+     * read back then, so a refusal ends on the stored value rather than on the
+     * value we hoped for.
      *
      * @returns a promise for whether the host accepted every field, or null
      *          when the form does not carry values yet.
@@ -188,7 +189,10 @@ export function createSettingsBinding(options: SettingsBindingOptions) {
           return false
         }
         if (typeof pending === 'boolean' || pending === undefined) return typeof pending === 'boolean' ? pending : true
-        return pending.then((ok: unknown) => ok === true)
+        // A rejected set() is the same refusal as the synchronous throw: the
+        // field is released and the stored value read back, so a failure that
+        // crossed the wire cannot leave this page's value held over the document.
+        return pending.then((ok: unknown) => ok === true, () => false)
       }
       let run = Promise.resolve(true)
       for (const key of Object.keys(patch)) run = run.then(step(key))

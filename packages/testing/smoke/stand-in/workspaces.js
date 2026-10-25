@@ -1,6 +1,8 @@
 /**
- * The switch cases also need the sidebar workspace view, which follows the
- * host's two client lists: an empty archive set, ready.
+ * The switch cases also carry the host's workspace list: the search feature
+ * reads it to leave archived sessions out of its rows. The archive set is empty
+ * and the list is ready. The sidebar's own workspace view no longer reads it —
+ * that browser is the host's, driven through its view store (stand-in/slots.js).
  */
 (function () {
   var host = window.__dshSmokeHost

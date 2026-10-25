@@ -8,9 +8,11 @@
  * figure the fold alone can supply; the ledger has no hour dimension.
  *
  * The cost meter's ledger and our own fold are two accounts of the same days, so
- * they combine by date and never by addition: a day the ledger knows is the
- * ledger's, and only the dates past its newest come from the fold. Adding
- * the fold's days on top of the ledger's would count the same settlements twice.
+ * they combine by date and never by addition: a day the ledger recorded is the
+ * ledger's, and every day it left out comes from the fold — the stretch after it
+ * stopped writing, the history before it was installed, and the days of sessions
+ * deleted since. Adding the fold's days on top of the ledger's would count the
+ * same settlements twice.
  */
 import { BUCKET_KEYS, addBuckets, emptyBuckets } from './usage-ledger.js'
 import type { Buckets, DayBuckets } from './usage-ledger.js'
@@ -162,15 +164,16 @@ export interface LedgerMerge {
  *
  * A ledger day is the ledger's, down to its per-day session ids and its model
  * split; the ledger is the account that saw every provider, so the fold never
- * overwrites one of its days. The fold supplies the dates the ledger's newest
- * day leaves uncovered — the stretch after the cost meter stopped writing —
- * which is also where its hour histograms, the one dimension the ledger has no
- * column for, are worth keeping.
+ * overwrites one of its days. The fold supplies every date the ledger did not
+ * record — the stretch after the cost meter stopped writing, the history before
+ * it was installed, and the days of sessions deleted since — which is also
+ * where its hour histograms, the one dimension the ledger has no column for,
+ * are worth keeping.
  *
  * @param ledgerDays - the ledger's day map, or null when there is no ledger at
  *     all: a null is what tells the caller the answer is the fold's alone, which
  *     an empty map cannot say.
- * @param sessions - the per-session folds, keyed by session id.
+ * @param sessions - the per-session folds, keyed by the name the usage record holds (the stored directory name).
  */
 export function mergeLedgerFold(
   ledgerDays: ReadonlyMap<string, DayBuckets> | null,
@@ -178,17 +181,16 @@ export function mergeLedgerFold(
 ): LedgerMerge {
   const days = new Map<string, DayBuckets>()
   const sessionIds = new Set<string>()
-  let lastLedgerDay: string | null = null
   for (const [date, buckets] of ledgerDays ?? []) {
     days.set(date, buckets)
-    if (lastLedgerDay === null || date > lastLedgerDay) lastLedgerDay = date
     for (const id of buckets.sessionIds ?? []) sessionIds.add(id)
   }
-  // An uncovered day is the fold's whole day: its model split, the sessions
-  // that settled on it and its hour histogram, as the fold alone would answer.
+  // A day the ledger did not record is the fold's whole day: its model split,
+  // the sessions that settled on it and its hour histogram, as the fold alone
+  // would answer.
   let folded = false
   for (const [date, buckets] of mergeSessions(sessions)) {
-    if (lastLedgerDay !== null && date <= lastLedgerDay) continue
+    if (days.has(date)) continue
     days.set(date, buckets)
     folded = true
     // The count follows the days rather than the logs: a session whose log is

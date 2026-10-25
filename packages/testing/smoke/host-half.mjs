@@ -735,7 +735,14 @@ function requestAsset(host, url, headers = {}) {
       },
       end(chunk) { resolve({ status: this.status, headers: this.headers, raw: chunk === undefined ? null : chunk }) },
     }
-    host.routes['/dsh-claude-style'].handler({ method: 'GET', url, headers }, res)
+    // The fence in front of that route reads the peer address and the Host
+    // header, which a browser sends with a same-origin subresource.
+    host.routes['/dsh-claude-style'].handler({
+      method: 'GET',
+      url,
+      headers: { host: '127.0.0.1:3080', ...headers },
+      socket: { remoteAddress: '127.0.0.1' },
+    }, res)
   })
 }
 

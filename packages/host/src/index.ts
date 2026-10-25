@@ -41,6 +41,7 @@ import { PACKAGE_NAME } from '@dsh-claude-style/contracts/package'
 import { registerRoutes } from './routes.js'
 import type { DshContext, DshScope } from '@dsh-claude-style/engine/node/dsh'
 import { registerSettings } from './settings.js'
+import { registerWidgetUsage } from './widget-usage.js'
 
 export const name = PACKAGE_NAME
 export { Config } from './settings.js'
@@ -62,4 +63,5 @@ export function apply(ctx: DshContext) {
   else registerRoutes(ctx, ctx as DshScope)
 
   registerSettings(ctx)
+  registerWidgetUsage(ctx)
 }

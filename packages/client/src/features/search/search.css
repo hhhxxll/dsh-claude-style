@@ -298,7 +298,7 @@ body[data-dsh-claude-style] .dsh-claude-search-input {
   height: 32px;
   padding: 0;
   border: none !important;
-  outline: none !important;
+  outline: none;
   background: transparent;
   box-shadow: none;
   color: var(--dsw-alias-label-primary, #161616);

@@ -17,6 +17,7 @@
  * speak: none of those documents ships types, so the members this reader touches
  * are declared here.
  */
+import { PACKAGE_NAME } from '@dsh-claude-style/contracts/package'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -86,21 +87,27 @@ export function addBuckets(target: Buckets, buckets: Partial<Buckets> | null | u
  * The ledger's day map, or null when it cannot answer: the cost meter is not
  * installed, its file is mid-write, or its version is not the one read here.
  *
+ * The same answer covers a read that loses the writer's race: the local fold is
+ * an account of the same days on its own, so one plugin's file cannot fail the
+ * pass.
+ *
  * @param home - the harness home, resolved by the caller through the shared
  *   accessor.
+ * @param logger - receives the warning a tolerated read failure leaves.
  */
-export function readLedger(home: string): Map<string, DayBuckets> | null {
+export function readLedger(home: string, logger?: { warn?(message: string): void }): Map<string, DayBuckets> | null {
   // The cost meter is another plugin: no ledger means it is not installed.
   const file = join(home, 'storages', 'cost-meter', 'ledger.json')
   if (!existsSync(file)) return null
-  const raw = readFileSync(file, 'utf8')
   let parsed: unknown
   try {
-    parsed = JSON.parse(raw)
-  } catch {
-    // Another plugin's file, read without any coordination with its writer:
-    // a write in progress reads as no ledger, and the local fold answers
-    // (D12).
+    // Another plugin's file, read without any coordination with its writer: a
+    // write in progress reads as no ledger, and the local fold answers alone
+    // (D12). On Windows a writer holding the file makes the read itself throw,
+    // which is the same answer.
+    parsed = JSON.parse(readFileSync(file, 'utf8'))
+  } catch (error) {
+    logger?.warn?.(`${PACKAGE_NAME}: cost-meter ledger unreadable, folding the session logs alone: ${(error as { message?: string }).message}`)
     return null
   }
   if (parsed === null || typeof parsed !== 'object') return null

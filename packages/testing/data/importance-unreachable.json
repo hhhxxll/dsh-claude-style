@@ -5,14 +5,9 @@
       "reason": "首页用量面板：临时宿主里没有用量数据，面板画的是空状态",
       "selectors": [
         "body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-matrix",
-        "body[data-dsh-claude-style] .dsh-claude-effort-matrix-sq::before",
-        "body[data-dsh-claude-style] .dsh-claude-effort-matrix-sq::after",
-        "body[data-dsh-claude-style][data-dsh-claude-motion=reduced] .dsh-claude-effort-matrix-sq::before",
-        "body[data-dsh-claude-style][data-dsh-claude-motion=reduced] .dsh-claude-effort-matrix-sq::after",
         "body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-fill",
         "body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-ticks",
         "body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-knob",
-        "body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-value",
         "body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-effort[data-apex] .dsh-claude-effort-knob",
         "body[data-dsh-claude-style] .dsh-claude-home-models-more",
         "body[data-dsh-claude-style] .dsh-claude-home-panel[data-computing] .dsh-claude-home-stat[data-skeleton] .dsh-claude-home-stat-value",
@@ -23,7 +18,6 @@
         "body[data-dsh-claude-style] .dsh-claude-home-heat-cell[data-level=\"1\"]",
         "body[data-dsh-claude-style] .dsh-claude-home-heat-cell[data-level=\"2\"]",
         "body[data-dsh-claude-style] .dsh-claude-home-heat-cell[data-level=\"3\"]",
-        "body[data-dsh-claude-style] .dsh-claude-home-heat-cell[data-level=\"4\"]",
         "body[data-dsh-claude-style] .dsh-claude-home-chart",
         "body[data-dsh-claude-style] .dsh-claude-home-chart-plot",
         "body[data-dsh-claude-style] .dsh-claude-home-chart-tick",
@@ -217,7 +211,6 @@
         "body[data-dsh-claude-style] [data-dsh-claude-part~=sidebar-root][data-dsh-claude-part~=sidebar-collapsed] .dsh-claude-account-avatar",
         "body[data-dsh-claude-style] [data-dsh-claude-part~=sidebar-root][data-dsh-claude-part~=sidebar-collapsed] :is(.dsh-claude-account-label,.dsh-claude-account-chevron)",
         "body[data-dsh-claude-style] [data-dsh-claude-part~=sidebar-root][data-dsh-claude-part~=sidebar-collapsed] .dsh-claude-account-popover",
-        "body[data-dsh-claude-style] [data-dsh-claude-part~=sidebar-root][data-dsh-claude-part~=sidebar-collapsed] [data-dsh-claude-account-menu]",
         "body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~=sidebar-root][data-dsh-claude-part~=sidebar-collapsed] [data-dsh-claude-part~=foot-area] [data-dsh-claude-part~=settings-area] :is(button,[data-dsh-claude-part~=settings-trigger]):not([data-dsh-claude-account-host-row]):not([data-dsh-claude-holds~=account-row])",
         "body[data-dsh-claude-style] [data-dsh-claude-part~=sidebar-root][data-dsh-claude-part~=sidebar-collapsed] [data-dsh-claude-account-host-row]"
       ]
@@ -226,21 +219,8 @@
       "reason": "宿主的账户菜单与它的账户行：只在桌面外壳里出现，走查跑在网页外壳",
       "selectors": [
         "body[data-dsh-claude-style][data-ds-dark-theme] :is([data-dsh-claude-account-menu],[data-dsh-claude-hero-menu])",
-        "body[data-dsh-claude-style] [data-dsh-claude-account-host-row]",
-        "body[data-dsh-claude-style] [data-dsh-claude-account-host-row] img",
-        "body[data-dsh-claude-style] [data-dsh-claude-part~=foot-area] [data-dsh-claude-part~=settings-trigger][data-dsh-claude-holds~=account-row]",
-        "body[data-dsh-claude-style] [data-dsh-claude-part~=foot-area] [data-dsh-claude-part~=settings-trigger] [data-dsh-claude-holds~=account-row]",
-        "body[data-dsh-claude-style] .dsh-claude-account-inject",
-        "body[data-dsh-claude-style] [data-dsh-claude-account-menu]",
-        "body[data-dsh-claude-style][data-dsh-claude-palette=claude] [data-dsh-claude-account-menu]",
         "body[data-dsh-claude-style][data-dsh-claude-account-armed] div[role=menu][data-menu-material]:not([data-dsh-claude-account-ready])",
-        "body[data-dsh-claude-style][data-dsh-claude-account-armed] div[role=menu][data-menu-material][data-dsh-claude-account-ready]",
-        "body[data-dsh-claude-style] [data-dsh-claude-account-menu] [data-dsh-claude-part~=menu-item]>[role=menuitem]",
-        "body[data-dsh-claude-style] [data-dsh-claude-account-menu] [role=separator]",
-        "body[data-dsh-claude-style] [data-dsh-claude-account-menu] [data-dsh-claude-part~=menu-viewport]",
         "body[data-dsh-claude-style] [data-dsh-claude-account-menu] [data-dsh-claude-part~=menu-footer]",
-        "body[data-dsh-claude-style] [data-dsh-claude-account-menu] .dsh-claude-account-inject",
-        "body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~=foot-area]>[data-dsh-claude-part~=settings-area][data-dsh-claude-holds~=account-row]",
         "body[data-dsh-claude-style] [data-dsh-claude-account-menu] [data-dsh-claude-part~=menu-item-selected]"
       ]
     },
@@ -277,42 +257,20 @@
         "body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-search-item[data-active]",
         "body[data-dsh-claude-style] .dsh-claude-search-item-image",
         "body[data-dsh-claude-style] .dsh-claude-search-item-snippet",
-        "body[data-dsh-claude-style] .dsh-claude-search-item-match",
-        "body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-search-foot"
+        "body[data-dsh-claude-style] .dsh-claude-search-item-match"
       ]
     },
     {
       "reason": "一次动画里的短暂标记：走查把页面停住，标记已经落下",
       "selectors": [
-        "body[data-dsh-claude-style] .dsh-claude-process-summary-digit[data-dsh-claude-roll=exit]",
         "body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-leave=back]",
         "body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-enter=back]",
         "body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-leave=forward]"
       ]
     },
     {
-      "reason": "归档视图：走查没有打开它",
-      "selectors": [
-        "body[data-dsh-claude-style] .dsh-claude-archive-row",
-        "body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-archive-row",
-        "body[data-dsh-claude-style] .dsh-claude-archive-row:is(,)",
-        "body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-archive-row:is(,)",
-        "body[data-dsh-claude-style] .dsh-claude-archive-title",
-        "body[data-dsh-claude-style] .dsh-claude-archive-time",
-        "body[data-dsh-claude-style] .dsh-claude-archive-row .dsh-claude-archive-time",
-        "body[data-dsh-claude-style] .dsh-claude-archive-action",
-        "body[data-dsh-claude-style] .dsh-claude-archive-row .dsh-claude-archive-action",
-        "body[data-dsh-claude-style] .dsh-claude-archive-delete",
-        "body[data-dsh-claude-style] .dsh-claude-archive-restore"
-      ]
-    },
-    {
       "reason": "模型选择器的分组与规则：临时宿主的目录里没有分组",
       "selectors": [
-        "body[data-dsh-claude-style] .dsh-claude-model-group-section",
-        "body[data-dsh-claude-style] .dsh-claude-model-group-row",
-        "body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-model-group-row",
-        "body[data-dsh-claude-style] .dsh-claude-model-group",
         "body[data-dsh-claude-style] .dsh-claude-model-option[data-brand=claude] .dsh-claude-model-name",
         "body[data-dsh-claude-style] .dsh-claude-model-rule",
         "body[data-dsh-claude-style] .dsh-claude-model-rule-name"
@@ -322,14 +280,11 @@
       "reason": "自定义品牌：走查一次只写一个标记，读者提供的图形与文字不在页面上",
       "selectors": [
         "body[data-dsh-claude-style] .dsh-claude-masked-mark",
-        "body[data-dsh-claude-style] .dsh-claude-masked-word",
         "body[data-dsh-claude-style][data-dsh-claude-custom-mark] [data-dsh-claude-part~=hero-mark]",
         "body[data-dsh-claude-style][data-dsh-claude-custom-mark][data-dsh-claude-custom-tint] :is([data-dsh-claude-part~=brand-mark],[data-dsh-claude-part~=rail-mark])",
         "body[data-dsh-claude-style][data-dsh-claude-custom-mark][data-dsh-claude-custom-tint] [data-dsh-claude-part~=hero-mark]",
         "body[data-dsh-claude-style][data-dsh-claude-custom-word=image][data-dsh-claude-custom-tint] [data-dsh-claude-part~=brand-identity]>[data-dsh-claude-part~=brand-name]",
-        "body[data-dsh-claude-style][data-dsh-claude-custom-mark] [data-dsh-claude-part~=hero-mark]>*",
-        "body[data-dsh-claude-style][data-dsh-claude-palette=claude][data-dsh-claude-accent][data-ds-dark-theme]",
-        "body[data-dsh-claude-style][data-dsh-claude-palette=claude][data-dsh-claude-brand=deepseek][data-dsh-claude-accent]"
+        "body[data-dsh-claude-style][data-dsh-claude-custom-mark] [data-dsh-claude-part~=hero-mark]>*"
       ]
     },
     {
@@ -407,7 +362,6 @@
       "reason": "设置页里的个别状态：出错、按下、展开、选好图片",
       "selectors": [
         "body[data-dsh-claude-style] .dsh-claude-settings-error",
-        "body[data-dsh-claude-style] .dsh-claude-settings-switch[data-moved][data-on] .dsh-claude-settings-switch-knob",
         "body[data-dsh-claude-style] .dsh-claude-settings-picker[aria-expanded=true]",
         "body[data-dsh-claude-style] .dsh-claude-brand-image-preview>img",
         "body[data-dsh-claude-style] .dsh-claude-brand-image-error"
@@ -501,12 +455,6 @@
       ]
     },
     {
-      "reason": "工作区视图：走查没有打开它",
-      "selectors": [
-        "body[data-dsh-claude-style] [data-dsh-claude-ws-view=archived] [data-dsh-claude-ws-tree]"
-      ]
-    },
-    {
       "reason": "快速服务商的弹出层：走查没有打开它",
       "selectors": [
         "body[data-dsh-claude-style] .dsh-claude-quick-popover"
@@ -527,23 +475,9 @@
       ]
     },
     {
-      "reason": "皮肤自己的归档视图与设置分区：走查没有打开归档视图，也没有走到设置页的这一项",
-      "selectors": [
-        "body[data-dsh-claude-style] button[data-dsh-section=claude-style] [data-dsh-claude-part~=nav-icon]",
-        "body[data-dsh-claude-style] button[data-dsh-section=claude-style]",
-        "body[data-dsh-claude-style]:not([data-ds-dark-theme]) button[data-dsh-section=claude-style]"
-      ]
-    },
-    {
       "reason": "减少动效配上等待行的状态动效：走查把动画偏好与等待行的状态动效分开走",
       "selectors": [
         "body[data-dsh-claude-style][data-dsh-claude-motion=reduced][data-dsh-claude-status-motion=wash] .dsh-claude-chat-wait .dsh-claude-swap-shimmer"
-      ]
-    },
-    {
-      "reason": "减少动效配上正在进行的会话行：走查写动画偏好时那一轮已经落定，侧栏里没有正在进行的会话",
-      "selectors": [
-        "body[data-dsh-claude-style][data-dsh-claude-motion=reduced] svg[data-state=ongoing]"
       ]
     },
     {

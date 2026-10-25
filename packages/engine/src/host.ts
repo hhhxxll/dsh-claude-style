@@ -1,5 +1,5 @@
 import { COMPOSER_CARD_SELECTOR, COMPOSER_INPUT_SELECTOR, COMPOSER_PLACEHOLDER_SELECTOR, COMPOSER_SELECTOR, COMPOSER_STACK_SELECTOR, COMPOSER_STATS_SELECTOR, COMPOSER_STAT_SELECTOR, COMPOSER_VARIANT_ATTRIBUTE, CONVERSATION_SCROLL_SELECTOR, CONVERSATION_SESSION_ATTRIBUTE, CONVERSATION_SESSION_SELECTOR, DIALOG_TRIGGER_SELECTOR, FOOT_AREA_SELECTOR, FOREGROUND_SELECTOR, MENU_ROLE_SELECTOR, PERMISSION_TRIGGER_SELECTOR, PHASE_ATTRIBUTE, RIGHTBAR_TOGGLE_SELECTOR, SIDEBAR_BRAND_SELECTOR, SIDEBAR_LOGO_ROW_SELECTOR, SIDEBAR_ROOT_SELECTOR, SIDEBAR_TOGGLE_SELECTOR, WINDOWS_MENU_SELECTOR } from '@dsh-claude-style/contracts/dom'
-import type { HostAccountService, HostAssistantStep, HostBundleListAnswer, HostChatSnapshot, HostChatTarget, HostConfigFormsService, HostConversationService, HostInventoryAnswer, HostLocaleService, HostModelDirectoriesService, HostPluginBundle, HostServiceLookup, HostOutlineTurn, HostRunningCall, HostSession, HostSessionsService, HostSessionRenameAnswer, HostShortcutsService, HostSlotsService, HostThemeService, HostTurn, HostUiConversationService, HostUiSessionService, HostWorkspacesService } from '@dsh-claude-style/contracts/services'
+import type { HostAccountService, HostAssistantStep, HostBundleListAnswer, HostChatSnapshot, HostChatTarget, HostConfigFormsService, HostConversationService, HostInventoryAnswer, HostLocaleService, HostModelDirectoriesService, HostPluginBundle, HostServiceLookup, HostOutlineTurn, HostRunningCall, HostSession, HostSessionsService, HostSessionRenameAnswer, HostShortcutsService, HostSlotsService, HostThemeService, HostTurn, HostUiConversationService, HostUiSessionService, HostWorkspacesService, HostWorkspaceViewStore } from '@dsh-claude-style/contracts/services'
 import { observeMatches, subscribeMutations } from './bus'
 import { closestFrom } from './dom'
 
@@ -52,6 +52,20 @@ function stillFirstMatch(element: Element, selector: string) {
   return true
 }
 
+/** The batch count the one shared body watch has seen: every cached seat forgets its answer when this moves. */
+let matchEpoch = 0
+/** Whether the shared body watch is open. One is enough for every seat, and it is never closed. */
+let matchEpochWatched = false
+
+/** Open the one body watch the cached seats read: the first cacheFirstMatch call does it. */
+function openMatchEpochWatch() {
+  if (matchEpochWatched) return
+  matchEpochWatched = true
+  subscribeMutations(document.body, { subtree: true, childList: true }, () => {
+    matchEpoch += 1
+  })
+}
+
 /**
  * The first match of `selector`, resolved once and kept while it stays the
  * first match (D40): a pass re-reads it, and the document is queried again only
@@ -63,24 +77,29 @@ function stillFirstMatch(element: Element, selector: string) {
  * most of the pages a pass runs over — the hero root on a conversation page,
  * the settings nav list away from the dialog — so a query re-issued per pass
  * paid a document walk for an answer that only the host's own mounting can
- * change. A batch that adds or removes nodes asks for the query once more, and
- * this subscription exists whether or not a reader has asked for anything yet,
- * so no answer is kept across a mount.
+ * change.
+ *
+ * One body watch serves every cached seat, opened by the first reader and never
+ * closed: a seat created inside `install()` would otherwise add a subscription
+ * per enable, and the batch the watch hears is the only thing that can change a
+ * kept answer. The watch moves an epoch rather than clearing each reader by
+ * hand, so a reader that has not asked since the last batch drops its answer on
+ * the next call.
  *
  * Exported for the seats one feature alone reads (a header, a slot, a meter):
  * the mechanism lives once, the selector stays with its reader.
  */
 export function cacheFirstMatch<T extends Element>(selector: string) {
+  openMatchEpochWatch()
   let kept: T | null = null
   let answered = false
-  // The subscription outlives the reader on purpose: a generation whose
-  // teardown a client reload dropped would otherwise keep an answer with
-  // nothing left to clear it.
-  subscribeMutations(document.body, { subtree: true, childList: true }, () => {
-    kept = null
-    answered = false
-  })
+  let seenEpoch = matchEpoch
   return () => {
+    if (seenEpoch !== matchEpoch) {
+      kept = null
+      answered = false
+      seenEpoch = matchEpoch
+    }
     if (kept !== null && stillFirstMatch(kept, selector)) return kept
     if (kept === null && answered) return null
     kept = document.querySelector<T>(selector)
@@ -464,6 +483,31 @@ export function hostRemotePermissionPresets(lookup: HostServiceLookup | null | u
 export function hostWorkspaces(lookup: HostServiceLookup | null | undefined): HostWorkspacesService | null {
   const workspaces = lookup?.get('workspaces') as HostWorkspacesService | undefined
   return workspaces ?? null
+}
+
+/**
+ * The workspace browser's viewing store: the grouping and the archived filter
+ * behind the host's own view menu. The host registers its browser under
+ * `sidebar.workspaces` with the store it creates, and that registration's
+ * `create` answers the one instance the browser renders from, so a write here
+ * is the menu's own. Null when the host carries no such registration or its
+ * store is not the shape this reads: the caller stays off rather than mounting a
+ * control that cannot drive the host (D12).
+ */
+export function hostWorkspaceView(lookup: HostContext | null | undefined): HostWorkspaceViewStore | null {
+  const slots = lookup === null || lookup === undefined ? null : hostSlots(lookup)
+  if (slots === null) return null
+  const entries = slots.entries('sidebar.workspaces')
+  for (let i = 0; i < entries.length; i++) {
+    const declaration = entries[i].store
+    if (declaration === undefined) continue
+    const view = declaration.create() as unknown as HostWorkspaceViewStore
+    if (view === null || typeof view !== 'object') continue
+    if (typeof view.getSnapshot !== 'function') continue
+    if (typeof view.actions?.setArchivedFilter !== 'function' || typeof view.actions?.setGroupBy !== 'function') continue
+    return view
+  }
+  return null
 }
 
 /** The shell's workspace actions: open a session, start one. */

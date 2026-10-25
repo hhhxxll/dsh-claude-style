@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-24",
-  "group": "fixes",
-  "order": 0,
-  "external": false,
-  "zh": "修复从独立成行切换到紧凑底栏时统计信息的详情与位置适配，使不同切换路径得到一致布局。",
-  "en": "Fix statistics detail and placement when switching from On its own line to Compact footer so different switching paths produce the same layout."
-}

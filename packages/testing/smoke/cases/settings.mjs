@@ -220,13 +220,29 @@ export default {
     check('all switches off leave no switched feature on the page',
       !!sw.allOff && keys.every((key) => !present(sw.allOff, key)), JSON.stringify(sw.allOff))
     check('all switches back on bring every feature back', !!sw.allOn && keys.every((key) => present(sw.allOn, key)), JSON.stringify(sw.allOn))
+    const view = sw.view || {}
+    const archivedView = view.archived || {}
+    const activeView = view.active || {}
+    check('the 已归档 segment drives the host\'s own view: archived rows alone in one flat list, and the segment checked',
+      archivedView.snapshot?.archivedFilter === 'only' && archivedView.snapshot?.groupBy === 'flat' &&
+        archivedView.checked === 'true',
+      JSON.stringify(archivedView))
+    check('the 进行中 segment puts the filter back with the grouping that stood before the visit, and stands checked again',
+      activeView.snapshot?.archivedFilter === 'default' && activeView.snapshot?.groupBy === 'workspace' &&
+        activeView.checked === 'true',
+      JSON.stringify(activeView))
+    const reinstall = sw.reinstall || {}
+    check('a store left on 已归档 comes back on that segment when the feature installs again',
+      reinstall.snapshot?.archivedFilter === 'only' && reinstall.snapshot?.groupBy === 'flat' &&
+        reinstall.checked === 'true',
+      JSON.stringify(reinstall))
     const rail = sw.rail || {}
-    check('the host dropping the section heading takes the workspace control and the archived list off the page with it',
-      !!rail.wide && rail.wide.segments > 0 && !!rail.collapsed &&
-        rail.collapsed.segments === 0 && rail.collapsed.list === 0,
+    check('the host dropping the section heading takes the workspace control off the page with it, leaving the host\'s own tree where it stands',
+      !!rail.wide && rail.wide.segments > 0 && rail.wide.rows > 0 && !!rail.collapsed &&
+        rail.collapsed.segments === 0 && rail.collapsed.rows === rail.wide.rows,
       JSON.stringify(rail))
-    check('the heading coming back seats both in the section again',
-      !!rail.back && rail.back.segments > 0 && rail.back.list > 0, JSON.stringify(rail.back))
+    check('the heading coming back seats the control in the section again',
+      !!rail.back && rail.back.segments > 0 && rail.back.rows === rail.wide.rows, JSON.stringify(rail.back))
     commonChecks(r)
   },
   'switches-off'(r) {

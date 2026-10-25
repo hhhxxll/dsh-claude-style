@@ -17,9 +17,16 @@ export type CopyEntries = Readonly<Record<string, CopyPair>>
  */
 export const COPY_FALLBACK_LOCALE = 'en'
 
-/** The shell's active locale id, or the language the copy ships in when it cannot be read. */
+/**
+ * The shell's active locale id, or the language the copy ships in when it cannot
+ * be read: a host with no locale service, a service without `getSnapshot`, or a
+ * snapshot that says nothing are all the same answer here (D12 — the copy ships
+ * in its own language rather than the page throwing).
+ */
 export function activeLocale(ctx?: HostContext | null): string {
-  const active = (ctx || hostCtx)?.get('locale')?.getSnapshot().active
+  const locale = (ctx || hostCtx)?.get('locale')
+  const snapshot = typeof locale?.getSnapshot === 'function' ? locale.getSnapshot() : undefined
+  const active = snapshot?.active
   if (typeof active === 'string' && active) return active
   return COPY_FALLBACK_LOCALE
 }

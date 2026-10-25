@@ -11,14 +11,14 @@
  *     declares the bucket shapes. Its days are the whole history the cost meter
  *     saw, every provider included.
  *   - `usage-fold.ts` finds the session logs and folds them, which is what covers
- *     the dates past the ledger's newest day.
+ *     every date the ledger does not record.
  *   - `usage-record.ts` keeps each session's fold: the account that outlives the
  *     log, so a deleted session keeps its days.
  *   - `usage-summary.ts` merges the two accounts by date, and shapes the payload.
  *
  * The two accounts are combined, never added: both describe the same days, so a
- * day the ledger knows stays the ledger's and the fold answers only for the days
- * past its newest one. A ledger that answers is published before the fold starts,
+ * day the ledger recorded stays the ledger's and the fold answers for every day
+ * it left out. A ledger that answers is published before the fold starts,
  * so a ledger the cost meter stopped updating still shows its days at once.
  * `totals.sessions` can count a session twice when it spans a ledger day and a
  * folded one: the two sources name sessions in different shapes.
@@ -131,16 +131,17 @@ export function createUsage(ctx: DshContext) {
     let failed = 0
     let firstFailure: string | null = null
     for (const log of logs) {
-      const stored = record.sessions.get(log.id)
+      // The record is keyed by the stored name: it outlives the log, and the
+      // name is what the disk still holds once the session is deleted.
+      const stored = record.sessions.get(log.storedName)
       const fingerprint = stored?.fingerprint
       if (stored !== undefined && fingerprint !== undefined
         && fingerprint.size === log.size && fingerprint.mtimeMs === log.mtimeMs) {
-        sessions.set(log.id, stored)
+        sessions.set(log.storedName, stored)
         continue
       }
-      // Each changed log is read by id. That read resolves the session through
-      // the host's listing-free observation, so a pass costs one `stat`
-      // per log read and never walks the stored corpus.
+      // Each changed log is read by its logical id: the host resolves a session
+      // through the listing-free observation, and the id is what it knows.
       let events: UsageEvent[] | null
       try {
         events = await readEvents<UsageEvent>(ctx, PACKAGE_NAME, log.id, 'the usage roll-up')
@@ -152,7 +153,7 @@ export function createUsage(ctx: DshContext) {
         // failure from the rest).
         failed += 1
         firstFailure = firstFailure ?? `${log.id}: ${messageOf(error)}`
-        if (stored !== undefined) sessions.set(log.id, stored)
+        if (stored !== undefined) sessions.set(log.storedName, stored)
         continue
       }
       if (events === null) {
@@ -160,10 +161,10 @@ export function createUsage(ctx: DshContext) {
         // parse). Leave the entry as it stands, so the next pass retries this log
         // instead of freezing an empty day map behind a fresh fingerprint.
         failed += 1
-        if (stored !== undefined) sessions.set(log.id, stored)
+        if (stored !== undefined) sessions.set(log.storedName, stored)
         continue
       }
-      sessions.set(log.id, { fingerprint: { size: log.size, mtimeMs: log.mtimeMs }, days: foldSession(events).days })
+      sessions.set(log.storedName, { fingerprint: { size: log.size, mtimeMs: log.mtimeMs }, days: foldSession(events).days })
       read += 1
     }
     if (firstFailure !== null) {
@@ -176,8 +177,10 @@ export function createUsage(ctx: DshContext) {
     for (const [id, stored] of record.sessions) {
       if (!sessions.has(id) && stored.days.size > 0) sessions.set(id, { days: stored.days })
     }
-    const recorded = record.writable && (record.mustWrite || recordChanged(record.sessions, sessions, read))
-      ? writeRecord(ctx, sessions, new Set(logs.map((log) => log.id)))
+    // A pass that outlives its routes writes nothing: the file would belong to
+    // a plugin no longer installed.
+    const recorded = !disposed && record.writable && (record.mustWrite || recordChanged(record.sessions, sessions, read))
+      ? writeRecord(ctx, sessions, new Set(logs.map((log) => log.storedName)))
       : sessions
     const merge = mergeLedgerFold(ledgerDays, recorded)
     // The source names what answered: with no ledger at all the fold is the
@@ -205,8 +208,10 @@ export function createUsage(ctx: DshContext) {
    */
   async function compute(publish: (partial: UsageSummary) => void): Promise<UsageSummary> {
     const root = resolve(join(home(), 'sessions'))
-    const logs = listSessionLogs(root)
-    const ledgerDays = readLedger(home())
+    // The walk is the store's own readdir/stat, awaited: listing a large
+    // history must not hold the event loop.
+    const logs = await listSessionLogs(root)
+    const ledgerDays = readLedger(home(), ctx.logger)
 
     if (ledgerDays !== null && ledgerDays.size > 0) {
       // The ledger is the wider account: it saw every provider, so it answers

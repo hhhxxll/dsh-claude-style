@@ -1,0 +1,8 @@
+{
+  "group": "new",
+  "order": 1,
+  "external": true,
+  "at": "2026-10-25",
+  "zh": "新增看板用量能力：已折好的会话用量（每天的四类 token 分桶、按小时的结算次数与各模型总量）经 `dsh-claude-style:usage` 交给看板组件，与工作台首页那块用量面板读同一份缓存；能力注册可以带自己的调用时长上限。",
+  "en": "Add a widget-board usage capability: the folded session usage (four token buckets per day, settlements per hour and per-model totals) reaches widget cards as `dsh-claude-style:usage`, reading the same cache as the studio home panel; a capability registration can now carry its own call timeout."
+}

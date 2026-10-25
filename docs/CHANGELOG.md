@@ -2,6 +2,56 @@
 
 All notable changes to `dsh-claude-style` are documented here, newest first.
 
+## [0.19.3] - 2026-10-25
+
+[中文](#cn-0.19.3) | [English](#en-0.19.3)
+
+<h3 id="cn-0.19.3">体验优化</h3>
+
+- 改善 DeepSeek 配色的浅色层次：画布改为 #FBFCFF、侧栏为 #F7F9FF，表面、表头、悬停底、边框与文字色从画布种子派生，不再继承 Claude 的纯白卡片。
+- 改善模型选择器在千级模型目录下的开销：开卡不再整卡重建，峰谷徽章按行原位刷新，价目表匹配与目录签名按代缓存。
+- 改善主题风格切换的反馈：配色固定在某张颜色卡时，切换主题会提示「配色已被固定为…」，并可直接改为跟随品牌。
+
+### 问题修复
+
+- 修复其他插件的输入框被套上整页焦点描边：键盘焦点环改由宿主自己的 `:focus-visible` 规则画出、皮肤只提供墨色，兜底环以零权重写在 `:where()` 里，插件声明的 `outline: none` 重新生效。
+- 修复从独立成行切换到紧凑底栏时统计信息的详情与位置适配，使不同切换路径得到一致布局。
+- 修复「进行中」分段仍显示已归档会话的问题：切换分段会同步宿主的筛选与分组，已归档改用宿主自己的列表，归档行保留删除按钮。
+- 修复用量面板丢失账本安装前的历史、以及插件生成的会话不计入用量的问题：用量折叠按宿主认的逻辑会话 id 读取日志，账本没有记录的日子由本地折叠补齐。
+- 修复内容搜索对含冒号或斜杠的会话 id 写不进缓存、以及一次读取失败让该会话从结果中消失的问题：缓存文件按 id 的哈希命名，读取失败的会话保留上一份语料并在下一轮重试。
+- 修复单个特性的失败牵连整页的问题：设置写入被拒绝时重新读取存储值，事件分发与滚动缓动逐个隔离，measure 与 sync 分别累计连续失败次数。
+- 修复关闭工作区开关后归档删除按钮仍在渲染、占位文案不随特性退出还原、折叠动画期间的第二次点击被丢弃，以及等待徽章退场定时器不随特性停止的问题。
+- 修复延后加载的功能块一次失败后再也不重试、以及反复开关功能累积页面观察的问题：失败的块加载会被遗忘并在下次启用时重试，宿主查找共用一条页面观察；分块脚本超时也会失败而不是无限挂起。
+- 修复独立成行时统计行比输入区底部那一行更高的问题：统计行现在与那一行同高，紧凑底栏仍占工具栏的一行。
+- 修复独立成行时费用数字与前后数字之间的间距比其他数字之间更宽的问题，各数字现在按行自身的间距等距排布。
+
+### 安全
+
+- 修复模型文案、字体与构建资源路由缺少同源栅栏的问题：这三个入口与其余私有路由共用同一道校验，非本机页面不能再借它们探测用户自置的字体。
+
+<h3 id="en-0.19.3">Improvements</h3>
+
+- Improve the DeepSeek palette's light steps: the canvas is #FBFCFF and the sidebar #F7F9FF, with surfaces, table heads, hover plates, borders and inks derived from that canvas instead of inheriting Claude's white card.
+- Improve the model picker's cost on a four-digit model catalog: an open stops rebuilding the card, rate badges refresh row by row in place, and the price-table match and the catalog signature are cached per generation.
+- Improve the feedback when switching theme style while the colours are pinned to a card: a toast names the pinned colours and offers to follow the brand again.
+
+### Bug Fixes
+
+- Fix another plugin's inputs gaining a page-wide focus outline: the keyboard ring is now drawn by the host's own `:focus-visible` rules from the skin's ink, and the fallback ring weighs nothing inside `:where()`, so a plugin's own `outline: none` stands.
+- Fix statistics detail and placement when switching from On its own line to Compact footer so different switching paths produce the same layout.
+- Fix the In progress section still listing archived conversations: switching the segment now drives the host's filter and grouping, the archived view uses the host's own list, and its rows keep the delete button.
+- Fix the usage panel losing history from before the cost ledger existed and sessions with plugin-generated ids never reaching the totals: the fold now reads logs by the host's logical session id, and days the ledger never recorded are filled from the local fold.
+- Fix content search failing to cache sessions whose ids carry a colon or a slash, and a session disappearing from results after one unreadable pass: cache files are named by a hash of the id, and a session that cannot be read keeps its previous corpus and is retried on the next pass.
+- Fix one feature's failure spreading across the page: a rejected settings write reads the stored value back, event dispatch and scroll easing are isolated per feature, and measure and sync count consecutive failures apart.
+- Fix the archived-row delete action staying mounted after the workspace switch is turned off, placeholder text not being restored when the feature stands down, a second fold click dropped during the closing animation, and the wait badge's exit timer outliving its feature.
+- Fix deferred feature chunks never retrying after one failed load and feature switches accumulating page observers: a failed chunk is forgotten and retried on the next enable, host lookups share one page observation, and a chunk whose script never arrives now times out instead of hanging.
+- Fix the statistics standing taller than the composer's bottom row when they have a line of their own: the line now matches that row's height, while the compact footer keeps the toolbar row's.
+- Fix the cost figure standing farther from the figures around it than they stand from each other when the statistics have a line of their own: every figure now keeps the line's own gap.
+
+### Security
+
+- Fix the model copy, font and built-asset routes missing the same-origin fence every other private route carries: all three now pass the same check, so a page outside this machine can no longer probe the fonts a reader dropped in.
+
 ## [0.19.2] - 2026-10-24
 
 [中文](#cn-0.19.2) | [English](#en-0.19.2)

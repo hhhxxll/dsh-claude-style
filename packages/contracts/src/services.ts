@@ -65,6 +65,34 @@ export interface HostWorkspacesService {
   unarchiveSession(id: string): Promise<unknown>
 }
 
+/** Session-list grouping: sibling Workspace sections, a Workspace tree, or one flat list. */
+export type HostSessionGroupBy = 'workspace' | 'workspace-tree' | 'flat'
+
+/** Which archived rows the host's tree shows: `default` hides them, `show` keeps them among the others, `only` shows nothing else. */
+export type HostArchivedFilter = 'default' | 'show' | 'only'
+
+/** The workspace browser's view state, as the host's own view menu reads it. */
+export interface HostWorkspaceViewSnapshot {
+  groupBy: HostSessionGroupBy
+  /** Absent in pre-filter snapshots; the host reads it as `default`. */
+  archivedFilter?: HostArchivedFilter
+}
+
+/**
+ * The workspace browser's viewing store: the host registers it under
+ * `sidebar.workspaces` with a `create` that answers the one instance its
+ * browser renders from, so a write here is the view menu's own write. The skin
+ * reads the filter and grouping from `getSnapshot` and drives both through
+ * `actions`; the host build these shapes were read on is 0.2.1-rc.2.
+ */
+export interface HostWorkspaceViewStore {
+  getSnapshot(): HostWorkspaceViewSnapshot
+  actions: {
+    setGroupBy(mode: HostSessionGroupBy): void
+    setArchivedFilter(filter: HostArchivedFilter): void
+  }
+}
+
 /** One shortcut row: its command id, its label, its keycaps and its aliases. */
 export interface HostShortcutRow {
   id: string

@@ -690,14 +690,20 @@ stands between the written-back tokens and the cache share, and it is among the
 figures the ladder gives up when the line needs the room for the total; in the
 block it is the usage section's first row.
 
-The segment keeps its width across a session switch: the session's figure is
-replaced while the next one is being priced, so the amount sits in a box of an
-amount's measure, right-aligned so a growing figure extends left, and the box
-stands as the currency symbol and a dash in `label-tertiary` until the new
-figure arrives. Without it the segment folds out of the line and back, and the
-whole bottom line re-lays around it. The `billingCurrency` choice's Off takes
-the segment out of the line altogether: nothing is drawn, and the browser asks
-the host for neither the price table nor the session's total.
+In the toolbar's placement the segment keeps its width across a session switch:
+the session's figure is replaced while the next one is being priced, so the
+amount sits in a box of an amount's measure, right-aligned so a growing figure
+extends left, and the box stands as the currency symbol and a dash in
+`label-tertiary` until the new figure arrives. Without it the segment folds out
+of the line and back, and the whole bottom line re-lays around it. The box leads
+that line, so the room an amount does not need is the line's leading edge rather
+than a gap between two figures. On the line of its own the segment hugs its
+amount like every other figure: a box there would stand between the written-back
+figure and the cost and the figures would no longer keep one gap, so the line
+fits its figures again for the width the arriving amount needs. The
+`billingCurrency` choice's Off takes the segment out of the line altogether:
+nothing is drawn, and the browser asks the host for neither the price table nor
+the session's total.
 
 Which figures appear follows the host's statistics row. Its detailed form gets
 the whole list. Its compact form carries only the output speed and the cache-hit

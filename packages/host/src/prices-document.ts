@@ -102,8 +102,11 @@ function asSchedule(value: unknown): PriceSchedule | null {
 
 /**
  * One catalogue table, validated: model id → `"input cacheRead output"`.
- * Lines that are not three non-negative numbers are dropped alone, and an
- * entry's id is read lowercase.
+ * A line holding exactly three non-negative numbers is kept in whatever spacing
+ * it arrived with; anything else is dropped alone. A run of spaces is one
+ * separator, so it can never stand for an empty number, and the stored line is
+ * rewritten with single spaces because the client splits it that way
+ * (`split(' ')` in the price contract).
  */
 function asCatalog(value: unknown): Record<string, string> | null {
   const raw = asRecord(value)
@@ -111,9 +114,10 @@ function asCatalog(value: unknown): Record<string, string> | null {
   const out: Record<string, string> = {}
   for (const [id, line] of Object.entries(raw)) {
     if (typeof line !== 'string' || id.trim() === '') continue
-    const parts = line.split(' ').map(Number)
-    if (parts.length !== 3 || !parts.every(candidate => Number.isFinite(candidate) && candidate >= 0)) continue
-    out[id.trim().toLowerCase()] = line
+    const parts = line.trim().split(/\s+/u)
+    const rates = parts.map(Number)
+    if (parts.length !== 3 || !rates.every(candidate => Number.isFinite(candidate) && candidate >= 0)) continue
+    out[id.trim().toLowerCase()] = rates.join(' ')
   }
   return out
 }

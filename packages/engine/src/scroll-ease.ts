@@ -197,39 +197,46 @@ function stepScrollEase(now: number) {
   scrollEaseLastAt = now
   const seconds = interval / 1000
   for (const [element, ease] of scrollEasing) {
-    // A container that left the document, or one the reader has taken over,
-    // is done here: the loop never scrolls what nobody is following.
-    if (!element.isConnected || !ease.wanted()) {
+    // One container's callback throwing must not freeze the others' motion
+    // (D12): the failing element is dropped here and the frame carries the rest.
+    try {
+      // A container that left the document, or one the reader has taken over,
+      // is done here: the loop never scrolls what nobody is following.
+      if (!element.isConnected || !ease.wanted()) {
+        scrollEasing.delete(element)
+        continue
+      }
+      const floor = scrollEnd(element)
+      const target = Math.max(0, Math.min(floor, ease.destination(element, floor)))
+      // The fraction the ease keeps, unless someone else moved the position
+      // since its last write: then the position is taken where it is.
+      let position = ease.position
+      if (position === null || ease.lastWritten === null || Math.abs(element.scrollTop - ease.lastWritten) > SCROLL_EASE_MOVED_PX) {
+        position = element.scrollTop
+      }
+      // A far destination: closed to the lead first, on the side the position comes from.
+      if (Math.abs(target - position) > ease.lead) {
+        position = target - Math.sign(target - position) * ease.lead
+      }
+      const motion = stepSpring(position, ease.velocity, target, seconds)
+      const velocity = motion.velocity
+      position = Math.max(0, Math.min(floor, motion.position))
+      if (springArrived(position, velocity, target)) {
+        writeScrollEase(element, ease, target)
+        scrollEasing.delete(element)
+        continue
+      }
+      ease.velocity = velocity
+      const written = writeScrollEase(element, ease, position)
+      // The container's real end can sit a few pixels inside the arithmetic
+      // one — a child's clipped overflow, a scrollbar's rounding — and the
+      // write is then clamped: a position the container will not take has
+      // arrived as far as it can, and the loop must not keep waking for it.
+      if (Math.abs(written - position) > SCROLL_EASE_MOVED_PX) scrollEasing.delete(element)
+    } catch (error) {
       scrollEasing.delete(element)
-      continue
+      reportError(error)
     }
-    const floor = scrollEnd(element)
-    const target = Math.max(0, Math.min(floor, ease.destination(element, floor)))
-    // The fraction the ease keeps, unless someone else moved the position
-    // since its last write: then the position is taken where it is.
-    let position = ease.position
-    if (position === null || ease.lastWritten === null || Math.abs(element.scrollTop - ease.lastWritten) > SCROLL_EASE_MOVED_PX) {
-      position = element.scrollTop
-    }
-    // A far destination: closed to the lead first, on the side the position comes from.
-    if (Math.abs(target - position) > ease.lead) {
-      position = target - Math.sign(target - position) * ease.lead
-    }
-    const motion = stepSpring(position, ease.velocity, target, seconds)
-    const velocity = motion.velocity
-    position = Math.max(0, Math.min(floor, motion.position))
-    if (springArrived(position, velocity, target)) {
-      writeScrollEase(element, ease, target)
-      scrollEasing.delete(element)
-      continue
-    }
-    ease.velocity = velocity
-    const written = writeScrollEase(element, ease, position)
-    // The container's real end can sit a few pixels inside the arithmetic
-    // one — a child's clipped overflow, a scrollbar's rounding — and the
-    // write is then clamped: a position the container will not take has
-    // arrived as far as it can, and the loop must not keep waking for it.
-    if (Math.abs(written - position) > SCROLL_EASE_MOVED_PX) scrollEasing.delete(element)
   }
   if (scrollEasing.size === 0) return
   scrollEaseFrameQueued = true

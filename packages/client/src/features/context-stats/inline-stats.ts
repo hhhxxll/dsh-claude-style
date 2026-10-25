@@ -346,10 +346,10 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
     show(shown.output, footerMode ? directions && hasOutput : hasOutput && !merged)
     // The cost stands beside the written-back figure until the ladder needs
     // its room for the total. It stands whenever the line has tokens and the
-    // reader keeps billing on, with a placeholder only while the figure is
-    // still coming (a switch): the segment keeps its width, so the line does
-    // not fold and unfold around it. A route the price table cannot price has
-    // nothing to wait for, and the segment goes.
+    // reader keeps billing on, with the currency's dash while the figure is
+    // still coming (a switch): the toolbar's placement keeps the segment's
+    // measure, so the figures after it hold their places. A route the price
+    // table cannot price has nothing to wait for, and the segment goes.
     show(shown.cost, billing && hasTokens && (cost !== null || costPending) && at < 3)
     // The compact footer carries one token total while its room is narrow, and
     // gives that segment up for the two directions on the widest footer step.
@@ -385,9 +385,10 @@ export function createInlineStats(read: () => StatsReading, chatText: () => Host
           : `${sessionStatsGrouped(Math.round(total), chat)}${tokenParts[1] ?? ' tok'}`
         : readTokens(total))
       // A figure that is still coming keeps the segment's place with the
-      // currency's own dash; the amount replaces it in the same width. A route
-      // the table cannot price has nothing to wait for, so the segment is
-      // hidden and no dash is written. With billing off neither is written.
+      // currency's own dash; the amount replaces it in the width it needs, and
+      // the line fits its figures again for that width. A route the table
+      // cannot price has nothing to wait for, so the segment is hidden and no
+      // dash is written. With billing off neither is written.
       if (billing && (cost !== null || costPending)) {
         const cur = currency ?? CURRENCY_CNY
         const known = cost !== null && cost > 0

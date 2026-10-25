@@ -80,8 +80,14 @@ export function installChatFoldGlide() {
     watch: FoldWatch
     takenAt: number
   } | null = null
-  /** A collapse is rolling: for these 200 ms no new click is taken, so two folds cannot pile up. */
+  /** A collapse is rolling: for these 200 ms no new fold starts, so two folds cannot pile up. */
   let glideShutting = false
+  /**
+   * The click that arrived while a collapse was rolling. It is replayed once
+   * the roll settles, so a quick second fold is delayed by the animation
+   * instead of being dropped.
+   */
+  let queuedPress: Element | null = null
   /** The intercepted click is being replayed to React, and that one must not be intercepted again. */
   let glideReplaying = false
   /**
@@ -126,6 +132,19 @@ export function installChatFoldGlide() {
       if (own) endChatFoldToggle()
       glideReplaying = false
     }
+    flushQueued()
+  }
+
+  /** Press the click held during a roll, once that roll has let go. */
+  function flushQueued() {
+    const target = queuedPress
+    queuedPress = null
+    if (!(target instanceof HTMLElement) || !target.isConnected) return
+    if (glideShutting) {
+      queuedPress = target
+      return
+    }
+    target.click()
   }
 
   /**
@@ -197,6 +216,7 @@ export function installChatFoldGlide() {
     // A backstop: if onfinish never arrives for any reason, the click must not stay locked.
     const release = window.setTimeout(() => {
       glideShutting = false
+      flushQueued()
     }, FOLD_ROLL_MS + FOLD_ROLL_BACKSTOP_MS)
     if (height <= fold.floor) {
       window.clearTimeout(release)
@@ -273,9 +293,10 @@ export function installChatFoldGlide() {
     if (target.closest(CHAT_FLOW_SELECTOR) === null) return
     // A popup opens no folding body: menus and dialogs must not move the chat flow.
     if (target.closest(FOLD_POPUP_SELECTOR) !== null) return
-    // A collapse is rolling: for these 200 ms no new click is taken, so two
-    // folds cannot pile up.
+    // A collapse is rolling: the click waits for it instead of being dropped,
+    // so a quick second fold lands one animation later.
     if (glideShutting) {
+      queuedPress = target
       event.stopPropagation()
       event.preventDefault()
       return
@@ -357,6 +378,7 @@ export function installChatFoldGlide() {
     if (stopConfirmWait !== null) stopConfirmWait()
     stopConfirmWait = null
     glideIntent = null
+    queuedPress = null
     leaveOwner()
   }
 }

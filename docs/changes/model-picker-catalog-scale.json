@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-25",
-  "group": "improvements",
-  "order": 0,
-  "external": false,
-  "zh": "改善模型选择器在千级模型目录下的开销：开卡不再整卡重建，峰谷徽章按行原位刷新，价目表匹配与目录签名按代缓存",
-  "en": "Improve the model picker's cost on a four-digit model catalog: an open stops rebuilding the card, rate badges refresh row by row in place, and the price-table match and the catalog signature are cached per generation"
-}

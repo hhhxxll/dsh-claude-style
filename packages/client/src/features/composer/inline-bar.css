@@ -280,12 +280,16 @@ body[data-dsh-claude-style] .dsh-claude-context-stats-value {
    them, so the gap carries what the glyph used to. The line is the button that
    opens the panel holding the same session's rows
    (features/context-stats/stats-binding.ts), and the shared focus ring marks it
-   where the reader tabs to it. */
+   where the reader tabs to it.
+
+   The line keeps the host row's own 20px text line here: it stands in the dock
+   the host draws the meter in, so a control height taller than that row would
+   deepen the composer's bottom edge against the compact footer's placement,
+   which takes the toolbar row's height (footer-layout.css). */
 body[data-dsh-claude-style] .dsh-claude-inline-stats {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  height: var(--dsh-claude-footer-control-height);
   overflow: clip;
   color: var(--dsw-alias-label-primary);
   font-family: var(--dsw-font-family);
@@ -296,6 +300,9 @@ body[data-dsh-claude-style] .dsh-claude-inline-stats {
   white-space: nowrap;
   cursor: pointer;
 }
+/* A figure holds its number and the host's own words after it
+   (features/context-stats/inline-stats.ts); a flex item trims the template's
+   leading space, so this gap is the only space between a number and its unit. */
 body[data-dsh-claude-style] .dsh-claude-inline-seg,
 body[data-dsh-claude-style] .dsh-claude-inline-figure {
   display: inline-flex;
@@ -332,16 +339,22 @@ body[data-dsh-claude-style] .dsh-claude-inline-arrow {
   color: var(--dsw-alias-label-tertiary);
 }
 /* The session's cost: the line's own figure style, the currency symbol
-   carrying the unit (features/context-stats/inline-stats.ts). The width is
-   held at an amount's own measure and the figure is right-aligned in it, so a
-   switch's placeholder and the amount that replaces it occupy the same room. */
+   carrying the unit (features/context-stats/inline-stats.ts). On its own line
+   the figure hugs its amount like every other figure, so the figures keep the
+   line's own gap. */
 body[data-dsh-claude-style] .dsh-claude-inline-cost {
   display: inline-flex;
   align-items: center;
   flex: none;
+  font-variant-numeric: tabular-nums;
+}
+/* In the toolbar the segment keeps an amount's own measure: the line leads with
+   the cost there, so a switch's box stands where no pair of figures can show its
+   slack, and the room the amount does not need is the line's leading edge
+   instead of a gap between two figures (docs/STYLE.md). */
+body[data-dsh-claude-style][data-dsh-claude-stats-position="footer"] .dsh-claude-inline-cost {
   min-width: 7ch;
   justify-content: flex-end;
-  font-variant-numeric: tabular-nums;
 }
 /* No figure for this session yet: the segment keeps its place with a dash. */
 body[data-dsh-claude-style] .dsh-claude-inline-cost[data-pending] {

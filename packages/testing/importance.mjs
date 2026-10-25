@@ -21,6 +21,10 @@ import path from 'node:path'
 import { createImportanceAudit, planImportance, dropImportance, ROOT } from './importance-audit.mjs'
 import { openSkinSettings } from './settings-route.mjs'
 import { readAppearance, compareAppearance, writeAppearance, HOST_DEPENDENT_STATES } from './appearance.mjs'
+import surfaceTable from './data/surface.json' with { type: 'json' }
+
+/** A mark the walk sets, read from the surface table rather than spelled here (D77). */
+const surfaceAttribute = (id) => surfaceTable.surface.find((entry) => entry.id === id).attribute
 
 /**
  * The selectors this walk cannot reach, each under the reason it is out of
@@ -90,6 +94,12 @@ const MARKS = [
   ['custom brand word image', 'data-dsh-claude-custom-word', 'image'],
   ['custom brand tint', 'data-dsh-claude-custom-tint', ''],
   ['custom brand accent', 'data-dsh-claude-accent', '#d97757'],
+  // The zoom the reader picks: the sheet keys rules on each of its values, and
+  // the walk had no state that reached them (D9). The colour card under the
+  // Claude palette waits for a spec that reads its mark (surface.json).
+  ['page zoom 80', surfaceAttribute('skin.page-zoom'), '0.8'],
+  ['page zoom 125', surfaceAttribute('skin.page-zoom'), '1.25'],
+  ['page zoom 150', surfaceAttribute('skin.page-zoom'), '1.5'],
   // The window's focus state, which the skin mirrors onto the page for the
   // selection paints: a browser the lane drives keeps the focus, so the state
   // is set as the mirror writes it.

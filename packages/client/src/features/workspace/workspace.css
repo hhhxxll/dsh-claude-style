@@ -1,13 +1,15 @@
-/* ---------- Workspace section: 进行中 / 已归档 segments and the archived list ---------- */
-/* The segment control and the archived list dress the markup built by
-   packages/client/src/features/workspace/workspace-view.ts; sidebar-adjacent, but split from theme/sidebar.css
-   when that file neared the 750-line stop line. */
+/* ---------- Workspace section: 进行中 / 已归档 segments ---------- */
+/* The segment control and the archived row action dress the host's own
+   workspace browser under the marks packages/client/src/features/workspace/workspace-view.ts
+   writes; sidebar-adjacent, but split from theme/sidebar.css when that file
+   neared the 750-line stop line. */
 
 /* ---------- workspace section: 进行中 / 已归档 ---------- */
 /* The section label gives way to a two-state segment control (the skin's own
-   markup, built by packages/client/src/features/workspace/workspace-view.ts); the archived state swaps
-   the host's tree for the skin's list, and the list's rows carry a delete
-   button. The label and the control cross-fade by opacity further down.
+   markup, built by packages/client/src/features/workspace/workspace-view.ts);
+   the two segments are the host's own archived filter, so the tree below the
+   header stays the host's in both. The label and the control cross-fade by
+   opacity further down.
    The control's look is the shared small segment look (shared/segment-control.css);
    this sheet keeps its placement over the label and the crossfade.
    The control is a mode switch, not furniture: while 进行中 is the state it steps
@@ -67,143 +69,29 @@ body[data-dsh-claude-style] .dsh-claude-ws-segment {
 body[data-dsh-claude-style] .dsh-claude-ws-segment:hover {
   color: var(--dsw-alias-label-primary, #161616);
 }
-/* ---------- workspace view: the skin's own archived list ---------- */
-/* 已归档 is the skin's list (packages/client/src/features/workspace/workspace-view.ts), flat on purpose:
-   the host's own filter buries archived rows inside collapsed workspace groups
-   and its state is not reachable without clicking its menu. */
-body[data-dsh-claude-style] [data-dsh-claude-ws-view="archived"] [data-dsh-claude-ws-tree] {
-  display: none !important;
+/* ---------- 已归档: the delete action on the host's own rows ---------- */
+/* The host's session rows render their hover actions in a 16px box with the
+   host's own 归档 / 取消归档 button beside the skin's entry; this button takes
+   that box so the two sit on one line (the archived list is the host's, D43).
+   The icon is the host's Trash, and the hover ink is the skin's destructive
+   one rather than the host's primary ink. */
+body[data-dsh-claude-style] .dsh-claude-ws-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: var(--dsw-radius-xs, 4px);
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary, #b2acad);
+  cursor: pointer;
+  flex: none;
+  transition: background-color var(--dsh-claude-timing-feedback), color var(--dsh-claude-timing-feedback);
 }
-body[data-dsh-claude-style] [data-dsh-claude-ws-view="active"] .dsh-claude-archive-list {
-  display: none;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  /* It takes the tree's place in the section's column, so it takes the tree's
-     box and scrolling too: fill the height left under the header and scroll
-     inside it (the region above clips), with the tree's thin, reserved
-     scrollbar. The host's scroller reaches 4px left of the section's content
-     and 10px past its right edge to hold that gutter, then insets 4px / 5px —
-     the same box puts the rows where the tree's rows sit (measured: row x=12,
-     width 251, title x=36). */
-  margin: 0 -10px 0 -4px;
-  padding: 0 5px 0 4px;
-  min-width: 0;
-  flex: 1 1 0%;
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-gutter: stable;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-row {
-  /* The list scrolls at a fixed height; its rows keep theirs instead of
-     shrinking to fit. */
-  flex: none !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  height: 28px !important;
-  /* The host's own session row: 6px inside the list's 12px, so the row's box and
-     the title's x land where the tree's rows put them (measured 12 / 36). */
-  padding: 0 6px !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-  /* The host's 进行中 rows rest in the secondary ink and darken under the pointer;
-     the archived list reads the same way, so an archived conversation does not
-     sit there looking selected. */
-  color: var(--dsw-alias-label-secondary, #70686a) !important;
-  font-family: var(--dsw-font-family) !important;
-  font-size: 13px !important;
-  font-weight: 400 !important;
-  transition: background-color var(--dsh-claude-timing-feedback), color var(--dsh-claude-timing-feedback) !important;
-}
-body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-archive-row {
-  color: var(--dsw-alias-label-tertiary) !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-row:is(:hover, :focus-visible) {
-  color: var(--dsw-alias-label-primary, #161616) !important;
-}
-body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-archive-row:is(:hover, :focus-visible) {
-  color: var(--dsw-alias-label-primary) !important;
-}
-/* The leading slot the host's rows carry (a 6px circle centred in 14px), so the
-   two lists start their titles at the same x. */
-body[data-dsh-claude-style] .dsh-claude-archive-row::before {
-  content: "" !important;
-  flex: none !important;
-  width: 6px !important;
-  height: 6px !important;
-  margin: 0 4px !important;
-  border-radius: 50% !important;
-  corner-shape: round !important;
-  border: 1px solid var(--dsw-alias-label-caption, #b2acad) !important;
-  box-sizing: border-box !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-row:hover {
-  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.06)) !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-title {
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
-  white-space: nowrap !important;
-  text-overflow: ellipsis !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-time {
-  flex: none !important;
-  color: var(--dsw-alias-label-caption, #b2acad) !important;
-  font-size: 11px !important;
-}
-/* Hover swaps the trailing time for the two row actions, the way the host's
-   own session rows swap their time cell for the action buttons — so at rest
-   the time right-aligns with the row and nothing sits reserved beside it. */
-body[data-dsh-claude-style] .dsh-claude-archive-row:hover .dsh-claude-archive-time,
-body[data-dsh-claude-style] .dsh-claude-archive-row:focus-visible .dsh-claude-archive-time {
-  display: none !important;
-}
-/* The two row actions follow the host's own session rows: display none while
-   the row is at rest — nothing sits reserved at the row's right end, and the
-   invisible buttons offered phantom click targets there — and on hover, or
-   while the row holds keyboard focus (a display:none button cannot be tabbed
-   to), they take the time's place. Each button lives in the span its React
-   root renders into. */
-body[data-dsh-claude-style] .dsh-claude-archive-action {
-  display: none !important;
-  flex: none !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-row:hover .dsh-claude-archive-action,
-body[data-dsh-claude-style] .dsh-claude-archive-row:focus-visible .dsh-claude-archive-action {
-  display: inline-flex !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-delete,
-body[data-dsh-claude-style] .dsh-claude-archive-restore {
-  flex: none !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 22px !important;
-  height: 22px !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 5px !important;
-  background: transparent !important;
-  color: var(--dsw-alias-label-caption, #b2acad) !important;
-  cursor: pointer !important;
-  transition: background-color var(--dsh-claude-timing-feedback), color var(--dsh-claude-timing-feedback) !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-restore:hover {
-  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08)) !important;
-  color: var(--dsw-alias-label-primary, #161616) !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-delete:hover {
-  background: rgba(192, 57, 43, 0.12) !important;
-  color: var(--dsw-alias-state-error-primary, #c0392b) !important;
-}
-body[data-dsh-claude-style] .dsh-claude-archive-status {
-  padding: 8px;
-  color: var(--dsw-alias-label-caption, #b2acad);
-  font-family: var(--dsw-font-family);
-  font-size: 12px;
+body[data-dsh-claude-style] .dsh-claude-ws-delete:hover,
+body[data-dsh-claude-style] .dsh-claude-ws-delete:focus-visible {
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--dsw-alias-state-error-primary, #c0392b);
 }

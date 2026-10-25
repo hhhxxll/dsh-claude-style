@@ -75,6 +75,8 @@ export function createPrices(ctx: DshContext): PriceStore {
   let loaded = false
   let timer: ReturnType<typeof setInterval> | undefined
   let inFlight: AbortController | null = null
+  /** Set by dispose: a source answer that lands afterwards must not write the cache. */
+  let disposed = false
   let lastAskedAt = 0
   const listeners = new Set<() => void>()
   const warn = (message: string) => ctx.logger?.warn?.(message)
@@ -140,6 +142,9 @@ export function createPrices(ctx: DshContext): PriceStore {
   async function refresh(): Promise<boolean> {
     let next: PriceDocument | null = null
     for (const url of PRICES_URLS) {
+      // Disposed while the previous source was being asked: nothing below runs
+      // on behalf of a plugin that is gone.
+      if (disposed) return false
       try {
         next = await fetchOne(url)
       } catch (error) {
@@ -153,6 +158,8 @@ export function createPrices(ctx: DshContext): PriceStore {
       warn(`${PACKAGE_NAME}: no price source answered a document this build understands; keeping the current one`)
       return false
     }
+    // A disposal during the fetch must not leave this answer in the cache.
+    if (disposed) return false
     document = next
     origin = 'remote'
     fetchedAt = Date.now()
@@ -202,6 +209,7 @@ export function createPrices(ctx: DshContext): PriceStore {
       return () => listeners.delete(listener)
     },
     dispose() {
+      disposed = true
       stopTimer()
       listeners.clear()
       if (inFlight !== null) {

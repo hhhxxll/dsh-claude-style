@@ -67,6 +67,8 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
    * session that never shows leaves the reader where its row put him.
    */
   const REVEAL_WAIT_MS = 5000
+  /** The listbox the field controls; option ids hang off it. */
+  const LIST_ID = 'dsh-claude-search-listbox'
   const SVG_OPEN = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
   const ICONS: Record<string, string> = {
     search: `${SVG_OPEN}<circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 13.5 13.5"/></svg>`,
@@ -163,6 +165,12 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     field.type = 'text'
     field.spellcheck = false
     field.setAttribute('autocomplete', 'off')
+    // The list itself never takes focus: the field is the combobox, and the
+    // active option is named through aria-activedescendant (paintActive).
+    field.setAttribute('role', 'combobox')
+    field.setAttribute('aria-expanded', 'true')
+    field.setAttribute('aria-controls', LIST_ID)
+    field.setAttribute('aria-autocomplete', 'list')
     field.setAttribute('data-modal-autofocus', '')
     field.placeholder = copy('searchPlaceholder')
     field.value = query
@@ -202,6 +210,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
 
     const listbox = buildElement('div', 'dsh-claude-search-list')
     list = listbox
+    listbox.id = LIST_ID
     listbox.setAttribute('role', 'listbox')
     card.appendChild(listbox)
 
@@ -306,7 +315,9 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
 
   function buildRow(row: SearchRow, index: number) {
     const item = buildElement('div', 'dsh-claude-search-item')
+    item.id = `${LIST_ID}-option-${index}`
     item.setAttribute('role', 'option')
+    item.setAttribute('aria-selected', 'false')
     item.setAttribute('data-kind', row.kind)
     item.setAttribute('data-index', String(index))
     const icon = buildElement('span', 'dsh-claude-search-item-icon')
@@ -353,10 +364,21 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   function paintActive(reveal: boolean) {
     if (list === null) return
     const items = list.querySelectorAll('.dsh-claude-search-item')
+    let named: string | null = null
     for (let i = 0; i < items.length; i++) {
       const on = i === active
       if (items[i].hasAttribute('data-active') !== on) items[i].toggleAttribute('data-active', on)
-      if (on && reveal) items[i].scrollIntoView({ block: 'nearest' })
+      if (items[i].getAttribute('aria-selected') !== String(on)) items[i].setAttribute('aria-selected', String(on))
+      if (on) {
+        named = items[i].id
+        if (reveal) items[i].scrollIntoView({ block: 'nearest' })
+      }
+    }
+    // The field keeps focus; this is what tells a reader which option the
+    // arrows and Enter will act on.
+    if (input !== null) {
+      if (named === null) input.removeAttribute('aria-activedescendant')
+      else input.setAttribute('aria-activedescendant', named)
     }
   }
 
@@ -437,11 +459,16 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       const run = settleClose()
       closingStamp.release()
       if (run !== null) run()
-      // Still mounted while it fades: the field is there.
-      input!.value = ''
-      render()
-      input!.focus()
-      return
+      // Still mounted while it fades: the field is there. A host that took the
+      // card away mid-fade leaves no field to reset, and the rebuild path below
+      // is the one that can put one back.
+      if (input !== null) {
+        input.value = ''
+        render()
+        input.focus()
+        return
+      }
+      renderModal()
     }
     renderModal()
   }

@@ -124,12 +124,22 @@ export function installScheduler<Name extends string>(ctx: HostContext, ui: Sche
     return ui[name]
   }
 
-  /** Call one hook on every feature that implements it, in FEATURES order. */
+  /**
+   * Call one hook on every feature that implements it, in FEATURES order. Each
+   * call is isolated (D12): an event route that throws must not keep the rest
+   * of the page's features from hearing the same event, and the failure is
+   * reported where it happened rather than retiring the feature.
+   */
   function dispatch<K extends FeatureHook>(hook: K, ...args: Parameters<NonNullable<FeatureHandle[K]>>) {
     for (const name of features) {
       const handle = handleOf(name)
       const call = handle?.[hook] as ((...args: unknown[]) => void) | undefined
-      if (handle && typeof call === 'function') call.apply(handle, args)
+      if (!handle || typeof call !== 'function') continue
+      try {
+        call.apply(handle, args)
+      } catch (error) {
+        reportError(error)
+      }
     }
   }
 
@@ -142,11 +152,16 @@ export function installScheduler<Name extends string>(ctx: HostContext, ui: Sche
     onGlobalActivity()
     const target = e.target
     // A press a feature does not own closes it; features without an `owns`
-    // keep their own dismiss route.
+    // keep their own dismiss route. One feature's close throwing must not keep
+    // the others from closing (D12).
     for (const name of features) {
       const handle = handleOf(name)
       if (!handle || typeof handle.owns !== 'function' || typeof handle.close !== 'function') continue
-      if (target instanceof Node && !handle.owns(target)) handle.close('outside')
+      try {
+        if (target instanceof Node && !handle.owns(target)) handle.close('outside')
+      } catch (error) {
+        reportError(error)
+      }
     }
     dispatch('onPointerDown', target)
   }
@@ -246,46 +261,51 @@ export function installScheduler<Name extends string>(ctx: HostContext, ui: Sche
   // re-pin in the same frame, or a JS-pinned control trails the reflow.
   const onCardResize = () => { dispatch('reposition', 'composer') }
 
-  /** Failed passes in a row after which a feature's sync is switched off. */
-  const SYNC_FAILURE_LIMIT = 3
+  /** Failed passes in a row after which one of a feature's hooks is switched off. */
+  const FAILURE_LIMIT = 3
+  /** Sync failures in a row, per feature. */
   const syncFailures: Record<string, number> = {}
+  /** Measure failures in a row, per feature: a read that keeps throwing does not ride on a write that succeeds. */
+  const measureFailures: Record<string, number> = {}
 
   /**
    * Run one feature's sync in isolation: a throw is retried on the next pass,
-   * and after SYNC_FAILURE_LIMIT failures in a row the feature is reported
-   * once and retired while the rest of the pass carries on (D12).
+   * and after FAILURE_LIMIT failures in a row the feature is reported once and
+   * retired while the rest of the pass carries on (D12).
    */
   function runSync(name: Name) {
     const feature = handleOf(name)
     if (!feature || typeof feature.sync !== 'function') return
     const failures = syncFailures[name] || 0
-    if (failures >= SYNC_FAILURE_LIMIT) return
+    if (failures >= FAILURE_LIMIT) return
     try {
       feature.sync()
       syncFailures[name] = 0
     } catch (error) {
       syncFailures[name] = failures + 1
-      if (failures + 1 < SYNC_FAILURE_LIMIT) return
+      if (failures + 1 < FAILURE_LIMIT) return
       reportFeatureFailure(name, error)
       ui.retire(name)
     }
   }
 
   /**
-   * Run one feature's measurement, in the pass's read phase and under the same
-   * failure rule as its sync (D12): a feature that throws here is retired like
-   * one that throws while writing.
+   * Run one feature's measurement, in the pass's read phase, counted apart from
+   * its sync (D12): the two halves fail independently, so a pass whose read
+   * throws every frame still retires the feature after FAILURE_LIMIT failures in
+   * a row — a sync succeeding in the same pass does not zero this count.
    */
   function runMeasure(name: Name) {
     const feature = handleOf(name)
     if (!feature || typeof feature.measure !== 'function') return
-    const failures = syncFailures[name] || 0
-    if (failures >= SYNC_FAILURE_LIMIT) return
+    const failures = measureFailures[name] || 0
+    if (failures >= FAILURE_LIMIT) return
     try {
       feature.measure()
+      measureFailures[name] = 0
     } catch (error) {
-      syncFailures[name] = failures + 1
-      if (failures + 1 < SYNC_FAILURE_LIMIT) return
+      measureFailures[name] = failures + 1
+      if (failures + 1 < FAILURE_LIMIT) return
       reportFeatureFailure(name, error)
       ui.retire(name)
     }

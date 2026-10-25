@@ -61,6 +61,13 @@ export function createPlaceholderCopy(cards: MatchList<HTMLElement>, placeholder
   let pass = 0
   /** The shell's locale when the stand-in was last drawn. */
   let drawnLocale = ''
+  /**
+   * The host's own hint text this generation replaced, with the skin's text it
+   * was replaced by. The teardown and a restyle that stands down put the host's
+   * words back; a node whose text no longer matches what was written is left
+   * alone, because the host has re-rendered it since.
+   */
+  const replaced = new Map<HTMLElement, { original: string, written: string }>()
 
   /** Whether a placeholder's text is one of the hints this skin replaces. */
   function isShippedHint(text: string) {
@@ -86,15 +93,46 @@ export function createPlaceholderCopy(cards: MatchList<HTMLElement>, placeholder
     return copyIn(ENTRIES, hero ? 'heroHint' : 'defaultHint', activeLocale())
   }
 
+  /**
+   * Put the host's own hint back into every node this generation rewrote.
+   *
+   * The host's text goes back only where the skin's text still stands: a node
+   * the host has re-rendered since owns its new words. A hint the host no longer
+   * shows needs nothing — the node left with it.
+   */
+  function restoreHints() {
+    for (const [node, entry] of replaced) {
+      if (!node.isConnected) {
+        replaced.delete(node)
+        continue
+      }
+      if ((node.textContent || '') !== entry.written) {
+        replaced.delete(node)
+        continue
+      }
+      node.textContent = entry.original
+      replaced.delete(node)
+    }
+  }
+
   /** Write the skin's words into every shipped hint the page shows. */
   function rewriteHint(target: string, active: boolean) {
-    if (!active) return
+    if (!active) {
+      restoreHints()
+      return
+    }
+    for (const node of replaced.keys()) if (!node.isConnected) replaced.delete(node)
     const hints = placeholders.all()
     for (let i = 0; i < hints.length; i++) {
       const node = hints[i]
       if (node.hasAttribute(SYNTHETIC_ATTR)) continue
       const text = node.textContent || ''
-      if (isShippedHint(text) && text !== target) node.textContent = target
+      if (!isShippedHint(text) || text === target) continue
+      // The host's own words are kept per node, so turning the restyle off (or
+      // reloading the plugin) leaves the host's hint rather than the skin's.
+      const entry = replaced.get(node)
+      replaced.set(node, { original: entry?.original ?? text, written: target })
+      node.textContent = target
     }
   }
 
@@ -185,6 +223,8 @@ export function createPlaceholderCopy(cards: MatchList<HTMLElement>, placeholder
       for (const node of placeholders.all()) {
         if (node.hasAttribute(SYNTHETIC_ATTR)) node.remove()
       }
+      restoreHints()
+      replaced.clear()
     },
   }
 }

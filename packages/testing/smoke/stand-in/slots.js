@@ -9,22 +9,43 @@
  * the file rows must leave alone. The chunk-late case declares the settings
  * seats too: a settings section installed after its generation ended would
  * register there.
+ *
+ * The switch cases carry the registry as well: the workspace feature reads the
+ * host's view store from the `sidebar.workspaces` declaration and registers the
+ * archived row's delete action in `sidebar.workspaces.session.row.action`.
  */
 (function () {
   var host = window.__dshSmokeHost
   var CASE = host.CASE
+  var switchCase = CASE === 'switches' || CASE === 'switches-off'
 
-  var slotRegistry = CASE === 'studio' || CASE === 'settings' || CASE === 'chunk-late' || CASE === 'chat-files' || CASE === 'peer-chat-ux' || CASE === 'skin-center-handoff' || CASE === 'skin-center-arrival' ? {
+  /**
+   * The host's workspace view store: the filter and grouping its own view menu
+   * writes, which the skin's segment control drives. One instance for the page,
+   * as the host's browser renders from the one its `create` answered.
+   */
+  var viewState = { groupBy: 'workspace', archivedFilter: 'default' }
+  var viewStore = switchCase ? {
+    getSnapshot: function () { return viewState },
+    actions: {
+      setArchivedFilter: function (filter) { viewState.archivedFilter = filter },
+      setGroupBy: function (mode) { viewState.groupBy = mode },
+    },
+  } : undefined
+
+  var slotRegistry = CASE === 'studio' || CASE === 'settings' || CASE === 'chunk-late' || CASE === 'chat-files' || CASE === 'peer-chat-ux' || CASE === 'skin-center-handoff' || CASE === 'skin-center-arrival' || switchCase ? {
     inject: function (key, callback) {
-      var declared = CASE === 'studio'
-        ? key === 'conversation.input.dock'
-        : CASE === 'chat-files'
-          ? key === 'tool.call.toolview'
-          : CASE === 'skin-center-handoff' || CASE === 'skin-center-arrival'
-            ? key === 'settings.section' || key === 'plugins.bundle.config'
-          : CASE === 'peer-chat-ux'
-            ? key === 'tool.call.toolview' || key === 'settings.section' || key === 'plugins.bundle.config'
-            : key === 'settings.section' || key === 'plugins.bundle.config'
+      var declared = switchCase
+        ? key === 'sidebar.workspaces' || key === 'sidebar.workspaces.session.row.action'
+        : CASE === 'studio'
+          ? key === 'conversation.input.dock'
+          : CASE === 'chat-files'
+            ? key === 'tool.call.toolview'
+            : CASE === 'skin-center-handoff' || CASE === 'skin-center-arrival'
+              ? key === 'settings.section' || key === 'plugins.bundle.config'
+            : CASE === 'peer-chat-ux'
+              ? key === 'tool.call.toolview' || key === 'settings.section' || key === 'plugins.bundle.config'
+              : key === 'settings.section' || key === 'plugins.bundle.config'
       return declared ? callback() : function () {}
     },
     register: function (spec, component) {
@@ -45,8 +66,12 @@
       }
     },
     // The host lists a slot's entries in render order (ui-slots' registry),
-    // each with the options it was registered under.
+    // each with the options it was registered under. The workspace browser
+    // declares the store it renders from instead, which is what the skin reads.
     entries: function (key) {
+      if (switchCase && key === 'sidebar.workspaces') {
+        return [{ store: { create: function () { return viewStore } } }]
+      }
       var out = []
       var all = window.__slots || []
       for (var i = 0; i < all.length; i++) {
@@ -56,5 +81,6 @@
       return out
     },
   } : undefined
+  if (viewStore !== undefined) host.workspaceViewStore = viewStore
   host.slotRegistry = slotRegistry
 })()

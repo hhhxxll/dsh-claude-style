@@ -14,9 +14,11 @@
  * buckets are disjoint. The one addition is the day dimension: a replaced sample
  * is subtracted from the day it was recorded on.
  */
-import { existsSync, readdirSync, statSync } from 'node:fs'
+import { existsSync } from 'node:fs'
+import { readdir, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { DshContext } from '@dsh-claude-style/engine/node/dsh'
+import { sessionIdFromDirectoryName } from './session-name.js'
 import { BUCKET_KEYS, addBuckets, emptyBuckets } from './usage-ledger.js'
 import type { Buckets, DayBuckets } from './usage-ledger.js'
 
@@ -47,9 +49,12 @@ export interface UsageSample {
   cacheWriteTokens?: unknown
 }
 
-/** One session log on disk: its id, its path and its fingerprint. */
+/** One session log on disk: its logical id, the name it is stored under, and its fingerprint. */
 export interface SessionLog {
+  /** The logical id, decoded from the directory name: what the session services look a session up by. */
   id: string
+  /** The directory name on disk, which is also the key the usage record holds. */
+  storedName: string
   path: string
   size: number
   mtimeMs: number
@@ -198,10 +203,10 @@ export function foldSession(events: UsageEvent[]): FoldedSession {
 }
 
 /** The newest generation of a session directory's log, with its fingerprint. */
-function newestLog(dir: string): { path: string, size: number, mtimeMs: number } | null {
+async function newestLog(dir: string): Promise<{ path: string, size: number, mtimeMs: number } | null> {
   let entries
   try {
-    entries = readdirSync(dir, { withFileTypes: true })
+    entries = await readdir(dir, { withFileTypes: true })
   } catch (error) {
     // A session directory removed between the root listing and this read is a
     // session deleted mid-pass: it has no log to fold, and every other one
@@ -223,25 +228,30 @@ function newestLog(dir: string): { path: string, size: number, mtimeMs: number }
   }
   if (best === null) return null
   const path = join(dir, best.name)
-  const stat = statSync(path, { throwIfNoEntry: false })
-  // The log itself removed between that listing and this stat is the same
-  // deletion the directory read above tolerates.
-  if (stat === undefined) return null
-  return { path, size: stat.size, mtimeMs: stat.mtimeMs }
+  try {
+    const info = await stat(path)
+    return { path, size: info.size, mtimeMs: info.mtimeMs }
+  } catch (error) {
+    // The log itself removed between that listing and this stat is the same
+    // deletion the directory read above tolerates.
+    if ((error as { code?: string }).code === 'ENOENT') return null
+    throw error
+  }
 }
 
 /**
- * Every stored session: id, newest log, and that log's fingerprint. A harness
- * home that has never stored a session has no sessions root yet.
+ * Every stored session: its logical id, the directory name it is stored under,
+ * its newest log and that log's fingerprint. A harness home that has never
+ * stored a session has no sessions root yet.
  */
-export function listSessionLogs(root: string): SessionLog[] {
+export async function listSessionLogs(root: string): Promise<SessionLog[]> {
   const out: SessionLog[] = []
   if (!existsSync(root)) return out
-  for (const project of readdirSync(root, { withFileTypes: true })) {
+  for (const project of await readdir(root, { withFileTypes: true })) {
     if (!project.isDirectory()) continue
     let sessions
     try {
-      sessions = readdirSync(join(root, project.name), { withFileTypes: true })
+      sessions = await readdir(join(root, project.name), { withFileTypes: true })
     } catch (error) {
       // A workspace directory removed since the root listing went with its
       // sessions: the pass walks the ones that are left.
@@ -250,9 +260,10 @@ export function listSessionLogs(root: string): SessionLog[] {
     }
     for (const session of sessions) {
       if (!session.isDirectory()) continue
-      const log = newestLog(join(root, project.name, session.name))
+      const log = await newestLog(join(root, project.name, session.name))
       if (log === null) continue
-      out.push({ id: session.name, ...log })
+      const storedName = session.name
+      out.push({ id: sessionIdFromDirectoryName(storedName), storedName, ...log })
     }
   }
   return out

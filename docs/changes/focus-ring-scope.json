@@ -1,8 +1,0 @@
-{
-  "at": "2026-10-24",
-  "group": "fixes",
-  "order": 0,
-  "external": false,
-  "zh": "修复其他插件的输入框被套上整页焦点描边：键盘焦点环改由宿主自己的 `:focus-visible` 规则画出、皮肤只提供墨色，兜底环以零权重写在 `:where()` 里，插件声明的 `outline: none` 重新生效。",
-  "en": "Fix another plugin's inputs gaining a page-wide focus outline: the keyboard ring is now drawn by the host's own `:focus-visible` rules from the skin's ink, and the fallback ring weighs nothing inside `:where()`, so a plugin's own `outline: none` stands."
-}

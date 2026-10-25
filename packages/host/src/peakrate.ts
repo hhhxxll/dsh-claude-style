@@ -100,6 +100,8 @@ export function createPeakRate(ctx: DshContext): PeakRateStore {
    * otherwise land after the routes are gone and write the cache file.
    */
   let inFlight: AbortController | null = null
+  /** Set by dispose: a source answer that lands afterwards must not write the cache. */
+  let disposed = false
   /** When the route last asked: what tells a reader-driven timer from an idle one. */
   let lastAskedAt = 0
   const warn = (message: string) => ctx.logger?.warn?.(message)
@@ -158,6 +160,9 @@ export function createPeakRate(ctx: DshContext): PeakRateStore {
   async function refresh(): Promise<boolean> {
     let raw: unknown
     for (const url of PEAKRATE_CATALOG_URLS) {
+      // Disposed while the previous source was being asked: nothing below runs
+      // on behalf of a plugin that is gone.
+      if (disposed) return false
       try {
         const controller = new AbortController()
         inFlight = controller
@@ -190,6 +195,8 @@ export function createPeakRate(ctx: DshContext): PeakRateStore {
       warn(`${PACKAGE_NAME}: peak rate source answered a document this build does not understand; keeping the current catalog`)
       return false
     }
+    // A disposal during the fetch must not leave this answer in the cache.
+    if (disposed) return false
     catalog = parsed
     origin = 'remote'
     fetchedAt = Date.now()
@@ -199,6 +206,7 @@ export function createPeakRate(ctx: DshContext): PeakRateStore {
 
   /** Store the fetched document, so a restart does not have to reach the source again. */
   function writeCache(): void {
+    if (disposed) return
     const stored: CacheDocument = { fetchedAt, document: catalog }
     writeJsonDocument(ctx, cacheFile, 'peak rate cache', stored)
   }
@@ -243,6 +251,7 @@ export function createPeakRate(ctx: DshContext): PeakRateStore {
     refresh,
     payload,
     dispose() {
+      disposed = true
       stopTimer()
       // A read still in flight is stopped here: its answer would write the
       // cache file for a plugin that is no longer installed.
