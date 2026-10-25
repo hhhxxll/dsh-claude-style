@@ -27,3 +27,56 @@ body[data-dsh-claude-style] [data-dsh-claude-restart]:hover {
 body[data-dsh-claude-style] [data-dsh-claude-restart]:hover svg {
   color: var(--dsw-alias-label-primary, inherit);
 }
+
+/* ---------- the restart dialog's own layout ---------- */
+/* The host's Modal (its _dialog/_header/_body/_footer module) draws the shell:
+   a 380px panel with the header padded 22/14/12, the body 24px wide and the
+   footer right-aligned 24px above the panel's end. This dialog carries three
+   shapes — the confirmation, the running line and the failure — and the shared
+   rhythm below keeps them on one scale: the title seats beside its close
+   button, the sentence sits under it as the description's neighbour, and the
+   buttons hold the panel's own padding, so no step floats between the header's
+   asymmetric padding and the body's even one. */
+body[data-dsh-claude-style] .dsh-claude-restart-dialog._dialog_o6lrb_33 {
+  gap: 0;
+  padding-bottom: 20px;
+}
+
+/* The header's right padding carries the close button's own width, which the
+   confirm step has no use for asymmetry from: the title lines up with the
+   sentence and the buttons under it. */
+body[data-dsh-claude-style] .dsh-claude-restart-dialog ._header_o6lrb_71 {
+  padding: 20px 24px 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-restart-dialog ._title_o6lrb_79 {
+  font-size: 15px;
+  line-height: 22px;
+}
+
+/* The confirmation sentence: the body holds it and the failure note, one step
+   below the title, with the reading colour the host's description carries. */
+body[data-dsh-claude-style] .dsh-claude-restart-dialog ._body_o6lrb_115 {
+  margin-top: 10px;
+  gap: 6px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-restart-dialog .dsh-claude-restart-line {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* The running line stands alone on its step: the shimmer carries the words. */
+body[data-dsh-claude-style] .dsh-claude-restart-dialog ._content_o6lrb_63 {
+  gap: 0;
+}
+
+/* The buttons: the footer keeps the panel's own padding and one step of air
+   above, so the pair reads as the panel's end rather than as a toolbar. */
+body[data-dsh-claude-style] .dsh-claude-restart-dialog ._footer_o6lrb_123 {
+  margin-top: 20px;
+  padding: 0 24px;
+}
