@@ -225,6 +225,15 @@ export const EXPANDED_ATTRIBUTE = 'data-expanded'
 export const FOLD_TOGGLE_SELECTOR = '[aria-expanded]'
 /** Controls whose opening is skipped whole: a turn's header and its trigger notice. */
 export const FOLD_SKIPPED_CONTROL_SELECTOR = '[data-turn-process], [data-turn-trigger]'
+/**
+ * The header button of the host's compaction row (MessageItem.module.css's
+ * `…_compactionButton`): the sentence 「已压缩 N 条历史记录」 the host renders
+ * where a checkpoint folded the earlier turns. The row carries no data mark of
+ * its own and the button's class local name has no part in the host's tables,
+ * so it is read through the stable tail of that hashed name — the same shape
+ * as the attachment rail.
+ */
+export const COMPACTION_BUTTON_SELECTOR = '[class*="_compactionButton"]'
 
 /* ---------- the frame around the chat ---------- */
 

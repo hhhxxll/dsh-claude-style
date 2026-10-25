@@ -23,6 +23,14 @@ body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wa
   background: transparent;
 }
 
+/* The compaction row's header button paints a sticky canvas fill so the row
+   stays readable while the transcript scrolls under it, and a solid hover chip
+   beside that; over the wash both stand down, the way the disclosure header's
+   own sticky fill does. Its ink stays the host's label ladder. */
+body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"] :is([class*="_compactionButton"], [class*="_compactionButton"]:hover) {
+  background: transparent;
+}
+
 body[data-dsh-claude-style][data-dsh-claude-deepseek-background]:not([data-we-wallpaper]) [data-dsh-claude-part~="layout-frame"][data-dsh-claude-holds~="sidebar-column"]:not([data-dsh-claude-sidebar-peek]) > :is([data-dsh-claude-part~="sidebar-column"], [data-dsh-claude-part~="center-column"]) {
   box-shadow: none;
 }

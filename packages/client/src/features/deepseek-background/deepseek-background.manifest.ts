@@ -18,6 +18,6 @@ export default {
       dynamic: 'deepseekBackgroundDynamic',
     },
   }],
-  contracts: [],
+  contracts: ['fold.compaction-button'],
   cases: ['hero'],
 } satisfies FeatureManifest
