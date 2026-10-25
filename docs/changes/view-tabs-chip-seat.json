@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-25",
+  "group": "fixes",
+  "order": 2,
+  "external": false,
+  "zh": "修复会话视图页签栏的「更多视图」按钮比页签药丸低约两像素：芯片改按自己的行盒落位，与药丸在同一水平中心。",
+  "en": "Fix the view tabs' overflow button sitting about two pixels below the tab plate: the chip now seats on its own line box, level with the plate's centre."
+}

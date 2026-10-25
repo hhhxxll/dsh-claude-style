@@ -89,11 +89,15 @@ body[data-dsh-claude-style] [data-dsh-view-tabs] [data-dsh-claude-part~="view-ta
 }
 /* The row's "more views" button: a chip seated beside the plate, sized like a tab
    so the two line up. Its colour states stay the host's own — the accent marks
-   the view sitting in the menu. */
+   the view sitting in the menu. The host seats the button on its anchor's text
+   baseline and pulls it up with a negative top margin of its own; the chip
+   states its line box instead, so the seating holds whatever the host's sheet
+   and the platform's font metrics do with the baseline. */
 body[data-dsh-claude-style] [data-dsh-claude-part~="view-tabs-more"] {
   width: 22px;
   height: 22px;
   margin-top: 0;
+  line-height: 22px;
   border-radius: 5px;
 }
 body[data-dsh-claude-style] [data-dsh-claude-part~="view-tabs-more"]:hover {
