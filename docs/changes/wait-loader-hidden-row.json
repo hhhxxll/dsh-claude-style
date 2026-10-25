@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-25",
+  "group": "fixes",
+  "order": 4,
+  "external": false,
+  "zh": "修复等待行的装载点在行尚未显示时挂载会抛出未捕获错误的问题：改为记下待启动并在此后的每次同步重试，等圆点真的带上动画再开始。",
+  "en": "Fix the waiting line's loader throwing an uncaught error when it mounted while its row was not yet shown: it now records the pending opening and retries on every later sync, starting once the dots carry their motion."
+}

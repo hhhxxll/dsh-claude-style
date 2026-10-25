@@ -169,6 +169,9 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       // The same row can stand for another turn (the host reuses the running
       // row): the wording is looked up under the turn in hand from here on.
       standing.key = key
+      // A line built while the host still had its row hidden has not started
+      // its loader; every pass asks again until the dots carry their motion.
+      startWaitLoader(standing.loader)
       return standing
     }
     const line = buildElement('span', 'dsh-claude-chat-wait')

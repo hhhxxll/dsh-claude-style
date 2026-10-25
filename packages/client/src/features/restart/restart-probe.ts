@@ -6,10 +6,16 @@ export interface RestartProbe {
   ready: boolean
   boot: string | null
   desktop: boolean
+  /**
+   * The HTTP status the route answered, or null when nothing answered at all.
+   * Optional so a probe built by hand (a spec, a caller that only has the boot
+   * identity) needs no transport detail to describe itself.
+   */
+  status?: number | null
 }
 
 /** The unset probe: nothing answered. */
-export const PROBE_DOWN: RestartProbe = { up: false, ready: false, boot: null, desktop: false }
+export const PROBE_DOWN: RestartProbe = { up: false, ready: false, boot: null, desktop: false, status: null }
 
 /** How the polling loop is shaped; the numbers ride with the logic that reads them. */
 export const RESTART_SETTLE_MS = 1500
@@ -19,10 +25,12 @@ export const RESTART_MAX_POLLS = 120
 /**
  * What one `GET RESTART_PATH` answered, folded into a probe: a refusal or a
  * body without a boot identity is a host that is not answering, and the page
- * readiness is decided by the caller, which fetches the page itself.
+ * readiness is decided by the caller, which fetches the page itself. The status
+ * rides along so a reader whose press reached no route is told which answer it
+ * got instead of a dialog that never opens.
  */
 export function probeFromBoot(body: unknown, status: number): RestartProbe {
-  if (status !== 200 || typeof body !== 'object' || body === null) return { ...PROBE_DOWN }
+  if (status !== 200 || typeof body !== 'object' || body === null) return { ...PROBE_DOWN, status }
   const boot = (body as { boot?: unknown }).boot
   const desktop = (body as { desktop?: unknown }).desktop
   return {
@@ -30,6 +38,7 @@ export function probeFromBoot(body: unknown, status: number): RestartProbe {
     ready: false,
     boot: typeof boot === 'string' && boot !== '' ? boot : null,
     desktop: desktop === true,
+    status,
   }
 }
 
@@ -64,3 +73,20 @@ export function nextPollState(state: { polls: number, timedOut: boolean }) {
 
 /** The route's own path, for the fetches the feature runs (D73). */
 export const RESTART_ROUTE = RESTART_PATH
+
+/**
+ * Why a probe that did not come back up reads the way it does, as one of the
+ * reasons the dialog names: a route the host never answered, a refusal the
+ * connection layer wrote, or an answer that carried no boot identity. The
+ * reader needs this because a press that opens nothing is indistinguishable
+ * from a press that was never heard.
+ */
+export type RestartTrouble = 'unreached' | 'refused' | 'malformed'
+
+export function troubleOf(probe: RestartProbe): RestartTrouble | null {
+  if (probe.up) return null
+  const status = probe.status ?? null
+  if (status === null) return 'unreached'
+  if (status >= 400) return 'refused'
+  return 'malformed'
+}

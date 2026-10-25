@@ -8,13 +8,27 @@
  * @risk The page reloads into the OLD process while it drains (the restart looks like it did nothing), or the wait outlives every reader's patience with no way out.
  */
 import { expect, test } from 'vitest'
-import { bootReplaced, nextPollState, probeFromBoot, RESTART_MAX_POLLS, restartArrived } from '@dsh-claude-style/client/pure'
+import { bootReplaced, nextPollState, PROBE_DOWN, probeFromBoot, RESTART_MAX_POLLS, restartArrived, troubleOf } from '@dsh-claude-style/client/pure'
 
 test('a boot answer folds into a probe', () => {
   expect(probeFromBoot({ ok: true, boot: '27468-1792827098612', desktop: true }, 200))
-    .toEqual({ up: true, ready: false, boot: '27468-1792827098612', desktop: true })
+    .toEqual({ up: true, ready: false, boot: '27468-1792827098612', desktop: true, status: 200 })
   expect(probeFromBoot({ ok: true, boot: '', desktop: false }, 200).boot).toBe(null)
-  expect(probeFromBoot({}, 409)).toEqual({ up: false, ready: false, boot: null, desktop: false })
+  expect(probeFromBoot({}, 409)).toEqual({ up: false, ready: false, boot: null, desktop: false, status: 409 })
+})
+
+test('a probe that did not come back up names the answer it got instead of standing silent', () => {
+  // Nothing answered at all: the request never reached the host.
+  expect(troubleOf({ up: false, ready: false, boot: null, desktop: false, status: null })).toBe('unreached')
+  expect(troubleOf(PROBE_DOWN)).toBe('unreached')
+  // The route or the connection layer wrote a refusal.
+  for (const status of [401, 403, 404, 409, 500]) {
+    expect(troubleOf({ up: false, ready: false, boot: null, desktop: false, status })).toBe('refused')
+  }
+  // An answer inside the 2xx/3xx range that still carried no boot identity.
+  expect(troubleOf({ up: false, ready: false, boot: null, desktop: false, status: 204 })).toBe('malformed')
+  // A host that answered is no trouble at all.
+  expect(troubleOf({ up: true, ready: false, boot: 'a-1', desktop: true, status: 200 })).toBe(null)
 })
 
 test('the same boot identity means the process was not replaced', () => {

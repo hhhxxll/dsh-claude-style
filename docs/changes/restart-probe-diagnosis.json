@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-25",
+  "group": "fixes",
+  "order": 3,
+  "external": false,
+  "zh": "修复点击重启入口时探测不到服务却毫无反馈的问题：连接不上时说明请求未到达宿主，被拒时显示具体 HTTP 状态，回答无法识别时另行说明。",
+  "en": "Fix the restart entry standing silent when its service probe found nothing: an unreachable request, a refusal with its HTTP status, and an unreadable answer now each say which one happened."
+}

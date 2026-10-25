@@ -11,6 +11,9 @@
   "waited": { "zh": "已等待 {seconds} 秒", "en": "Waited {seconds} s" },
   "timeout": { "zh": "重启超时：请查看 .debug/restart/ 下的重启日志，或手动重新打开", "en": "Restart timed out: check the restart log under .debug/restart/, or reopen the app manually" },
   "failed": { "zh": "重启请求失败", "en": "Restart request failed" },
+  "troubleUnreached": { "zh": "重启服务没有响应（请求未到达宿主）", "en": "The restart service did not answer (the request never reached the host)" },
+  "troubleRefused": { "zh": "重启服务拒绝了请求（HTTP {status}）", "en": "The restart service refused the request (HTTP {status})" },
+  "troubleMalformed": { "zh": "重启服务的回答无法识别", "en": "The restart service's answer could not be read" },
   "reload": { "zh": "刷新页面", "en": "Reload page" },
   "close": { "zh": "关闭", "en": "Close" }
 }

@@ -68,6 +68,8 @@ type LoaderState = {
   timer: number | null
   /** How many hand-overs have begun, so one that has been overtaken stops. */
   handOvers: number
+  /** Whether the opening motion has been laid down; false while the row is still hidden. */
+  started: boolean
 }
 
 /** A motion's own clock on one dot: its turn, whether every other turn runs backwards, and how far it has run. */
@@ -429,17 +431,51 @@ function rotate(loader: HTMLElement, state: LoaderState) {
 }
 
 /**
+ * Whether every dot of a lane carries the motion the stylesheet gives it. A
+ * CSS animation does not run while its subtree is hidden, so a loader mounted
+ * in a row the host is drawing and then hiding (or moving) reports none: the
+ * opening is laid down on a later pass, when the row is in the page, rather
+ * than throwing over a stylesheet that is perfectly good.
+ */
+function motionsReady(loader: HTMLElement, motion: WaitLoaderMotion): boolean {
+  const dots = dotsOf(loader, motion)
+  return dots.length > 0 && dots.every((dot) => dot.getAnimations().some((one) => one instanceof CSSAnimation))
+}
+
+/**
  * Set one loader going: one of its motions at random at once, then a new one
  * every `--dsh-claude-period-dot-rotate`, never the one already standing.
  *
  * @param loader - the loader leading the line.
+ * @returns whether it started: false while the row is not drawn yet, which the
+ *     caller is expected to try again on its next pass.
  */
 export function startWaitLoader(loader: HTMLElement) {
-  if (loaders.has(loader)) return
+  const standing = loaders.get(loader)
+  if (standing !== undefined) {
+    // A loader whose opening never landed, because its row was hidden when the
+    // line was built. Every pass asks again until the dots carry their motion.
+    if (standing.started || !motionsReady(loader, standing.motion)) return standing.started
+    start(loader, standing)
+    return true
+  }
   const opening = LANES[Math.floor(Math.random() * LANES.length)].motion
-  const state: LoaderState = { motion: opening, timer: null, handOvers: 0 }
+  const state: LoaderState = { motion: opening, timer: null, handOvers: 0, started: false }
   loaders.set(loader, state)
-  handOver(loader, state, null, opening)
+  if (!motionsReady(loader, opening)) {
+    // Recorded before the dots can be read: a row the host re-renders keeps the
+    // same loader, and the record is what stops a second one being built beside
+    // it. The opening is laid down by a later call, once the row is in the page.
+    return false
+  }
+  start(loader, state)
+  return true
+}
+
+/** Lay the opening motion down and arm the rotation. */
+function start(loader: HTMLElement, state: LoaderState) {
+  state.started = true
+  handOver(loader, state, null, state.motion)
   // Under the Reduced choice the loader holds one frame and never takes another
   // up: a rotation would be a visible jump with nothing moving the dots.
   if (!motionReduced()) rotate(loader, state)

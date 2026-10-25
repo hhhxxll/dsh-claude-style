@@ -4,7 +4,7 @@ import * as primitives from '@deepseek-ai/dsh-client-ui-primitives'
 import { PLATFORM_ATTRIBUTE, WINDOWS_TITLEBAR_ATTRIBUTE } from '@dsh-claude-style/contracts/dom'
 import { hostSlots } from '@dsh-claude-style/engine/host'
 import { copy } from './copy'
-import { nextPollState, probeFromBoot, RESTART_POLL_MS, RESTART_ROUTE, RESTART_SETTLE_MS, restartArrived } from './restart-probe'
+import { nextPollState, probeFromBoot, RESTART_POLL_MS, RESTART_ROUTE, RESTART_SETTLE_MS, restartArrived, troubleOf } from './restart-probe'
 import type { HostContext } from '@dsh-claude-style/engine/host'
 import type { FeatureUi } from '../../core/feature'
 import type manifest from './restart.manifest'
@@ -52,16 +52,18 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   let disposed = false
 
   /**
-   * Ask the route for its boot identity. A network refusal folds into the
-   * down probe: the caller decides what that means for its own step.
+   * Ask the route for its boot identity. A network refusal folds into the down
+   * probe: the caller decides what that means for its own step. The status rides
+   * on the answer, because the entry must tell the reader which answer it got:
+   * a press that opens nothing is indistinguishable from a press never heard.
    */
   async function probeBoot(): Promise<ReturnType<typeof probeFromBoot>> {
     try {
       const answer = await fetch(`${RESTART_ROUTE}?t=${Date.now()}`, { cache: 'no-store' })
-      if (!answer.ok) return { up: false, ready: false, boot: null, desktop: false }
+      if (!answer.ok) return { up: false, ready: false, boot: null, desktop: false, status: answer.status }
       return probeFromBoot(await answer.json(), answer.status)
     } catch {
-      return { up: false, ready: false, boot: null, desktop: false }
+      return { up: false, ready: false, boot: null, desktop: false, status: null }
     }
   }
 
@@ -147,8 +149,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       : step === 'restarting'
         ? copy('restartingDesc')
         : step === 'timeout' ? copy('timeout') : note ?? copy('failed')
-    const footer = step === 'confirm'
-      ? React.createElement(React.Fragment, null,
+    const footer = step === 'confirm'      ? React.createElement(React.Fragment, null,
         React.createElement(primitives.Button, { variant: 'outline', onClick: drawOff }, copy('cancel')),
         React.createElement(primitives.Button, { variant: 'primary', onClick: () => void runRestart() }, copy('confirm')))
       : step === 'restarting' ? undefined
@@ -185,7 +186,18 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
         void (async () => {
           // The boot the restart must replace, read at the moment of asking.
           const probe = await probeBoot()
-          if (!probe.up) return
+          if (!probe.up) {
+            // A press that opens nothing is indistinguishable from a press this
+            // page never heard, so an unreachable route is the reader's to see:
+            // the dialog names which answer came back instead of the entry
+            // standing silent.
+            const trouble = troubleOf(probe)
+            const detail = probe.status === null || probe.status === undefined
+              ? copy('troubleUnreached')
+              : copy('troubleRefused', { status: probe.status })
+            drawDialog('failed', `${copy(trouble === 'malformed' ? 'troubleMalformed' : 'failed')} — ${detail}`)
+            return
+          }
           leftBoot = probe.boot
           drawDialog('confirm')
         })()
