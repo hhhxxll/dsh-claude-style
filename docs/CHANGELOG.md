@@ -2,6 +2,44 @@
 
 All notable changes to `dsh-claude-style` are documented here, newest first.
 
+## [0.19.2] - 2026-10-24
+
+[中文](#cn-0.19.2) | [English](#en-0.19.2)
+
+<h3 id="cn-0.19.2">体验优化</h3>
+
+- 改善推理档位的强调色：外显文字与滑块卡片中的档位名跟随主题强调色，弱档更淡、强档对比更强，并随档位升高略微向红色偏移；说明文字和两端的「更快 / 更强」保持原来的灰色。
+- 改善推理档位的名称切换：名称的模糊进出改由滑块行程驱动，向更强档拖动时旧名向上离开、新名从下方进入，向更弱档拖动时反向播放。
+- 改善输入栏模型名与推理等级的共同容器：两者仍作为一个行项排列，但各自拥有独立的内层容器与 hover 底板，指针只点亮被指向的那一个。
+- 改善模型选择器的发布标记：1017 标签改用中性灰底与次级灰字，不再使用宿主的业务色。
+
+### 问题修复
+
+- 修复点按推理滑块切换档位时，指针的轻微抖动被误判为拖动，导致滑块瞬移并跳过动画的问题：指针需先离开点按位置一小段距离，才进入拖动状态。
+- 修复选择自定义配色后，开启「水波纹字符背景」的新会话首页不显示字符水波纹、控制台报「not an opaque colour」的问题。
+- 修复水波纹字符背景在颜色令牌不可读时持续报错且不退出：连续几轮读取失败后报告并退役，令牌恢复可读则照常绘制。
+- 自定义配色未选行内代码色时，深色主题沿用浅色卡的字色，代码胶囊几乎看不见；现在按主题各取本卡的字色。
+- 修复在较新的宿主版本上会话视图页签只剩当前一个、其余被收进「更多」菜单的问题：全部视图重新排在页签栏里，选中项仍由一颗滑动的药丸标出，「更多」按钮与页签栏并排。
+- 修复新会话页水波纹字符背景在相隔较远处连续点击时，先前的波纹突然变慢的问题：每一次点击现在只加快它自己周围的波速，已经荡开的波纹保持原来的行进速度。
+- 修复选择自定义配色后发送消息时，飞出的气泡取不到读者自己的气泡颜色、晕圈落在透明卡片上、气泡边缘的细线不显示的问题。
+
+<h3 id="en-0.19.2">Improvements</h3>
+
+- Improve the reasoning level's accent colour: the composer's words and the slider card's level name follow the theme accent, lighter at the weak end and stronger at the top, leaning slightly toward red as the level climbs; the caption and the Faster / Smarter scale ends keep their own grey.
+- Improve how the reasoning level's name changes: the blur and travel now follow the slider's own path, with the old name leaving upward and the new one rising from below toward a stronger level, and the motion playing in reverse toward a weaker one.
+- Improve the shared seat holding the composer's model name and reasoning level: the two stay one row item, but each now has its own inner container and hover plate, so the pointer lights only the one it is over.
+- Improve the model picker's release marker: the 1017 tag now uses a neutral grey plate and secondary grey ink instead of the host's business colour.
+
+### Bug Fixes
+
+- Fix the reasoning slider teleporting and skipping its animation on a click whose pointer moved by a pixel or two: the press now becomes a drag only after the pointer leaves the click's small tolerance.
+- Fix the new-conversation page drawing no ripple field, with an error in the console, once a custom palette is chosen and the field is on.
+- Fix the home ripple reporting forever without exiting while a colour token stays unreadable: it retires after several failed rounds and draws again once the tokens read.
+- An unpicked inline-code colour fell back to the light card's ink under the dark theme, leaving code chips all but invisible; each scheme now takes its own card ink.
+- Fix newer hosts showing only the current conversation view tab, with the other views sent into the More menu: every view sits in the strip again, the selected one still marked by the sliding pill, and the More button beside it.
+- Fix the new-conversation page's ripple glyph background slowing a ring already in flight when a second press lands far from the first: a press now speeds up only the ground around itself, and a ring keeps travelling as the press that started it set it.
+- Fix the send flight once a custom palette is chosen: the flying bubble no longer takes its fill from the reader's own bubble, the halo lands on the transparent card, and the hairline around the bubble is left out.
+
 ## [0.19.1] - 2026-10-24
 
 [中文](#cn-0.19.1) | [English](#en-0.19.1)

@@ -97,8 +97,18 @@ export default spec({ page: 'stats-inline' }, ({ test }) => {
     // and read the steps as they appear instead of naming a platform's pixels.
     const found = new Map()
     for (let width = 360; width <= 900; width += 5) {
-      const reading = await at(width)
-      if (reading.mode === 'overlay' && !found.has(reading.detail)) found.set(reading.detail, reading)
+      const fitted = await at(width)
+      if (fitted.mode === 'overlay' && !found.has(fitted.detail)) {
+        found.set(fitted.detail, fitted)
+        for (const source of ['context', 'inline']) {
+          await t.prefs({ statsPosition: source })
+          await t.prefs({ statsPosition: 'footer' })
+          const switched = await reading(t)
+          t.expectThat.equal([switched.mode, switched.detail, switched.order], [fitted.mode, fitted.detail, fitted.order], `switching from ${source} preserves the fitting footer detail without a resize`)
+          t.expectThat.boxWithin(switched.line, switched.toolbar, 'the switched footer stays inside the toolbar')
+          t.expectThat.boxesApart(switched.line, switched.trailing, 'the switched footer leaves room for the model and ring')
+        }
+      }
       if (found.has('compact') && found.has('exact') && found.has('directions')) break
     }
     t.expectThat.equal([...found.keys()], ['compact', 'exact', 'directions'], 'the footer expands through every step as the card widens')

@@ -30,12 +30,13 @@ const ACCENT_PROPERTY = '--dsh-claude-custom-accent'
 const ACCENT_INK_PROPERTY = '--dsh-claude-custom-accent-ink'
 const CANVAS_LIGHT_PROPERTY = '--dsh-claude-custom-canvas-light'
 const CANVAS_DARK_PROPERTY = '--dsh-claude-custom-canvas-dark'
-const CODE_PROPERTY = '--dsh-claude-custom-code'
+const CODE_LIGHT_PROPERTY = '--dsh-claude-custom-code-light'
+const CODE_DARK_PROPERTY = '--dsh-claude-custom-code-dark'
 /** The ink the brand's own art and the reader's pictures take while the image-colour choice names the accent or the text colour. */
 const LOGO_INK_PROPERTY = '--dsh-claude-logo-ink'
 const PROPERTIES = [
   MARK_PROPERTY, WORD_PROPERTY, WORD_RATIO_PROPERTY, NAME_PROPERTY,
-  ACCENT_PROPERTY, ACCENT_INK_PROPERTY, CANVAS_LIGHT_PROPERTY, CANVAS_DARK_PROPERTY, CODE_PROPERTY, LOGO_INK_PROPERTY,
+  ACCENT_PROPERTY, ACCENT_INK_PROPERTY, CANVAS_LIGHT_PROPERTY, CANVAS_DARK_PROPERTY, CODE_LIGHT_PROPERTY, CODE_DARK_PROPERTY, LOGO_INK_PROPERTY,
 ]
 const ATTRIBUTES = [CUSTOM_MARK_ATTR, CUSTOM_WORD_ATTR, CUSTOM_TINT_ATTR, CUSTOM_PALETTE_ATTR, BRAND_INK_ATTR]
 
@@ -99,7 +100,9 @@ export function install() {
     property(ACCENT_INK_PROPERTY, custom ? accentInk(accent) : null)
     property(CANVAS_LIGHT_PROPERTY, custom ? (prefs.customCanvasLight === '' ? card.canvas.light : prefs.customCanvasLight) : null)
     property(CANVAS_DARK_PROPERTY, custom ? (prefs.customCanvasDark === '' ? card.canvas.dark : prefs.customCanvasDark) : null)
-    property(CODE_PROPERTY, custom ? (prefs.customCode === '' ? card.code.light : prefs.customCode) : null)
+    // A chip is drawn on the scheme's canvas, so an unpicked colour takes that scheme's own ink.
+    property(CODE_LIGHT_PROPERTY, custom ? (prefs.customCode === '' ? card.code.light : prefs.customCode) : null)
+    property(CODE_DARK_PROPERTY, custom ? (prefs.customCode === '' ? card.code.dark : prefs.customCode) : null)
     // The art's ink is a sheet token; this choice sits above every palette block, so it is written inline.
     property(LOGO_INK_PROPERTY, prefs.brandInk === BRAND_INK_ACCENT
       ? 'var(--dsw-alias-brand-primary)'

@@ -31,6 +31,8 @@
     "settings-trigger",
     "sidebar-root",
     "title-row",
-    "view-tabs"
+    "view-tabs",
+    "view-tabs-list",
+    "view-tabs-more"
   ]
 }

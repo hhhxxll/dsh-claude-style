@@ -1,3 +1,4 @@
+import { resolveColour } from '@dsh-claude-style/engine/colour'
 import { fractalNoise, hash } from './ripple-noise'
 import { RIPPLE } from './ripple-params'
 import type { WaveField } from './ripple-wave'
@@ -25,6 +26,18 @@ export interface GlyphField {
   invalidate(): void
   /** Give back the GPU resources; the canvas is free for a new field. */
   dispose(): void
+}
+
+/**
+ * The channels of a theme token's colour, or null for a value the field cannot
+ * paint with: the page states a token as a literal, the host's alias, or the
+ * relative colour a reader's palette derives from their canvas (D30), and the
+ * field sets solid glyphs with no backdrop of its own to mix a translucent ink
+ * into.
+ */
+export function readColour(value: string): Rgb | null {
+  const painted = resolveColour(value)
+  return painted === null || painted.alpha < 1 ? null : [painted.red, painted.green, painted.blue]
 }
 
 const DIGITS = '0123456789'

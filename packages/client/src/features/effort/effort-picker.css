@@ -22,6 +22,11 @@ body[data-dsh-claude-style] .dsh-claude-effort {
   gap: 3px;
   padding: 3px 7px 4px 7px;
   min-width: 0;
+  /* The slider's travel, as the name swap's progress. The override writes
+     these; the stylesheet only turns them into the two layers' motion. */
+  --dsh-claude-effort-swap-progress: 0;
+  --dsh-claude-effort-swap-rest: 1;
+  --dsh-claude-effort-swap-dir: 1;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -40,13 +45,15 @@ body[data-dsh-claude-style] .dsh-claude-effort-label {
   font-size: 13px;
   line-height: 16px;
   color: var(--dsw-alias-label-secondary, #70686a);
+  transition: color var(--dsh-claude-timing-feedback);
 }
 /* The level's name trails the label instead of sitting at the far edge: the
    control reads as one phrase, `Reasoning effort High`, the way the ends below
-   read as one scale. A change is a SWAP, not a replacement: the incoming name
-   rises out of a blur from below while the outgoing one (the ghost, absolutely
-   positioned over this one) blurs away upward. Both animations are re-armed
-   from the override on every real change. */
+   read as one scale. The name is two layers: this one holds the words on show,
+   the preview holds the words the knob is travelling toward. The slider's own
+   travel feeds both layers, so a slow drag holds the halfway words and a pull
+   back runs the same motion in reverse. On release the same move transition as
+   the knob carries the layers to their stop. */
 body[data-dsh-claude-style] .dsh-claude-effort-value {
   flex: 0 1 auto;
   min-width: 0;
@@ -56,20 +63,22 @@ body[data-dsh-claude-style] .dsh-claude-effort-value {
   font-size: 13px;
   line-height: 16px;
   color: var(--dsw-alias-label-primary, #161616);
-  transition: color var(--dsh-claude-timing-feedback);
-  animation: dsh-claude-swap-in var(--dsh-claude-duration-swap) var(--dsh-claude-swap-ease);
+  opacity: calc(1 - var(--dsh-claude-effort-swap-progress));
+  transform: translateY(calc(var(--dsh-claude-swap-distance) * -1 * var(--dsh-claude-effort-swap-dir) * var(--dsh-claude-effort-swap-progress)));
+  filter: blur(calc(var(--dsh-claude-swap-blur) * var(--dsh-claude-effort-swap-progress)));
+  transition: color var(--dsh-claude-timing-feedback), opacity var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), transform var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), filter var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide);
 }
-/* The outgoing name. It sits exactly where the value sat (the override writes
-   its left offset), takes no layout space, and ends at opacity 0 — so it never
-   needs removing, only re-arming. */
 /* The two halves of the name's swap are siblings, so both are told the travel:
    the shared preset over the short distance, this line being 16px tall
    (shared/motion.css, D9). */
 body[data-dsh-claude-style] .dsh-claude-effort-value,
-body[data-dsh-claude-style] .dsh-claude-effort-value-ghost {
+body[data-dsh-claude-style] .dsh-claude-effort-value-preview {
   --dsh-claude-swap-distance: var(--dsh-claude-distance-nudge);
 }
-body[data-dsh-claude-style] .dsh-claude-effort-value-ghost {
+/* The incoming name. It sits exactly where the value sits (the override writes
+   its left offset) and takes no layout space; its share of the travel decides
+   whether it waits below (stronger) or above (weaker). */
+body[data-dsh-claude-style] .dsh-claude-effort-value-preview {
   position: absolute;
   left: 0;
   top: 0;
@@ -78,8 +87,19 @@ body[data-dsh-claude-style] .dsh-claude-effort-value-ghost {
   font-size: 13px;
   line-height: 16px;
   color: var(--dsw-alias-label-primary, #161616);
-  opacity: 0;
-  animation: dsh-claude-swap-out var(--dsh-claude-duration-swap) var(--dsh-claude-swap-ease) forwards;
+  opacity: var(--dsh-claude-effort-swap-progress);
+  transform: translateY(calc(var(--dsh-claude-swap-distance) * var(--dsh-claude-effort-swap-dir) * var(--dsh-claude-effort-swap-rest)));
+  filter: blur(calc(var(--dsh-claude-swap-blur) * var(--dsh-claude-effort-swap-rest)));
+  transition: color var(--dsh-claude-timing-feedback), opacity var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), transform var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), filter var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide);
+}
+/* The drag writes the progress every frame, so the layers must not trail it.
+   The reset mark serves the same purpose on the first frame of a jump between
+   stops: the direction has to land before the progress starts moving. */
+body[data-dsh-claude-style] .dsh-claude-effort[data-dragging] .dsh-claude-effort-value,
+body[data-dsh-claude-style] .dsh-claude-effort[data-dragging] .dsh-claude-effort-value-preview,
+body[data-dsh-claude-style] .dsh-claude-effort[data-dsh-claude-effort-swap-reset] .dsh-claude-effort-value,
+body[data-dsh-claude-style] .dsh-claude-effort[data-dsh-claude-effort-swap-reset] .dsh-claude-effort-value-preview {
+  transition: none;
 }
 /* The ends name the axis: a scale, not a value, so they keep the caption colour
    and take their words from the copy table (更快 / 更强 in Chinese). */
@@ -91,6 +111,7 @@ body[data-dsh-claude-style] .dsh-claude-effort-ends {
   font-size: 11px;
   line-height: 14px;
   color: var(--dsw-alias-label-caption, #b2acad);
+  transition: color var(--dsh-claude-timing-feedback);
 }
 body[data-dsh-claude-style] .dsh-claude-effort-track {
   position: relative;
@@ -163,7 +184,7 @@ body[data-dsh-claude-style] .dsh-claude-effort-tick {
   corner-shape: round;
   background: color-mix(in srgb, var(--dsw-alias-label-primary, #161616) 26%, transparent);
 }
-/* The top rung's dot matrix: a grid of violet blocks floating on the bare track
+/* The top rung's dot matrix: a grid of accent blocks floating on the bare track
    (the 1px gaps ARE the grid lines). Three layers ride every block: its own
    hash-scattered flash, a band of light travelling right to left through
    hash-scattered clusters, and a one-pass glow as the entrance sweep passes it.
@@ -205,7 +226,7 @@ body[data-dsh-claude-style] .dsh-claude-effort-matrix-sq {
      opacity fell into. Nothing in the host targets these private classes. */
   background-color: var(--dsh-claude-apex, #8b7ad0);
   --dsh-flash-light: var(--dsh-claude-apex-flash, #d9d2f5);
-  /* One flash cycle: the block holds violet, jumps to its lighter peak for a
+  /* One flash cycle: the block holds the accent, jumps to its lighter peak for a
      short window, and eases back over the rest of the period. var() in keyframes
      resolves against the animated block, so one keyframes rule serves every
      block's own peak colour. */
@@ -213,7 +234,7 @@ body[data-dsh-claude-style] .dsh-claude-effort-matrix-sq {
 }
 /* The block's flash peak lives HERE, never inline: the override only picks the
    share of apex the peak mixes (--dsh-flash-mix), so a stylesheet swap always
-   re-colours every block. Inline rgb peaks did not — after the violet landed,
+   re-colours every block. Inline rgb peaks did not — after the accent landed,
    blocks built by the previous clay bundle kept flashing orange from their
    stale inline values. A continuous share, not eight buckets: the buckets
    showed as bands across a wide track. The rule is its own so the declarations
@@ -289,8 +310,8 @@ body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-effort
   100% { opacity: 0; }
 }
 /* Reaching the top rung: the plain fill and the ticks hand the groove over to
-   the matrix, the knob takes a violet tint and a soft glow, and the level's
-   name goes violet. */
+   the matrix, the knob takes the theme accent's tint and a soft glow, and the
+   level's name keeps the same ramp colour the trigger and the card's text wear. */
 body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-fill {
   opacity: 0 !important;
 }
@@ -301,9 +322,7 @@ body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-kno
   background: color-mix(in srgb, var(--dsh-claude-apex, #8b7ad0) 22%, var(--dsw-static-neutral-bluish-00, #ffffff)) !important;
   box-shadow: 0 0 10px color-mix(in srgb, var(--dsh-claude-apex, #8b7ad0) 80%, transparent), 0 0 0 1px color-mix(in srgb, var(--dsh-claude-apex, #8b7ad0) 35%, transparent) !important;
 }
-body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-value {
-  color: var(--dsh-claude-apex-ink, #5f51b5) !important;
-}
+
 /* A vertical capsule, not a bead: 16px wide, 30px tall, poking 2px past the
    groove top and bottom. The width stays 16px, which the override's travel
    geometry (and the fill's +8) depends on. */
@@ -387,18 +406,27 @@ body[data-dsh-claude-style] .dsh-claude-effort-btn-label {
   display: block;
   padding: 0;
 }
-/* The rung in force colours the label while the Composer tab's effort-accent
-   row is on. The override writes the rung's place on a ramp (0 to 100) between
-   two colours the reference effort slider ships — a blue at the weakest thinking
-   level, a violet at the strongest — mixed in OKLCH so every rung of any ladder
-   takes a step of its own. The ramp is its own palette rather than a mix of the
-   brand's accent: a ramp derived from the DeepSeek brand's blue left three
-   levels within a few steps of each other, unreadable at 13px. A rung with no
-   place on the ramp — the switch-off level, the model's own default level —
-   leaves the attribute off and keeps the resting ink. The pointer's colour gives
-   way to the ramp: the ramp outranks it, and the plate behind the seat is what
-   answers the pointer. Named through the seat box because the row's one type
-   rule outranks this button on its own. */
-body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-model-seat > .dsh-claude-effort-btn[data-tint] {
-  color: color-mix(in oklch, var(--dsh-claude-effort-low, #4d93f8), var(--dsh-claude-effort-high, #8b5cf6) calc(var(--dsh-claude-effort-tint, 0) * 1%));
+/* The rung in force colours the trigger and the card's level name while the
+   Composer tab's effort-accent row is on. The override writes the rung's place
+   on a ramp (0 to 100) whose two ends are mixed from the theme's accent in
+   OKLCH: the weak end toward the raised surface (less saturated, less contrast),
+   the strong end toward the label ink (more contrast). The hue then travels
+   slightly toward red as the rung climbs: an accent above 180° leans toward
+   359°, one below 180° toward 0°, by a quarter of that distance at the top.
+   HSL carries the same hue as HSV, and the shift leaves its saturation and
+   lightness alone. A rung with
+   no place on the ramp — the switch-off level, the model's own default level —
+   leaves the attribute off and keeps the resting ink. */
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-model-seat-effort > .dsh-claude-effort-btn[data-tint],
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-effort[data-tint] {
+  --dsh-claude-effort-ramp: color-mix(in oklch, var(--dsh-claude-effort-low, var(--dsw-alias-brand-primary)), var(--dsh-claude-effort-high, var(--dsw-alias-brand-primary)) calc(var(--dsh-claude-effort-tint, 0) * 1%));
+  --dsh-claude-effort-ink: hsl(from var(--dsh-claude-effort-ramp) calc(h + (359 * clamp(0, (h - 180) * 1000, 1) - h) * var(--dsh-claude-effort-tint, 0) * 0.0025) s l);
+}
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-model-seat-effort > .dsh-claude-effort-btn[data-tint] {
+  color: var(--dsh-claude-effort-ink);
+}
+/* The open card's level name takes the same rung colour as the trigger. */
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-effort[data-tint] .dsh-claude-effort-value,
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-effort[data-tint] .dsh-claude-effort-value-preview {
+  color: var(--dsh-claude-effort-ink);
 }

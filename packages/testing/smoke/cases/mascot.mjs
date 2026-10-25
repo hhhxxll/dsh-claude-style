@@ -49,8 +49,8 @@ export default {
     basicChecks(r)
     const deepy = r.states || {}
     const is = (state, animation, place) => !!state && state.animation === animation && state.place === place && state.ready === true
-    check('the brand stored as "off" reads as DeepSeek, and the light canvas turns white',
-      deepy.brand === 'deepseek' && deepy.canvas === 'rgb(255, 255, 255)', JSON.stringify({ brand: deepy.brand, canvas: deepy.canvas }))
+    check('the brand stored as "off" reads as DeepSeek, and the light canvas takes its pale blue-white',
+      deepy.brand === 'deepseek' && deepy.canvas === 'rgb(251, 252, 255)', JSON.stringify({ brand: deepy.brand, canvas: deepy.canvas }))
     check('the DeepSeek brand turns blue: DeepSeek\'s brand blue for the accent, a blue link, a blue-black dark canvas',
       deepy.accent === '#4d6bfe' && deepy.link === '#3e57e0' && !!deepy.dark && deepy.dark.canvas === 'rgb(19, 22, 29)' &&
         deepy.dark.accent === '#4d6bfe' && deepy.dark.card === '#1d2028',

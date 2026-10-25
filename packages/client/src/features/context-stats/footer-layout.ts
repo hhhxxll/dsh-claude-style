@@ -18,14 +18,16 @@ export function findStatsDock() {
  * ride the toolbar's free middle. The measured box is the line's own, taken
  * against the stack the dock stands in.
  */
-export function createFooterLayout() {
+export function createFooterLayout(refit: () => void) {
   let line: HTMLElement | null = null
   let cancel: (() => void) | null = null
+  let fittedRoom: number | null = null
   const properties = ['--dsh-claude-footer-left', '--dsh-claude-footer-bottom', '--dsh-claude-footer-height']
 
   function clear() {
     cancel?.()
     cancel = null
+    fittedRoom = null
     if (line !== null) {
       line.removeAttribute(FOOTER_LINE_ATTR)
       for (const property of properties) line.style.removeProperty(property)
@@ -69,7 +71,7 @@ export function createFooterLayout() {
     }
     mark(root)
     if (cancel !== null) return
-    let measured: { mode: string, left: number, bottom: number, height: number } | null = null
+    let measured: { mode: string, left: number, bottom: number, height: number, room: number } | null = null
     cancel = requestFrame({
       read() {
         const view = geometry()
@@ -83,12 +85,22 @@ export function createFooterLayout() {
           left: Math.max(start, left) - stackBox.left,
           bottom: stackBox.bottom - rowBox.bottom,
           height: rowBox.height,
+          room: Math.max(0, end - start),
         }
       },
       write() {
         cancel = null
         if (measured === null) {
           clear()
+          return
+        }
+        // The ring joins the toolbar after the statistics pass. A changed
+        // budget must refit the figures before their next box is positioned,
+        // even when the session's numbers and the card's width stayed still.
+        if (measured.room !== fittedRoom) {
+          fittedRoom = measured.room
+          refit()
+          sync(root)
           return
         }
         setAttributeIfChanged(root, FOOTER_LINE_ATTR, measured.mode)

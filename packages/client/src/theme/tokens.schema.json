@@ -24,7 +24,7 @@
       }
     },
     "apex": {
-      "description": "The reasoning slider's own colours — its violet top rung and the effort trigger's ramp — the same under every palette.",
+      "description": "The reasoning slider's accent colours — its matrix and knob glow, and the trigger's ramp — mixed from the accent of the palette in force.",
       "type": "array",
       "items": {
         "type": "object",

@@ -141,7 +141,7 @@ function templateParts(chat: HostText, key: string, names: string[]) {
  * @returns { render, refit, clear, root }.
  */
 export function createInlineStats(read: () => StatsReading, chatText: () => HostText | null, meter: () => HTMLElement | null, currency: () => Currency | null) {
-  const footer = createFooterLayout()
+  const footer = createFooterLayout(() => fit(true))
   let footerPosition = false
   let line: Line | null = null
   /** The twin a fit measures on, built on the first fit that asks. */

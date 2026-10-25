@@ -29,34 +29,58 @@ body[data-dsh-claude-style] [data-dsh-claude-model-host] {
 body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   height: var(--dsh-claude-footer-control-height);
   min-width: 0;
-  /* Both ends carry the same tail as the permission trigger, so the two texts
-     stand inside one control box while the meter's reserved gap (the cluster's
-     margin, features/composer/composer.ts) remains the space after it. */
-  padding: 0 var(--dsh-claude-footer-control-pad);
+  padding: 0;
   border-radius: 7px;
   box-sizing: border-box;
   cursor: pointer;
 }
-/* The name's own cap: the box stops growing with it, and a narrow row shortens
-   the name rather than the level beside it. */
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-btn {
-  max-width: 280px;
-}
-/* One plate for the whole box, the way the host's seat paints one: the two texts
-   are two hit areas of one control, so the hover face belongs to the box. */
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat:hover {
-  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08));
-}
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-btn,
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-effort-btn {
+/* One decision, one plate: the model's name and the level are two parts of the
+   same row item, and each answers the pointer alone. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-seat-model,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-seat-effort {
   display: inline-flex;
   align-items: center;
   height: var(--dsh-claude-footer-control-height);
   min-width: 0;
   padding: 0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: background var(--dsh-claude-timing-feedback);
+}
+/* The level keeps its room while the name beside it shortens; its part must not
+   shrink under its own button, or the button would paint over the ring the row
+   lays out after the seat. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-seat-effort {
+  flex: none;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-seat-model {
+  flex: 0 1 auto;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-seat-model:empty,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-seat-effort:empty {
+  display: none;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-seat-model:hover,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-seat-effort:hover {
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08));
+}
+/* The name's own cap: the part stops growing with it, and a narrow row shortens
+   the name rather than the level beside it. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat-model > .dsh-claude-model-btn {
+  max-width: 280px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat-model > .dsh-claude-model-btn,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat-effort > .dsh-claude-effort-btn {
+  display: inline-flex;
+  align-items: center;
+  height: var(--dsh-claude-footer-control-height);
+  min-width: 0;
+  /* The padding sits on the button so the whole plate is a hit area: the
+     pointer never rests on a painted edge that opens nothing. */
+  padding: 0 4px;
   border: none !important;
   background: transparent;
   white-space: nowrap;
@@ -141,15 +165,15 @@ body[data-dsh-claude-style] [data-composer-card] [data-dsh-claude-part~="row"] .
    pointer resolves it to full strength instead of each label taking a colour of
    its own. */
 body[data-dsh-claude-style] .dsh-claude-inline-stats,
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-model-btn,
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat > .dsh-claude-effort-btn,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat-model > .dsh-claude-model-btn,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat-effort > .dsh-claude-effort-btn,
 body[data-dsh-claude-style] [data-dsh-claude-context-meter] button > span {
   opacity: var(--dsh-claude-footer-ink-opacity);
   transition: opacity var(--dsh-claude-timing-feedback);
 }
 body[data-dsh-claude-style] .dsh-claude-inline-stats:hover,
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat:hover > .dsh-claude-model-btn,
-body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat:hover > .dsh-claude-effort-btn,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat-model:hover > .dsh-claude-model-btn,
+body[data-dsh-claude-style] [data-dsh-claude-part~="trailing"] .dsh-claude-model-seat-effort:hover > .dsh-claude-effort-btn,
 body[data-dsh-claude-style] [data-dsh-claude-context-meter]:hover button > span {
   opacity: var(--dsh-claude-footer-ink-hover-opacity);
 }

@@ -104,7 +104,12 @@ export const HEADER_PARTS: PartTable = {
   headerActions: 'header-actions',
   headerUtilities: 'header-utilities',
   headerCorner: 'header-corner',
+  // From 0.2.1-rc.3 the host draws the tab row as `tabs` with the tablist in its
+  // own `viewTabs` and the overflow menu beside it; before that `tabs` was the
+  // tablist. The stylesheet holds both shapes to one look.
   tabs: 'view-tabs',
+  viewTabs: 'view-tabs-list',
+  viewsMore: 'view-tabs-more',
   tab: 'view-tab',
   tabActive: 'view-tab-active',
   label: 'header-label',

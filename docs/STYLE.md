@@ -31,24 +31,26 @@ Rules:
 
 - Never pure black. The Claude card's light canvas is the desktop's `#FFFFFF`
   with a `#FAFAFA` sidebar; its dark canvas is `#191919` with a `#1F1F1F`
-  sidebar. The DeepSeek card's light canvas is white with a `#FAFAFA` sidebar.
+  sidebar. The DeepSeek card's light canvas is `#FBFCFF` with a `#F7F9FF`
+  sidebar; every surface, border and ink step around them is derived from that
+  canvas.
   The reader's own message plate is the card's `bubble` fill: Claude's neutral
   plate, DeepSeek's light blue `#ECF0FF`; the custom card derives it from its
   own canvas, so a conversation bubble reads as the card that painted it.
 - Accent usage stays under ~10% of visible elements.
-- Literal colours stay outside the ladder: the reasoning slider's violet
-  (`--dsh-claude-apex*`), the selection ring, the ripple's front, the peak and
-  off-peak badges and the popover shadow.
+- Literal colours stay outside the ladder: the selection ring, the ripple's
+  front, the peak and off-peak badges and the popover shadow.
 
 **The DeepSeek card** turns both schemes blue. Its accent is DeepSeek's brand
 blue `#4D6BFE` — the colour of its whale logo and of Deepy; the sidebar's whale
-and wordmark and the hero's fish take it as their ink. Its light canvas is pure
-white with a snow sidebar and a light blue reader's bubble, its dark canvas a
-blue-black, and its dark outlines are surface steps rather than highlights. The
+and wordmark and the hero's fish take it as their ink. Its light canvas is
+`#FBFCFF` with a `#F7F9FF` sidebar and a light blue reader's bubble, its dark
+canvas a blue-black, and its dark outlines are surface steps rather than
+highlights. The
 skin's Claude marks (the account row's picture without an avatar) become
 DeepSeek's
 whale (`packages/assets/src/brand/deepseek-mark.svg`, the host's `FISH_LOGO_PATH`); the
-violet top rung of the reasoning slider stays.
+reasoning slider's accent follows whichever palette is in force.
 
 The tables below are generated from `packages/client/src/theme/tokens.json` by `npm run build`;
 edit the JSON, not the tables. A token's row names the tone it reads and the
@@ -59,7 +61,7 @@ card leaves unset.
 | Card | Accent | Canvas light | Canvas dark | Sidebar light | Sidebar dark | Bubble light | Bubble dark | Link light | Link dark | Edges | Logo ink | Code light | Code dark |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | claude (default) | `#d97757` | `#ffffff` | `#191919` | `#fafafa` | `#1f1f1f` | `#f4f2f3` | `rgba(255, 255, 255, 0.06)` | `#184f95` | `#8ab4f8` | highlight | ink | `#943333` | `#e8a08a` |
-| deepseek | `#4d6bfe` | `#ffffff` | `#13161d` | `#fafafa` | `#13161d` | `#ecf0ff` | `#262b36` | `#3b56d9` | `#8fa4ff` | surface | accent | `#0f1115` | `#eef1f8` |
+| deepseek | `#4d6bfe` | `#fbfcff` | `#13161d` | `#f7f9ff` | `#13161d` | `#ecf0ff` | `#262b36` | `#3b56d9` | `#8fa4ff` | surface | accent | `#0f1115` | `#eef1f8` |
 
 | Tone | Seed | Light | Dark |
 | --- | --- | --- | --- |
@@ -107,66 +109,66 @@ card leaves unset.
 
 | Token | Tone | claude light | claude dark | deepseek light | deepseek dark | Host alias | Use |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `--dsw-alias-bg-base` | `canvas` | `#ffffff` | `#191919` | `#ffffff` | `#13161d` | host's own |  |
-| `--dsw-alias-bg-layer-1` | `surface-1` | `#ffffff` | `#212121` | `#ffffff` | `#1b1e26` | host's own |  |
-| `--dsw-alias-bg-layer-2` | `surface-2` | `#ffffff` | `#282828` | `#ffffff` | `#22252d` | host's own |  |
-| `--dsw-alias-bg-layer-3` | `surface-3` | `#ffffff` | `#323232` | `#ffffff` | `#2b2f37` | host's own |  |
+| `--dsw-alias-bg-base` | `canvas` | `#ffffff` | `#191919` | `#fbfcff` | `#13161d` | host's own |  |
+| `--dsw-alias-bg-layer-1` | `surface-1` | `#ffffff` | `#212121` | `#fbfcff` | `#1b1e26` | host's own |  |
+| `--dsw-alias-bg-layer-2` | `surface-2` | `#ffffff` | `#282828` | `#fbfcff` | `#22252d` | host's own |  |
+| `--dsw-alias-bg-layer-3` | `surface-3` | `#ffffff` | `#323232` | `#fcfdff` | `#2b2f37` | host's own |  |
 | `--dsw-alias-bg-overlay` | `overlay` | `#ffffff` | `#282828` | `#ffffff` | `#22252d` | host's own |  |
 | `--dsw-alias-border-l1` | `border-1` / `border-1-flat` | `#e9e9e9` | `rgba(255, 255, 255, 0.09)` | — | `#23262e` | host's own | the standard edge: card and panel outlines, dividers, field outlines |
 | `--dsw-alias-border-l2` | `border-2` / `border-2-flat` | `#dedede` | `rgba(255, 255, 255, 0.18)` | — | `#2c3038` | host's own |  |
 | `--dsw-alias-border-l3` | `border-3` / `border-3-flat` | `#cfcfcf` | `rgba(255, 255, 255, 0.3)` | — | `#3a3d46` | host's own |  |
-| `--dsh-claude-divider` | `divider` | `rgba(22, 22, 22, 0.05)` | `rgba(255, 255, 255, 0.06)` | `rgba(22, 22, 22, 0.05)` | `rgba(251, 255, 255, 0.06)` | `var(--dsw-alias-border-l1)` | a line that only separates: foot areas, settings rows, menu separators, the transcript's rule |
+| `--dsh-claude-divider` | `divider` | `rgba(22, 22, 22, 0.05)` | `rgba(255, 255, 255, 0.06)` | `rgba(19, 20, 22, 0.05)` | `rgba(251, 255, 255, 0.06)` | `var(--dsw-alias-border-l1)` | a line that only separates: foot areas, settings rows, menu separators, the transcript's rule |
 | `--dsw-alias-brand-primary` | `accent` | `#d97757` | `#d97757` | `#4d6bfe` | `#4d6bfe` | host's own | the single accent: checks, focus rings, selected marks |
-| `--dsw-alias-brand-text` | `on-accent` | `#ffffff` | `#fbfbfb` | `#ffffff` | `#f2f7ff` | host's own |  |
+| `--dsw-alias-brand-text` | `on-accent` | `#ffffff` | `#fbfbfb` | `#fbfcff` | `#f2f7ff` | host's own |  |
 | `--dsw-alias-button-primary-fill` | `accent` | `#d97757` | `#d97757` | `#4d6bfe` | `#4d6bfe` | host's own |  |
 | `--dsw-alias-button-primary-hover` | `accent-hover` | `#c46343` | `#eb9170` | `#3d56e9` | `#6a84ff` | host's own |  |
 | `--dsw-alias-button-elevated-fill` | `overlay` | `#ffffff` | `#282828` | `#ffffff` | `#22252d` | host's own |  |
 | `--dsw-alias-button-floating-fill` | `overlay` | `#ffffff` | `#282828` | `#ffffff` | `#22252d` | host's own |  |
-| `--dsw-alias-button-floating-hover` | `surface-3` | `#ffffff` | `#323232` | `#ffffff` | `#2b2f37` | host's own |  |
+| `--dsw-alias-button-floating-hover` | `surface-3` | `#ffffff` | `#323232` | `#fcfdff` | `#2b2f37` | host's own |  |
 | `--dsw-alias-button-info-fill` | `accent` | `#d97757` | `#d97757` | `#4d6bfe` | `#4d6bfe` | host's own |  |
 | `--dsw-alias-button-info-hover` | `accent-hover` | `#c46343` | `#eb9170` | `#3d56e9` | `#6a84ff` | host's own |  |
 | `--dsw-alias-interactive-bg-active` | `accent-active` | `rgba(246, 136, 98, 0.26)` | `rgba(217, 119, 87, 0.3)` | `rgba(95, 124, 255, 0.26)` | `rgba(77, 107, 254, 0.3)` | host's own |  |
-| `--dsh-claude-hover-bg` | `hover-wash` | `rgba(6, 6, 6, 0.08)` | `rgba(255, 255, 255, 0.08)` | `rgba(6, 6, 6, 0.08)` | `rgba(251, 255, 255, 0.08)` | `var(--dsw-alias-interactive-bg-hover)` | hover wash |
+| `--dsh-claude-hover-bg` | `hover-wash` | `rgba(6, 6, 6, 0.08)` | `rgba(255, 255, 255, 0.08)` | `rgba(4, 4, 6, 0.08)` | `rgba(251, 255, 255, 0.08)` | `var(--dsw-alias-interactive-bg-hover)` | hover wash |
 | `--dsh-claude-field-ring` | literal | `#2a78d6` | `#2a78d6` | `#2a78d6` | `#2a78d6` | `var(--dsw-alias-brand-primary)` | the ring around a field the reader is renaming in: the session title's own editor, drawn from the selection blue |
-| `--dsh-claude-inline-code-bg` | `code-wash` | `rgba(6, 6, 6, 0.05)` | `rgba(255, 255, 255, 0.05)` | `rgba(6, 6, 6, 0.05)` | `rgba(251, 255, 255, 0.05)` | `var(--dsw-alias-markdown-inline-code)` | inline code fill |
+| `--dsh-claude-inline-code-bg` | `code-wash` | `rgba(6, 6, 6, 0.05)` | `rgba(255, 255, 255, 0.05)` | `rgba(4, 4, 6, 0.05)` | `rgba(251, 255, 255, 0.05)` | `var(--dsw-alias-markdown-inline-code)` | inline code fill |
 | `--dsh-claude-inline-code-fg` | card `code` | `#943333` | `#e8a08a` | `#0f1115` | `#eef1f8` | `var(--dsw-alias-label-primary)` | inline code ink |
 | `--dsh-claude-link` | `link` | `#184f95` | `#8ab4f8` | `#3b56d9` | `#8fa4ff` | `var(--dsw-alias-link)` | markdown links |
 | `--dsh-claude-link-underline` | `link-underline` | `rgba(24, 79, 149, 0.6)` | `rgba(138, 180, 248, 0.6)` | `rgba(59, 86, 217, 0.6)` | `rgba(143, 164, 255, 0.6)` | `color-mix(in srgb, var(--dsw-alias-link) 60%, transparent)` | markdown link underline |
 | `--dsw-alias-markdown-code-block` | `code-block` | `#ffffff` | `#212121` | `#ffffff` | `#1b1e26` | host's own |  |
 | `--dsw-alias-markdown-code-block-banner` | `overlay` | `#ffffff` | `#282828` | `#ffffff` | `#22252d` | host's own |  |
 | `--dsw-alias-interactive-bg-hover` | `--dsh-claude-hover-bg` | `var(--dsh-claude-hover-bg)` | `var(--dsh-claude-hover-bg)` | `var(--dsh-claude-hover-bg)` | `var(--dsh-claude-hover-bg)` | host's own |  |
-| `--dsw-alias-interactive-bg-hover-solid` | `hover-plate` | `#f4f4f4` | `#323232` | `#f4f4f4` | `#2b2f37` | host's own | the host's solid hover chip |
-| `--dsw-alias-label-primary` | `ink` | `#161616` | `#fdfdfd` | `#161616` | `#f4f9ff` | host's own |  |
-| `--dsw-alias-label-primary-bluish` | `ink` | `#161616` | `#fdfdfd` | `#161616` | `#f4f9ff` | host's own |  |
-| `--dsw-alias-label-secondary` | `ink-2` | `#70686a` | `#beb6b8` | `#70686a` | `#aeb5c4` | host's own |  |
-| `--dsw-alias-label-tertiary` | `ink-3` | `#91888a` | `#9c9395` | `#91888a` | `#8a92a3` | host's own |  |
-| `--dsw-alias-label-caption` | `ink-4` | `#b2acad` | `#776f71` | `#b2acad` | `#676e7d` | host's own |  |
-| `--dsw-alias-label-shimmer` | `shimmer` | `#161616` | `#fdfdfd` | `#161616` | `#f4f9ff` | host's own | the highlight band's tint over running words: the host's own rows and the skin's band (shared/sweep-band.ts) alike |
-| `--dsw-alias-label-deep-diving-shimmer` | `shimmer` | `#161616` | `#fdfdfd` | `#161616` | `#f4f9ff` | host's own | the band's tint inside the running row, which the host points --dsw-alias-label-shimmer at; under Claude it is the same warm band as everywhere else |
+| `--dsw-alias-interactive-bg-hover-solid` | `hover-plate` | `#f4f4f4` | `#323232` | `#f0f1f4` | `#2b2f37` | host's own | the host's solid hover chip |
+| `--dsw-alias-label-primary` | `ink` | `#161616` | `#fdfdfd` | `#131416` | `#f4f9ff` | host's own |  |
+| `--dsw-alias-label-primary-bluish` | `ink` | `#161616` | `#fdfdfd` | `#131416` | `#f4f9ff` | host's own |  |
+| `--dsw-alias-label-secondary` | `ink-2` | `#70686a` | `#beb6b8` | `#656871` | `#aeb5c4` | host's own |  |
+| `--dsw-alias-label-tertiary` | `ink-3` | `#91888a` | `#9c9395` | `#848891` | `#8a92a3` | host's own |  |
+| `--dsw-alias-label-caption` | `ink-4` | `#b2acad` | `#776f71` | `#a8abb2` | `#676e7d` | host's own |  |
+| `--dsw-alias-label-shimmer` | `shimmer` | `#161616` | `#fdfdfd` | `#131416` | `#f4f9ff` | host's own | the highlight band's tint over running words: the host's own rows and the skin's band (shared/sweep-band.ts) alike |
+| `--dsw-alias-label-deep-diving-shimmer` | `shimmer` | `#161616` | `#fdfdfd` | `#131416` | `#f4f9ff` | host's own | the band's tint inside the running row, which the host points --dsw-alias-label-shimmer at; under Claude it is the same warm band as everywhere else |
 | `--dsw-alias-state-business-primary` | `accent` | `#d97757` | `#d97757` | `#4d6bfe` | `#4d6bfe` | host's own |  |
 | `--dsw-alias-state-business-tertiary` | `accent-tint` | `#f6ded7` | `#48261b` | `#dce4f7` | `#252f4c` | host's own |  |
 | `--dsw-alias-link` | `ui-link` | `#bf6446` | `#eaa088` | `#3e57e0` | `#7594fd` | host's own | text link at rest |
 | `--dsw-alias-shadow-lv2` | literal | `0 4px 18px rgba(20, 20, 19, 0.10), 0 1px 3px rgba(20, 20, 19, 0.05)` | `0 4px 16px rgba(0, 0, 0, 0.30), 0 1px 3px rgba(0, 0, 0, 0.14)` | `0 4px 18px rgba(20, 20, 19, 0.10), 0 1px 3px rgba(20, 20, 19, 0.05)` | `0 4px 16px rgba(0, 0, 0, 0.30), 0 1px 3px rgba(0, 0, 0, 0.14)` | host's own |  |
 | `--dsw-specific-input-major` | `inset` | `#ffffff` | `#141414` | `#ffffff` | `#0e1117` | host's own |  |
-| `--dsw-specific-selector` | `selector` | `#fefefe` | `#323232` | `#fefefe` | `#2b2f37` | host's own |  |
-| `--dsw-specific-sidebar-fill` | card `sidebar` | `#fafafa` | `#1f1f1f` | `#fafafa` | `#13161d` | host's own |  |
+| `--dsw-specific-selector` | `selector` | `#fefefe` | `#323232` | `#fafbfe` | `#2b2f37` | host's own |  |
+| `--dsw-specific-sidebar-fill` | card `sidebar` | `#fafafa` | `#1f1f1f` | `#f7f9ff` | `#13161d` | host's own |  |
 | `--dsw-alias-brand-primary-new-colorprimary-new-color` | `accent` | `#d97757` | `#d97757` | `#4d6bfe` | `#4d6bfe` | host's own |  |
-| `--dsh-claude-canvas` | `canvas` | `#ffffff` | `#191919` | `#ffffff` | `#13161d` | `var(--dsw-alias-bg-base)` | the page canvas, the search box |
-| `--dsh-claude-sidebar-canvas` | card `sidebar` | `#fafafa` | `#1f1f1f` | `#fafafa` | `#13161d` | `var(--dsw-specific-sidebar-fill)` | the sidebar |
-| `--dsh-claude-card` | `card` | `#ffffff` | `#232323` | `#ffffff` | `#1d2028` | `var(--dsw-alias-bg-overlay)` | cards on the canvas in light and raised in dark: the account popover, the search palette |
-| `--dsh-claude-inverse-fill` | `ink` | `#161616` | `#fdfdfd` | `#161616` | `#f4f9ff` | `var(--dsw-alias-interactive-bg-hover)` | the model picker's group label fill: an inverted chip under Claude, a hover-plate chip under the host |
-| `--dsh-claude-inverse-ink` | `inverse-ink` | `#ffffff` | `#171717` | `#ffffff` | `#11141a` | `var(--dsw-alias-label-primary)` | the model picker's group label ink |
-| `--dsh-claude-table-head` | `table-head` | `#f4f4f4` | `#282828` | `#f4f4f4` | `#22252d` | `var(--dsw-alias-bg-layer-2)` | table header row |
-| `--dsh-claude-ripple-ink` | `ink-3` | `#91888a` | `#9c9395` | `#91888a` | `#8a92a3` | `var(--dsw-alias-label-secondary, #8a8a85)` | the new-conversation page's glyph field, and the wake a ripple leaves in it |
+| `--dsh-claude-canvas` | `canvas` | `#ffffff` | `#191919` | `#fbfcff` | `#13161d` | `var(--dsw-alias-bg-base)` | the page canvas, the search box |
+| `--dsh-claude-sidebar-canvas` | card `sidebar` | `#fafafa` | `#1f1f1f` | `#f7f9ff` | `#13161d` | `var(--dsw-specific-sidebar-fill)` | the sidebar |
+| `--dsh-claude-card` | `card` | `#ffffff` | `#232323` | `#fbfcff` | `#1d2028` | `var(--dsw-alias-bg-overlay)` | cards on the canvas in light and raised in dark: the account popover, the search palette |
+| `--dsh-claude-inverse-fill` | `ink` | `#161616` | `#fdfdfd` | `#131416` | `#f4f9ff` | `var(--dsw-alias-interactive-bg-hover)` | the model picker's group label fill: an inverted chip under Claude, a hover-plate chip under the host |
+| `--dsh-claude-inverse-ink` | `inverse-ink` | `#ffffff` | `#171717` | `#feffff` | `#11141a` | `var(--dsw-alias-label-primary)` | the model picker's group label ink |
+| `--dsh-claude-table-head` | `table-head` | `#f4f4f4` | `#282828` | `#f0f1f4` | `#22252d` | `var(--dsw-alias-bg-layer-2)` | table header row |
+| `--dsh-claude-ripple-ink` | `ink-3` | `#91888a` | `#9c9395` | `#848891` | `#8a92a3` | `var(--dsw-alias-label-secondary, #8a8a85)` | the new-conversation page's glyph field, and the wake a ripple leaves in it |
 | `--dsh-claude-data-ink` | literal | `#3b6ecf` | `#3b6ecf` | `#3b6ecf` | `#3b6ecf` | `var(--dsw-alias-link, #3b6ecf)` | the home page's data blue: the deepest step of the model chart's ramp and the ink the heat grid's levels are mixed from |
 | `--dsh-claude-ripple-wave` | literal | `#3b6ef0` | `#7fa6ff` | `#3b6ef0` | `#7fa6ff` | `var(--dsw-alias-link, #3b6ef0)` | the front of a ripple in the new-conversation page's glyph field |
-| `--dsh-claude-scrollbar` | `scrollbar` | `rgba(213, 213, 213, 0.9)` | `rgba(62, 62, 62, 0.9)` | `rgba(213, 213, 213, 0.9)` | `rgba(55, 59, 64, 0.9)` | `var(--dsw-alias-border-l2)` | scrollbar thumb |
-| `--dsh-claude-scrollbar-hover` | `scrollbar-hover` | `rgba(138, 138, 138, 0.8)` | `rgba(113, 113, 113, 0.9)` | `rgba(138, 138, 138, 0.8)` | `rgba(105, 109, 115, 0.9)` | `var(--dsw-alias-label-caption)` | scrollbar thumb under the pointer |
+| `--dsh-claude-scrollbar` | `scrollbar` | `rgba(213, 213, 213, 0.9)` | `rgba(62, 62, 62, 0.9)` | `rgba(209, 210, 213, 0.9)` | `rgba(55, 59, 64, 0.9)` | `var(--dsw-alias-border-l2)` | scrollbar thumb |
+| `--dsh-claude-scrollbar-hover` | `scrollbar-hover` | `rgba(138, 138, 138, 0.8)` | `rgba(113, 113, 113, 0.9)` | `rgba(134, 135, 138, 0.8)` | `rgba(105, 109, 115, 0.9)` | `var(--dsw-alias-label-caption)` | scrollbar thumb under the pointer |
 | `--dsh-claude-link-hover` | `ui-link-hover` | `#a35035` | `#ffbea6` | `#2e41c0` | `#91b1ff` | `var(--dsw-alias-link)` | text link under the pointer |
 | `--dsh-claude-logo-ink` | card `logoInk` | `#161616` | `#fdfdfd` | `#4d6bfe` | `#4d6bfe` | `var(--dsw-alias-label-primary)` | sidebar brand art: the whale and the wordmark |
 | `--dsw-specific-menu` | `overlay` | `#ffffff` | — | `#ffffff` | — | host's own |  |
 | `--dsw-specific-bubble` | card `bubble` | `#f4f2f3` | `rgba(255, 255, 255, 0.06)` | `#ecf0ff` | `#262b36` | host's own | user message bubble |
-| `--dsh-claude-chip` | `chip` | `#f9f9f9` | — | `#f9f9f9` | — | `var(--dsw-specific-selector)` | segmented control and switch at rest |
+| `--dsh-claude-chip` | `chip` | `#f9f9f9` | — | `#f5f6f9` | — | `var(--dsw-specific-selector)` | segmented control and switch at rest |
 | `--dsh-claude-meter-peak` | literal | `#a4621d` | `#e2a45f` | `#a4621d` | `#e2a45f` | `var(--dsw-alias-state-warn-label)` | the peak rate badge: the expensive end of a provider's own billing clock |
 | `--dsh-claude-meter-valley` | literal | `#3d7550` | `#8cbf96` | `#3d7550` | `#8cbf96` | `var(--dsw-alias-state-success-primary)` | the off-peak rate badge, and the dated promotions priced below it |
 <!-- /generated:tokens -->
@@ -208,27 +210,28 @@ Under the host typeface the skin's own faces fall back to the host's:
 `--dsh-claude-font-serif`, `-prose` and `-brand` to `--dsw-font-family` (the host
 carries no serif), `--dsh-claude-font-code` to `--ds-font-family-code`.
 
-Two colours stay whoever paints: the reasoning slider's violet top rung
-(`--dsh-claude-apex*`) and the account-hold page, which reproduces a Claude
-screen. The effort trigger's ramp (`--dsh-claude-effort-*`) is the same kind of
-colour — a copy of the reference effort slider's own blue-to-violet ladder, kept
-apart from the brand's accent. Translucent neutral hover tints and the usage
-panel's data colours stay literal; they read on any canvas. Every other colour
-that paints a surface, a text, a border or an accent reads a token.
+The account-hold page keeps its own colours, reproducing a Claude screen.
+The reasoning slider and its trigger take the theme accent: the dot matrix and
+knob glow read `--dsh-claude-apex*`, and the level ramp reads
+`--dsh-claude-effort-*`. Translucent neutral hover tints and the usage panel's
+data colours stay literal; they read on any canvas. Every other colour that
+paints a surface, a text, a border or an accent reads a token.
 
 **The effort trigger's tone.** While the Composer tab's effort-accent row is on,
-the effort level's text in the composer's seat box takes its colour from the rung
-in force. Every thinking rung has a place on one ramp between two fixed colours —
-the blue `--dsh-claude-effort-low` and the violet `--dsh-claude-effort-high`, the
-ladder the reference effort slider draws — and the rung's place is its index over
-the ladder's span, so a four-stop ladder reads blue, two steps between, then the
-violet on the strongest level. The ramp is mixed in OKLCH, which keeps the steps
-apart at every ladder length. It reads no brand token: a ramp derived from the
-DeepSeek brand's blue accent left its three levels within a few steps of each
-other, indistinguishable at 13px. The switch-off level and the model's own
-default level have no strength the catalog names, so both keep the resting ink
-(`--dsw-alias-label-secondary`). The row off leaves the resting ink on every
-rung.
+the effort level's text in the composer's seat box and the card's level name
+take their colour from the rung in force. The caption and the scale ends keep
+their own caption inks. Every thinking rung has
+a place on one ramp between two ends mixed from the theme accent in OKLCH:
+`--dsh-claude-effort-low` toward the raised surface (less saturated, lower
+contrast) and `--dsh-claude-effort-high` toward the label ink (more contrast). The rung's
+place is its index over the ladder's span, so a four-stop ladder reads weak,
+two steps between, then strong. The hue starts at the theme accent and travels
+slightly toward red as the rung climbs: an accent above 180° leans toward 359°,
+one below 180° toward 0°, by a quarter of the distance at the top, while HSL
+keeps the saturation and lightness of the ramp step.
+The switch-off level and the model's own default level have no strength the catalog
+names, so both keep the resting ink (`--dsw-alias-label-secondary`). The row off
+leaves the resting ink on every rung.
 
 **The composer's seat.** The model's name and the effort level share one box in
 the row, the way the host's own seat carries both texts: the box is the row's one

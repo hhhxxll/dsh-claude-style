@@ -35,6 +35,19 @@
       var name = sidebar.querySelector('[data-dsh-claude-part~="brand-name"]')
       var hero = heroHolder.querySelector('[data-dsh-claude-part~="hero-mark"]')
       for (var wait = 0; wait < 40 && !document.body.hasAttribute('data-dsh-claude-custom-mark'); wait++) await sleep(50)
+      // An inline-code chip in the same place the host draws one, read under each
+      // scheme: the skin writes one code colour per scheme, so a chip that keeps
+      // the light ink on the dark canvas is invisible.
+      var chip = document.createElement('code')
+      chip.textContent = 'c'
+      document.body.appendChild(chip)
+      var codeInk = function () {
+        var light = getComputedStyle(chip).color
+        document.body.setAttribute('data-ds-dark-theme', '')
+        var dark = getComputedStyle(chip).color
+        document.body.removeAttribute('data-ds-dark-theme')
+        return { light: light, dark: dark }
+      }
       var read = function () {
         var body = getComputedStyle(document.body)
         var markArt = getComputedStyle(mark, '::before')
@@ -54,6 +67,7 @@
           avatarFill: avatar === null ? null : getComputedStyle(avatar, '::before').backgroundColor,
           accent: body.getPropertyValue('--dsw-alias-brand-primary').trim(),
           accentInk: body.getPropertyValue('--dsw-alias-label-primary-foreground').trim(),
+          codeInk: codeInk(),
         }
       }
       r.customBrand = { images: read() }

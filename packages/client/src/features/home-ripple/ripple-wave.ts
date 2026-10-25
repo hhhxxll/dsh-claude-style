@@ -31,21 +31,28 @@ const REST_HEIGHT = 0.003
 /**
  * The waves are the solution of ∂²h/∂t² = c²∇²h − γ∂h/∂t, integrated by the
  * symplectic Euler step. The Laplacian divides by the cell's width and height
- * squared, so the rings stay round on a grid whose cells are not square. The
- * speed c is largest at the latest click and falls with the distance from it,
- * so a ring slows as it travels and its pulse narrows; the border cells damp
+ * squared, so the rings stay round on a grid whose cells are not square. Every
+ * click raises the speed around itself, fastest at its cell and falling with the
+ * distance from it, and a cell keeps the fastest of the clicks that are still
+ * rippling: a ring slows along the curve of the click that started it, and a
+ * click elsewhere in the field leaves that curve alone. The border cells damp
  * strongly and swallow what reaches them. A step is stable while
  * c·step·√(4/dx² + 4/dy²) < 2, which the largest speed (1.4 × speedNear, from
  * the noise factor's cap) satisfies at WAVE_STEP.
+ *
+ * @param columns - the grid's width in cells.
+ * @param rows - the grid's height in cells.
+ * @param random - the source of the field's noise seed and each click's shape;
+ *   tests pass a seeded sequence so one sampled profile cannot decide a check.
  */
-export function createWaveField(columns: number, rows: number): WaveField {
+export function createWaveField(columns: number, rows: number, random: () => number = Math.random): WaveField {
   const cells = columns * rows
   const height = new Float32Array(cells)
   const velocity = new Float32Array(cells)
   const speedSquared = new Float32Array(cells)
   const speedFactor = new Float32Array(cells)
   const damping = new Float32Array(cells)
-  const seed = Math.random() * 1000
+  const seed = random() * 1000
   const { cellWidth, cellHeight } = RIPPLE
   const widthSquared = cellWidth * cellWidth
   const heightSquared = cellHeight * cellHeight
@@ -64,19 +71,23 @@ export function createWaveField(columns: number, rows: number): WaveField {
     }
   }
 
-  /** The speed profile around the latest click: fast at its cell, `speedFar` far away. */
-  function centreSpeeds(column: number, row: number) {
+  /**
+   * Raise the speed around one click to its own profile: fast at its cell,
+   * `speedFar` far away. A cell never loses a speed a click gave it until the
+   * field comes to rest, so a ring keeps the curve of the click it came from
+   * while later clicks only speed up the ground around themselves.
+   */
+  function raiseSpeeds(column: number, row: number) {
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < columns; c++) {
         const cell = r * columns + c
         const distance = Math.hypot((c - column) * cellWidth, (r - row) * cellHeight)
         const speed = (RIPPLE.speedFar + (RIPPLE.speedNear - RIPPLE.speedFar) * Math.exp(-distance / RIPPLE.speedFalloff)) * speedFactor[cell]!
-        speedSquared[cell] = speed * speed
+        const squared = speed * speed
+        if (squared > speedSquared[cell]!) speedSquared[cell] = squared
       }
     }
   }
-  // Before the first click the field is flat, so the speeds only need to exist.
-  centreSpeeds(Infinity, Infinity)
 
   function drive() {
     for (const source of sources) {
@@ -119,8 +130,10 @@ export function createWaveField(columns: number, rows: number): WaveField {
     drive()
     moving = sources.length > 0 || peak > REST_HEIGHT
     if (!moving) {
+      // The field is still again, so the clicks that raised its speeds are gone with the waves they started.
       height.fill(0)
       velocity.fill(0)
+      speedSquared.fill(0)
     }
   }
 
@@ -128,14 +141,14 @@ export function createWaveField(columns: number, rows: number): WaveField {
     height,
     active: () => moving,
     disturb(column, row) {
-      centreSpeeds(column, row)
+      raiseSpeeds(column, row)
       sources.push({
         column,
         row,
         time: 0,
-        duration: (1 + Math.floor(Math.random() * 2)) / RIPPLE.sourceFrequency,
-        radiusScale: 0.7 + Math.random() * 1.1,
-        amplitudeScale: 0.6 + Math.random() * 0.8,
+        duration: (1 + Math.floor(random() * 2)) / RIPPLE.sourceFrequency,
+        radiusScale: 0.7 + random() * 1.1,
+        amplitudeScale: 0.6 + random() * 0.8,
       })
       moving = true
     },

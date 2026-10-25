@@ -6,7 +6,7 @@ import { findHeroRoot } from '@dsh-claude-style/engine/host'
 import type { FrameTask } from '@dsh-claude-style/engine/frame'
 import { motionReduced } from '../../core/prefs'
 import { inPageBox, inPagePixels } from '../../shared/page-zoom'
-import { createGlyphField } from './ripple-field'
+import { createGlyphField, readColour } from './ripple-field'
 import type { FieldPalette, GlyphField, Rgb } from './ripple-field'
 import { RIPPLE } from './ripple-params'
 import { createWaveField } from './ripple-wave'
@@ -21,6 +21,8 @@ const RIPPLE_ATTR = 'data-dsh-claude-ripple'
 const INK_TOKEN = '--dsh-claude-ripple-ink'
 const WAVE_TOKEN = '--dsh-claude-ripple-wave'
 const FONT_TOKEN = '--dsh-claude-font-code'
+/** The consecutive unreadable-colour rounds the feature rides out before it retires (D12). */
+const FAILED_ROUNDS_TO_RETIRE = 5
 
 /** The field on one hero root: the canvas, the grid it is sized for, and the two layers that fill it. */
 interface Mounted {
@@ -44,18 +46,15 @@ interface Mounted {
  * A token's colour as channels, or null while the page has not applied the
  * token yet: the tokens stand behind the palette attribute, which is written
  * once the preferences have been read, so a page that opens on the home screen
- * mounts the field before its colours exist. The canvas context turns whatever
- * the page resolves the token to (a literal, or the host's own alias) into
- * `#rrggbb`; a value it cannot read is a mistake in the token table (D12).
+ * mounts the field before its colours exist. A value the canvas cannot paint is
+ * a mistake in the token table (D12).
  */
-function colour(context: CanvasRenderingContext2D, style: CSSStyleDeclaration, token: string): Rgb | null {
+function colour(style: CSSStyleDeclaration, token: string): Rgb | null {
   const value = style.getPropertyValue(token).trim()
   if (value === '') return null
-  context.fillStyle = '#000001'
-  context.fillStyle = value
-  const match = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(context.fillStyle)
-  if (match === null || context.fillStyle === '#000001') throw new Error(`home-ripple: ${token} is "${value}", not an opaque colour`)
-  return [parseInt(match[1]!, 16), parseInt(match[2]!, 16), parseInt(match[3]!, 16)]
+  const channels = readColour(value)
+  if (channels === null) throw new Error(`home-ripple: ${token} is "${value}", not an opaque colour`)
+  return channels
 }
 
 /**
@@ -74,16 +73,11 @@ function colour(context: CanvasRenderingContext2D, style: CSSStyleDeclaration, t
  */
 export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   let mounted: Mounted | null = null
-  let colourContext: CanvasRenderingContext2D | null | undefined
 
   function readPalette(canvas: HTMLCanvasElement): FieldPalette | null {
     const style = getComputedStyle(canvas)
-    // The canvas itself holds a webgl context, so the colours are parsed on a canvas of their own.
-    colourContext ??= canvas.ownerDocument.createElement('canvas').getContext('2d')
-    if (colourContext === null) throw new Error('home-ripple: the colour canvas has no 2d context')
-    const context = colourContext
-    const ink = colour(context, style, INK_TOKEN)
-    const wave = colour(context, style, WAVE_TOKEN)
+    const ink = colour(style, INK_TOKEN)
+    const wave = colour(style, WAVE_TOKEN)
     if (ink === null || wave === null) return null
     return {
       ink,
@@ -135,6 +129,8 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     }
     let previous = performance.now()
     let frameWanted = false
+    /** The consecutive rounds whose colour read failed; a readable read clears it. */
+    let failedRounds = 0
 
     /** Ask for a frame now; a pending timer is dropped, since the frame decides the next wake-up. */
     function wake() {
@@ -159,7 +155,24 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
         previous = now
         if (current.canvas.width > 0 && current.field.needsDraw(now, still)) {
           // A page without its tokens has no colours yet; it is asked again on the next wake-up.
-          current.palette = readPalette(canvas)
+          // A token that is present but unreadable fails the read outright — a permanent mistake
+          // in the token chain (D12). The failure is reported each round it happens, the count
+          // rides out a page that is still settling (the wake-ups come from the size observer
+          // and presses), and after several failed rounds the feature retires: the frame loop
+          // would otherwise throw into every wake-up forever, and a wrong colour is not one the
+          // canvas can invent its way out of. A readable read clears the count, so a chain that
+          // becomes readable (the palette applying late, a corrected colour) recovers.
+          try {
+            current.palette = readPalette(canvas)
+            failedRounds = 0
+          } catch (error) {
+            failedRounds += 1
+            reportError(error)
+            if (failedRounds >= FAILED_ROUNDS_TO_RETIRE) {
+              ui.retire('homeRipple')
+              return
+            }
+          }
           if (current.palette !== null) current.field.draw(now, current.palette, still)
         }
         if (current.field.busy() && !still) wake()

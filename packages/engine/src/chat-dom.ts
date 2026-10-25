@@ -1,4 +1,5 @@
 import { CHAT_FLOW_SELECTOR, CONVERSATION_SCROLL_SELECTOR, FLOW_KIND_ATTRIBUTE, SUBMISSION_ECHO_SELECTOR, USER_ROW_KIND } from '@dsh-claude-style/contracts/dom'
+import { resolveColour } from './colour'
 
 /**
  * The chat area's DOM helpers: the column and the session's scroll container, the
@@ -91,15 +92,26 @@ export const SUBMISSION_ROW_SELECTOR = `[${FLOW_KIND_ATTRIBUTE}="${USER_ROW_KIND
 /** Both faces inside the chat column, asked in one query. */
 export const CHAT_ROW_SELECTOR = `${CHAT_USER_ROW_SELECTOR}, ${SUBMISSION_ECHO_SELECTOR}`
 
-/** Split the numbers out of an `rgb()` / `rgba()` colour; null when it does not read as one. */
+/**
+ * A computed colour's channels, or null when the page paints nothing with it.
+ *
+ * The host's own rules state a fill as `rgb()`, while a card's token and a
+ * reader's custom palette reach the page as a literal or as a relative colour
+ * (D30), which no pattern over the written form reads: the painted pixel is the
+ * one reading that covers them all. The `rgb()` fast path keeps the ordinary
+ * case off the canvas.
+ */
 export function colorParts(color: string) {
   const match = /^rgba?\(([^)]+)\)$/.exec(color.trim())
-  if (match === null) return null
-  const raw = match[1]
-  if (raw === undefined) return null
-  const parts = raw.split(',').map(part => Number.parseFloat(part))
-  if (parts.length < 3 || parts.some(part => !Number.isFinite(part))) return null
-  return parts
+  if (match !== null) {
+    const raw = match[1]
+    if (raw === undefined) return null
+    const parts = raw.split(',').map(part => Number.parseFloat(part))
+    if (parts.length < 3 || parts.some(part => !Number.isFinite(part))) return null
+    return parts
+  }
+  const painted = resolveColour(color)
+  return painted === null ? null : [painted.red, painted.green, painted.blue, painted.alpha]
 }
 
 /** How opaque a computed colour is. An unreadable one counts as 0: an unknown colour is never taken for a fill. */

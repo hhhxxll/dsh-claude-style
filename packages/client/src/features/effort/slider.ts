@@ -5,6 +5,7 @@ import type { EffortStep } from './ladder'
 import { createEffortMatrix } from './matrix'
 import { buildElement, setAttributeIfChanged } from '@dsh-claude-style/engine/dom'
 import { inPagePixels } from '../../shared/page-zoom'
+import { createNameSwap } from './name-swap'
 import type { ModelCatalog } from '../model/catalog'
 import { copy } from './copy'
 
@@ -38,12 +39,11 @@ export interface EffortTrackBox {
  * The face of the control follows Claude Desktop's effort slider: a filled
  * portion grows from the left end to the knob, one tick dot marks every
  * stop the ladder offers, and the TOP rung is special — reaching it swaps
- * the plain fill for a dot-matrix (effort/matrix.ts) that twinkles in
- * Claude's Ultracode violet (the grid is solved in whole device pixels,
- * the phases scattered by hash, the entrance swept in from the right, in
- * the manner of the community skin-switcher plugin), tints the knob, and
- * colours the level's name. The violet is the one deliberate exception to
- * the skin's single clay accent, at the user's request.
+ * the plain fill for a dot-matrix (effort/matrix.ts) in the manner of Claude's
+ * Ultracode field (the grid is solved in whole device pixels, the phases
+ * scattered by hash, the entrance swept in from the right, in the manner of
+ * the community skin-switcher plugin), tints the knob, and colours the level's
+ * name. The matrix and the whole name ramp take the reader's theme accent.
  *
  * A seat that names no levels (the catalog has not produced a ladder yet)
  * leaves the slider in its empty state: the knob travels the same way and
@@ -72,10 +72,10 @@ export function createEffortControl(opts: {
   const head = buildElement('div', 'dsh-claude-effort-head')
   const labelEl = buildElement('span', 'dsh-claude-effort-label')
   const valueEl = buildElement('span', 'dsh-claude-effort-value')
-  /* The outgoing name, absolutely positioned over the value: it takes no
-     layout space and never needs removing — the out animation ends at
-     opacity 0 and is re-armed on the next swap. */
-  const valueGhost = buildElement('span', 'dsh-claude-effort-value-ghost')
+  /* The name being travelled to, absolutely positioned over the value: the
+     slider's own travel is its progress, so the incoming words sit where the
+     knob has not reached yet and take no layout space. */
+  const valuePreview = buildElement('span', 'dsh-claude-effort-value-preview')
   const ends = buildElement('div', 'dsh-claude-effort-ends')
   const fasterEl = buildElement('span', 'dsh-claude-effort-end')
   const smarterEl = buildElement('span', 'dsh-claude-effort-end')
@@ -87,7 +87,7 @@ export function createEffortControl(opts: {
 
   head.appendChild(labelEl)
   head.appendChild(valueEl)
-  head.appendChild(valueGhost)
+  head.appendChild(valuePreview)
   ends.appendChild(fasterEl)
   ends.appendChild(smarterEl)
   /* Paint order is DOM order: the fill under the ticks, the matrix over
@@ -108,6 +108,10 @@ export function createEffortControl(opts: {
   let steps: EffortStep[] = []
   let selected = -1
   let live = -1
+  /** The knob's travel, in the same pixels its translate uses. */
+  let liveTravel = 0
+  /** Which way the knob last moved: 1 toward stronger, -1 toward weaker, 0 still. */
+  let moveDirection = 0
   /**
    * A press and a drag are two states, not one. `pressed` starts on
    * pointerdown and the knob GLIDES to the press position (the stylesheet's
@@ -129,6 +133,15 @@ export function createEffortControl(opts: {
   let pointerId: number | null = null
   /** The dash shown when there is no level to name; cached, not re-read per move. */
   let noneLabel = ''
+  /** The two name layers, driven by the knob's own travel. */
+  const nameSwap = createNameSwap({
+    root,
+    value: valueEl,
+    preview: valuePreview,
+    steps: () => steps,
+    selected: () => selected,
+    none: () => noneLabel,
+  })
   /** Whether the top-rung treatment (the matrix) is on. */
   let apexOn = false
   /** The track width the ticks were laid out for, so a late layout re-does them. */
@@ -267,6 +280,13 @@ export function createEffortControl(opts: {
    * monotone, so the knob could jump backwards.
    */
   const DETENT = 0.8
+  /**
+   * How far the pointer must travel before a press becomes a drag. A click
+   * often brings one or two pixels of movement; treating that as a drag would
+   * switch the knob's transition off before the press glide has played, and
+   * the knob would teleport to the pointer instead of easing to it.
+   */
+  const DRAG_THRESHOLD_PX = 3
 
   /**
    * The detent transfer: raw pointer travel → knob travel. Within one
@@ -335,46 +355,13 @@ export function createEffortControl(opts: {
   }
 
   /**
-   * Re-arm a stylesheet animation on one element. The reset must be an
-   * !important inline: the rules carry !important (they have to, to outrank
-   * the host), and a plain inline 'none' loses that cascade — the restart
-   * would be a silent no-op.
-   */
-  function restartAnimation(el: HTMLElement) {
-    el.style.setProperty('animation', 'none', 'important')
-    void el.offsetWidth
-    el.style.removeProperty('animation')
-  }
-
-  /**
-   * The level's name while the gesture runs, the committed one otherwise.
-   * Same-value guard: the write runs per frame while dragging, and an
-   * identical textContent assignment still replaces the text node — the
-   * resulting mutation would feed the scheduler's observer and keep a full
-   * pass running every frame.
-   *
-   * A real change is a SWAP, not a replacement: the outgoing name is copied
-   * into the ghost (which sits exactly where the value sat), the ghost blurs
-   * away upward, and the value — now carrying the new name — rises out of a
-   * blur from below. Both animations are re-armed on every swap, mid-drag
-   * included: a slider whose label changes as the knob crosses a stop reads
-   * as a rolling counter, which is the point.
+   * The level's name while the gesture runs, the committed one otherwise. The
+   * two layers and their progress live in name-swap.ts; this reads the slider's
+   * own travel into them.
    */
   function paintValue() {
     const at = pressed ? live : selected
-    const text = at >= 0 && steps[at] ? steps[at].name : noneLabel
-    if (valueEl.textContent !== text) {
-      const previous = valueEl.textContent
-      if (previous !== '') {
-        /* Anchor the ghost where the value sits (offsetLeft is measured
-           against the positioned head, and the ghost shares that space). */
-        valueGhost.textContent = previous
-        valueGhost.style.left = `${valueEl.offsetLeft}px`
-        restartAnimation(valueGhost)
-      }
-      valueEl.textContent = text
-      restartAnimation(valueEl)
-    }
+    nameSwap.paint(at, pressed, dragging, liveTravel, moveDirection, geometry().span)
     paintApex(at)
   }
 
@@ -450,15 +437,17 @@ export function createEffortControl(opts: {
     root.removeAttribute('data-dragging')
     releaseCapture()
     const index = live
+    const previous = selected
     live = -1
     /* Commit FIRST, then paint ONCE on the committed level. Painting before
        the commit read the OLD `selected`: the name went back to the level
-       the gesture started from (replaying its blur-in), and the apex
-       attribute flipped off and on, which hid the matrix and restarted its
-       entrance sweep — a visible double take on every release. */
+       the gesture started from, and the apex attribute flipped off and on,
+       which hid the matrix and restarted its entrance sweep — a visible
+       double take on every release. */
     commit(index)
     place(positionFor(selected), true)
-    paintValue()
+    paintApex(selected)
+    nameSwap.settle(selected, previous)
   }
 
   /**
@@ -486,13 +475,19 @@ export function createEffortControl(opts: {
     document.addEventListener('pointercancel', onRelease, true)
     track.setPointerCapture(e.pointerId)
     if (typeof opts.onDragStart === 'function') opts.onDragStart()
+    // A pending settle no longer owns the words: this gesture does.
+    nameSwap.reset()
     const x = pointerTravel(e.clientX)
     /* Glide to the press position. The drag state (and with it the
        transition-off flag) only starts on the first MOVE — see the flags'
        note: setting it here would suppress the very transition that makes
        this read as travel. */
     pressed = true
-    place(dampTravel(x), true)
+    downX = e.clientX
+    liveTravel = dampTravel(x)
+    const delta = liveTravel - positionFor(selected)
+    moveDirection = Math.abs(delta) < 0.5 ? 0 : Math.sign(delta)
+    place(liveTravel, true)
     live = nearest(x)
     paintValue()
   }
@@ -507,6 +502,8 @@ export function createEffortControl(opts: {
   let cancelPendingFrame: (() => void) | null = null
   let moveQueued = false
   let pendingX = 0
+  /** Where the press landed, so a click's incidental movement is not a drag. */
+  let downX = 0
 
   function applyPending() {
     if (!pressed) return
@@ -515,16 +512,22 @@ export function createEffortControl(opts: {
     // stop stays reachable — ending it at the control's edge left the reader
     // unable to drag back off that stop.
     const x = pointerTravel(pendingX)
-    place(dampTravel(x), false)
+    const travel = dampTravel(x)
+    const delta = travel - liveTravel
+    if (Math.abs(delta) > 0.1) moveDirection = Math.sign(delta)
+    liveTravel = travel
+    // Until the press has actually become a drag, the knob keeps the press
+    // glide's transition: a click's one-pixel move must not snap it.
+    place(travel, !dragging)
     live = nearest(x)
     paintValue()
   }
 
   function onPointerMove(e: PointerEvent) {
     if (!pressed) return
-    if (!dragging) {
-      // The pointer is moving: the gesture is a drag now, so the knob must
-      // follow it without easing.
+    if (!dragging && Math.abs(inPagePixels(e.clientX - downX)) >= DRAG_THRESHOLD_PX) {
+      // The pointer has left the click's tolerance: the knob must follow it
+      // without easing.
       dragging = true
       root.setAttribute('data-dragging', '')
     }
@@ -555,10 +558,12 @@ export function createEffortControl(opts: {
     else return
     e.preventDefault()
     e.stopPropagation()
+    const previous = selected
     commit(next)
     place(positionFor(next), true)
     paintAria(state().labels)
-    paintValue()
+    paintApex(selected)
+    nameSwap.start(previous, selected)
   })
 
   /**
@@ -591,8 +596,10 @@ export function createEffortControl(opts: {
     if (pendingEcho && next.index >= 0 && next.steps[next.index] !== undefined && next.steps[next.index].id === pendingId) {
       clearPending()
     }
+    let swapFrom = -1
     if (!pressed && !pendingEcho) {
       const moved = painted && !changed && selected !== next.index
+      swapFrom = moved ? selected : -1
       selected = next.index
       place(positionFor(selected), moved)
       painted = true
@@ -601,7 +608,12 @@ export function createEffortControl(opts: {
     // A drag or a key between passes reads the layout it acts on.
     passBox = null
     paintAria(next.labels)
-    paintValue()
+    if (swapFrom >= 0) {
+      paintApex(selected)
+      nameSwap.start(swapFrom, selected)
+    } else {
+      paintValue()
+    }
   }
 
   return {
@@ -624,6 +636,7 @@ export function createEffortControl(opts: {
       document.removeEventListener('pointercancel', onRelease, true)
       if (cancelPendingFrame !== null) cancelPendingFrame()
       cancelPendingFrame = null
+      nameSwap.dispose()
       moveQueued = false
       releaseCapture()
       clearPending()

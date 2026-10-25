@@ -142,8 +142,8 @@ export const CONVERSATION_WIDTH_ATTR = 'data-dsh-claude-conversation-width'
 /**
  * Present while the effort trigger takes a colour from the rung in force
  * (features/effort/effort-picker.css): the switch-off rung keeps the resting
- * ink, the rungs below the top take the accent, and the top rung takes the
- * violet the effort card's own apex wears.
+ * ink, and every thinking rung takes its step along the theme accent's ramp,
+ * the top rung included.
  */
 export const EFFORT_ACCENT_ATTR = 'data-dsh-claude-effort-accent'
 /**

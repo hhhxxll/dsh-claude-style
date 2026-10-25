@@ -204,7 +204,7 @@ function customPaletteBlocks(doc, gates) {
       const seeds = {
         canvas: `var(--dsh-claude-custom-canvas-${scheme})`,
         accent: 'var(--dsh-claude-custom-accent)',
-        code: 'var(--dsh-claude-custom-code)',
+        code: `var(--dsh-claude-custom-code-${scheme})`,
         link: scheme === 'light'
           ? 'oklch(from var(--dsh-claude-custom-accent) calc(l - 0.06) c h)'
           : 'oklch(from var(--dsh-claude-custom-accent) calc(l + 0.15) c h)',
@@ -229,7 +229,7 @@ function customPaletteBlocks(doc, gates) {
         if (spec.tone !== undefined) value = `var(--dsh-tone-${card.edges === 'surface' && spec.flat !== undefined && scheme === 'dark' ? spec.flat : spec.tone})`
         else if (spec.literal !== undefined) value = spec.literal[scheme]
         else if (spec.alias !== undefined) value = `var(${spec.alias})`
-        else if (spec.card === 'code') value = 'var(--dsh-claude-custom-code)'
+        else if (spec.card === 'code') value = `var(--dsh-claude-custom-code-${scheme})`
         // The reader's canvas carries its own sidebar step, like the cards'.
         else if (spec.card === 'sidebar') value = 'var(--dsh-tone-sidebar)'
         // The bubble follows the reader's canvas too; a card with flat contours

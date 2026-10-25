@@ -1,7 +1,8 @@
 import { SLOT_NODE_ATTR } from '../../constants'
 import { MODEL_OFFICIAL_GROUP } from './model-labels'
 import { activeLocale } from '../../core/i18n'
-import { ensureSeatBox } from './seat-box'
+import { ensureSeatBox, ensureSeatPart } from './seat-box'
+import type { SeatPart } from './seat-box'
 import { loadModelCopy } from './model-copy'
 import { readPrefs } from '../../core/prefs'
 import { findModelSlot } from '@dsh-claude-style/engine/host'
@@ -27,6 +28,8 @@ export interface ModelHandle extends FeatureHandle {
   close(reason?: CloseReason): void
   /** The skin's seat box: the model's text and the effort level's share it (seat-box.ts). */
   seatBox(): HTMLElement | null
+  /** One decision's own part of that box, with its own hover plate. */
+  seatPart(part: SeatPart): HTMLElement | null
   /** The skin's model trigger while it is in the document. */
   trigger(): HTMLButtonElement | null
   effort(): ReturnType<ModelCatalog['effort']>
@@ -346,7 +349,8 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     const hostRoot = slot.querySelector(`:scope > :not([${SLOT_NODE_ATTR}])`)
     if (hostRoot !== null) hostRoot.toggleAttribute('data-dsh-claude-model-host', true)
     seatBox = ensureSeatBox(slot, seatBox)
-    if (modelBtn === null || modelBtn.parentElement !== seatBox) {
+    const modelPart = ensureSeatPart(seatBox, 'model')
+    if (modelBtn === null || modelBtn.parentElement !== modelPart) {
       if (modelBtn !== null && modelBtn.parentElement !== null) modelBtn.parentElement.removeChild(modelBtn)
       modelBtn = document.createElement('button')
       modelBtn.type = 'button'
@@ -371,9 +375,9 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
         if (open) cards.closeAll()
         else cards.openMain()
       })
-      // First in the box: the model's name, then the level's (the effort picker
-      // appends its own button into the same box).
-      seatBox.insertBefore(modelBtn, seatBox.firstChild)
+      // First part of the box: the model's name; the effort picker appends its
+      // own button into the second part.
+      modelPart.appendChild(modelBtn)
     }
     cards.ensureChrome()
 
@@ -456,6 +460,10 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
      * without either fragment pushing it.
      */
     seatBox() { return seatBox !== null && seatBox.isConnected ? seatBox : null },
+    seatPart(part) {
+      if (seatBox === null || !seatBox.isConnected) return null
+      return ensureSeatPart(seatBox, part)
+    },
     /** The skin's model trigger while it is in the document, else null. */
     trigger() { return modelBtn !== null && modelBtn.isConnected ? modelBtn : null },
     effort() { return modelCatalog.effort(modelCatalog.snapshot()) },

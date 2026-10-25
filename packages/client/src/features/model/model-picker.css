@@ -316,14 +316,14 @@ body[data-dsh-claude-style] .dsh-claude-model-line {
 body[data-dsh-claude-style] .dsh-claude-model-line .dsh-claude-model-name {
   min-width: 0;
 }
-/* The host's own label paints this tag in the info tone; the accent tint and its
-   ink keep that reading without a second colour family. */
+/* The release marker is metadata, not a second accent: a neutral plate and the
+   secondary ink let the model name and the effort colour carry the emphasis. */
 body[data-dsh-claude-style] .dsh-claude-model-tag {
   flex: none;
   padding: 0 5px;
   border-radius: 4px;
-  background: var(--dsw-alias-state-business-tertiary);
-  color: var(--dsw-alias-state-business-primary);
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+  color: var(--dsw-alias-label-secondary);
   font-family: var(--dsw-font-family);
   font-size: 10px;
   font-weight: 500;

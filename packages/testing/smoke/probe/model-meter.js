@@ -159,8 +159,10 @@
       r.modelSeat = {
         text: seatBtn === null ? null : seatBtn.textContent,
         // The tag's own face: the pill's background is what the trigger's
-        // transparent-innards rule must leave standing.
+        // transparent-innards rule must leave standing, and its ink is neutral
+        // metadata rather than a second accent.
         tagBg: seatTag === null ? null : getComputedStyle(seatTag).backgroundColor,
+        tagColor: seatTag === null ? null : getComputedStyle(seatTag).color,
       }
       card.remove()
     })

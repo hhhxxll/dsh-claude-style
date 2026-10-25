@@ -27,6 +27,24 @@
         card: claudeDark.getPropertyValue('--dsh-claude-card').trim(),
       }
       document.body.removeAttribute('data-ds-dark-theme')
+      // The DeepSeek card's light shell derives from its pale blue-white canvas;
+      // its dark card keeps the blue-black steps it already had.
+      window.__pushForm({ paletteColors: 'deepseek' })
+      await sleep(250)
+      var dsLight = getComputedStyle(document.body)
+      r.deepseekPalette = {
+        canvas: dsLight.backgroundColor,
+        accent: dsLight.getPropertyValue('--dsw-alias-brand-primary').trim(),
+      }
+      document.body.setAttribute('data-ds-dark-theme', '')
+      var dsDark = getComputedStyle(document.body)
+      r.deepseekPalette.dark = {
+        canvas: dsDark.backgroundColor,
+        accent: dsDark.getPropertyValue('--dsw-alias-brand-primary').trim(),
+      }
+      document.body.removeAttribute('data-ds-dark-theme')
+      window.__pushForm({ paletteColors: 'brand' })
+      await sleep(150)
     })
     await probe.onlyFor(['hero'], async function () {
       // The classic hero's welcome is drawn on arrival and holds between
@@ -125,6 +143,70 @@
             mediaRule.cssText.indexOf('data-dsh-claude-pill') !== -1) r.viewPill.reducedMotionRules++
         }
       }
+    })
+    await probe.onlyFor(['view-tabs-row'], async function () {
+      // The row shape 0.2.1-rc.3 draws: the host's row holds the tablist and the
+      // overflow button, and counts the tabs it keeps from the row's own width.
+      // The row must span the header for that count while the plate inside it
+      // hugs the tabs, and the pill travels inside the plate.
+      var rowHeader = document.createElement('div')
+      rowHeader.className = '_header_v_1'
+      rowHeader.setAttribute('data-slot', 'conversation.header')
+      rowHeader.innerHTML = '<div class="_tabs_v_1">' +
+        '<div class="_viewTabs_v_1" role="tablist" data-conversation-tabs="">' +
+        '<button type="button" role="tab" aria-selected="true" class="_tab_v_1 _tabActive_v_1">Chat</button>' +
+        '<button type="button" role="tab" aria-selected="false" class="_tab_v_1">Trajectory</button>' +
+        '<button type="button" role="tab" aria-selected="false" class="_tab_v_1">Context</button>' +
+        '<button type="button" role="tab" aria-selected="false" class="_tab_v_1">Team</button></div>' +
+        '<span class="_viewsMoreAnchor_v_1"><button type="button" class="_viewsMore_v_1" aria-haspopup="menu" aria-expanded="false">more</button></span>' +
+        '</div>'
+      document.body.appendChild(rowHeader)
+      await sleep(150)
+      // Read by the host's own structure: the row is the header's first box, the
+      // tablist its marked tablist, and the overflow button the tablist's
+      // neighbour (the skin's marks are what the assertions below see in styles).
+      var row = rowHeader.firstElementChild
+      var list = row.querySelector('[role="tablist"]')
+      var more = list.nextElementSibling.querySelector('button')
+      var rowTabs = list.children
+      var rowBox = row.getBoundingClientRect()
+      var listBox = list.getBoundingClientRect()
+      var moreBox = more.getBoundingClientRect()
+      var rowStyle = getComputedStyle(row)
+      var listStyle = getComputedStyle(list)
+      var moreStyle = getComputedStyle(more)
+      r.viewRow = {
+        justifyContent: rowStyle.justifyContent,
+        pointerEvents: rowStyle.pointerEvents,
+        width: Math.round(rowBox.width),
+        headerWidth: rowHeader.clientWidth,
+        counted: row.clientWidth,
+        groupCentre: Math.round((listBox.left + moreBox.right) / 2 - rowBox.left),
+        plate: {
+          width: Math.round(listBox.width),
+          centre: Math.round(listBox.top + listBox.height / 2 - rowBox.top),
+          background: listStyle.backgroundColor,
+          radius: listStyle.borderTopLeftRadius,
+          padding: listStyle.paddingLeft,
+          gap: listStyle.gap,
+        },
+        chip: {
+          width: Math.round(moreBox.width),
+          height: Math.round(moreBox.height),
+          centre: Math.round(moreBox.top + moreBox.height / 2 - rowBox.top),
+          marginTop: moreStyle.marginTop,
+        },
+        tabHeight: getComputedStyle(rowTabs[0]).height,
+        underline: getComputedStyle(rowTabs[0], '::after').display,
+        pill: pillState(list, rowTabs[0]),
+      }
+      rowTabs[0].setAttribute('aria-selected', 'false')
+      rowTabs[0].className = '_tab_v_1'
+      rowTabs[2].setAttribute('aria-selected', 'true')
+      rowTabs[2].className = '_tab_v_1 _tabActive_v_1'
+      await sleep(60)
+      r.viewRow.pillSwitched = pillState(list, rowTabs[2])
+      probe.viewRow = { row: row, list: list }
     })
     await probe.onlyFor(['composer'], async function () {
       // The composer's host controls are marked by what they are, read from

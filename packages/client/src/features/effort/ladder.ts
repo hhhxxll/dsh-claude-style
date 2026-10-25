@@ -119,10 +119,11 @@ export function effortSteps(effort: EffortLadder, defaultName: string): { steps:
  * Where the rung in force stands on the trigger's colour ramp, or null for the
  * ink the trigger rests in.
  *
- * The ramp runs from the accent's text step to the violet the card's apex
- * matrix marks, so every thinking level takes a colour of its own and the top
- * rung wears exactly the card's violet. The switch-off level and the model's
- * own default level have no strength the catalog names, so both rest.
+ * The ramp runs from the theme accent mixed toward the raised surface to the
+ * same accent mixed toward the label ink, so every thinking level takes a
+ * colour of its own and the top rung wears the card's own accent. The
+ * switch-off level and the model's own default level have no strength the
+ * catalog names, so both rest.
  */
 export function effortTint(steps: readonly EffortStep[], index: number): number | null {
   if (index < 0 || steps.length === 0) return null

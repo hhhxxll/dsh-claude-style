@@ -3,5 +3,5 @@
   "effortFaster": { "zh": "更快", "en": "Faster" },
   "effortSmarter": { "zh": "更强", "en": "Smarter" },
   "effortAccentTitle": { "zh": "思考强度重点色", "en": "Effort accent colour" },
-  "effortAccentDesc": { "zh": "推理等级按钮按当前档位着色：关闭的档位与模型自己的默认档位保持灰色，每个思考档位在蓝色到紫色之间取自己的一档，越高越靠紫色一端。", "en": "Colours the reasoning-effort button by the level in force: a switched-off level and the model's own default level stay grey, each thinking level takes its own step between the blue and the violet, and the ladder climbs toward the violet." }
+  "effortAccentDesc": { "zh": "推理等级按钮按当前档位着色：关闭的档位与模型自己的默认档位保持灰色，每个思考档位在主题强调色的深浅之间取自己的一档，越高越接近强调色的强端并略微向红色偏移。", "en": "Colours the reasoning-effort button by the level in force: a switched-off level and the model's own default level stay grey, each thinking level takes its own step along the theme accent's depth, and the ladder climbs toward its stronger end and leans slightly toward red." }
 }

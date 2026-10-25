@@ -88,6 +88,48 @@ export default spec({ page: 'effort' }, ({ test }) => {
     t.expectThat.equal(strongest > weakest, true, `the strongest rung is the heaviest (${strongest} against ${weakest})`)
   })
 
+  test('the open card level name carries the trigger colour, the caption keeps its grey, and the hue is the theme accent', async (t) => {
+    await open(t)
+    const labelBefore = await painted(t, t.surface('effort.label'))
+    const endBefore = await painted(t, t.surface('effort.end'))
+    await pick(t, 0)
+    const labelLow = await painted(t, t.surface('effort.label'))
+    const endLow = await painted(t, t.surface('effort.end'))
+    t.expectThat.equal([labelLow, endLow].join(), [labelBefore, endBefore].join(), 'the caption and the scale ends keep their own inks across the ladder')
+
+    await pick(t, 0.97)
+    const trigger = await painted(t, t.surface('effort.trigger'))
+    const value = await painted(t, t.surface('effort.value'))
+    const preview = await painted(t, t.surface('effort.value-preview'))
+    t.expectThat.equal([value, preview].every(colour => colour === trigger), true, `the card's level name takes the trigger's rung colour (${[trigger, value, preview].join(', ')})`)
+
+    const channels = colour => colour.match(/[\d.]+/g).slice(0, 3).map(Number)
+    const hue = (rgb) => {
+      const [r, g, b] = rgb.map(value => value / 255)
+      const max = Math.max(r, g, b)
+      const delta = max - Math.min(r, g, b)
+      if (delta === 0) return 0
+      const raw = max === r ? ((g - b) / delta) % 6 : max === g ? (b - r) / delta + 2 : (r - g) / delta + 4
+      return (raw * 60 + 360) % 360
+    }
+    await t.page.evaluate(() => document.body.style.setProperty('--dsw-alias-brand-primary', '#00ff00'))
+    await pick(t, 0)
+    const lowGreen = channels(await painted(t, t.surface('effort.trigger')))
+    t.expectThat.equal(lowGreen[1] > lowGreen[0] + 30 && lowGreen[1] > lowGreen[2] + 30, true, `the weak rung keeps the accent's green hue (${lowGreen.join(', ')})`)
+    await pick(t, 0.97)
+    const highGreen = channels(await painted(t, t.surface('effort.trigger')))
+    t.expectThat.equal(hue(highGreen) < hue(lowGreen) - 8 && hue(highGreen) > 45, true, `an accent below 180° leans toward 0° without losing its hue (${hue(lowGreen).toFixed(0)}° → ${hue(highGreen).toFixed(0)}°)`)
+
+    await t.page.evaluate(() => document.body.style.setProperty('--dsw-alias-brand-primary', '#0066ff'))
+    await pick(t, 0)
+    const lowBlue = channels(await painted(t, t.surface('effort.trigger')))
+    await pick(t, 0.97)
+    const highBlue = channels(await painted(t, t.surface('effort.trigger')))
+    t.expectThat.equal(hue(highBlue) > hue(lowBlue) + 8 && hue(highBlue) < 320, true, `an accent above 180° leans toward 359° without losing its hue (${hue(lowBlue).toFixed(0)}° → ${hue(highBlue).toFixed(0)}°)`)
+    await t.page.evaluate(() => document.body.style.removeProperty('--dsw-alias-brand-primary'))
+    await t.page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+  })
+
   test('the effort-accent row is what paints the colour, and off leaves every rung one ink', async (t) => {
     const trigger = t.surface('effort.trigger')
     await open(t)

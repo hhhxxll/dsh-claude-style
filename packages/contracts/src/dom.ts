@@ -402,6 +402,12 @@ export const CONVERSATION_HEADER_SELECTOR = '[data-dsh-claude-part~="conversatio
 /** The view-tab strip inside the header, whose box the band placement keeps clear of. */
 export const VIEW_TABS_STRIP_SELECTOR = '[data-dsh-claude-part~="view-tabs"]'
 /**
+ * The tablist the strip holds when the host wraps it in a row of its own
+ * (0.2.1-rc.3): the plate the stylesheet draws, and the box a placement reads
+ * where the strip's own box is kept wide for the host's count of the tabs.
+ */
+export const VIEW_TABS_LIST_SELECTOR = '[data-dsh-claude-part~="view-tabs-list"]'
+/**
  * The conversation's own view tablist, which the host marks: a tablist a
  * plugin renders in the composer's toolbar or a popover sits inside the same
  * conversation root and is no view switch.

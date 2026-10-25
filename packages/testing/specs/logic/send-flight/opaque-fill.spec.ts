@@ -19,10 +19,15 @@ test('a translucent fill is written as the colour the screen paints', () => {
   expect(chatSendOpaque('rgba(234, 240, 254, 1)', 'rgb(251, 252, 255)')).toBe('rgba(234, 240, 254, 1)')
 })
 
+test('a colour the browser can paint is read in whatever form the page states it', () => {
+  // A mix the page hands over resolved: the canvas's own paint is the reading.
+  expect(chatSendOpaque('color-mix(in srgb, black 8%, transparent)', 'rgb(252, 252, 251)')).toBe('rgb(232, 232, 231)')
+})
+
 test('an unreadable colour or backdrop leaves the fill alone', () => {
   // A fill nobody can read is better left as the page wrote it than guessed at.
-  expect(chatSendOpaque('color-mix(in srgb, black 8%, transparent)', 'rgb(252, 252, 251)')).toBe('color-mix(in srgb, black 8%, transparent)')
-  expect(chatSendOpaque('rgba(0, 0, 0, 0.08)', 'canvastext')).toBe('rgba(0, 0, 0, 0.08)')
+  expect(chatSendOpaque('#fffff', 'rgb(252, 252, 251)')).toBe('#fffff')
+  expect(chatSendOpaque('rgba(0, 0, 0, 0.08)', '#fffff')).toBe('rgba(0, 0, 0, 0.08)')
   expect(chatSendOpaque('rgba(0, 0, 0, 0.08)', 'rgba(0, 0, 0, 0)')).toBe('rgba(0, 0, 0, 0.08)')
 })
 

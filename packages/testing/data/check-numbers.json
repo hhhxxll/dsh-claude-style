@@ -912,6 +912,17 @@
       "the pill slides whatever the system motion setting: no reduced-motion rule reaches it": [
         0
       ],
+      "the plate and the overflow button stand as one group in the row's middle, the button seated like a tab": [
+        1,
+        2,
+        22
+      ],
+      "the view tabs draw their pill under the active tab inside the plate, without sliding in": [
+        0
+      ],
+      "a view switch slides the pill to the newly active tab (line 138)": [
+        1
+      ],
       "the title is handed the room left between its own edge and the controls once the strip's width is reserved, and the row it left keeps its gap under it": [
         1,
         28

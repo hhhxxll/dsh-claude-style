@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-24",
+  "group": "improvements",
+  "order": 0,
+  "external": false,
+  "zh": "改善 DeepSeek 配色的浅色层次：画布改为 #FBFCFF、侧栏为 #F7F9FF，表面、表头、悬停底、边框与文字色从画布种子派生，不再继承 Claude 的纯白卡片。",
+  "en": "Improve the DeepSeek palette's light steps: the canvas is #FBFCFF and the sidebar #F7F9FF, with surfaces, table heads, hover plates, borders and inks derived from that canvas instead of inheriting Claude's white card."
+}

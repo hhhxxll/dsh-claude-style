@@ -3,7 +3,8 @@ import { MODEL_EFFORT_DEFAULT } from '../model/model-labels'
 import { readPrefs } from '../../core/prefs'
 import { createEffortControl } from './slider'
 import type { EffortTrackBox } from './slider'
-import { effortSteps, effortTint } from './ladder'
+import { effortSteps } from './ladder'
+import { paintEffortTint } from './tint'
 import type { HostContext } from '@dsh-claude-style/engine/host'
 import type { CloseReason } from '@dsh-claude-style/engine/scheduler'
 import type { FeatureUi } from '../../core/feature'
@@ -40,8 +41,6 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   let effortBtn: HTMLButtonElement | null = null
   let effortPop: HTMLElement | null = null
   let effortSlider: ReturnType<typeof createEffortControl> | null = null
-  /** The rung's place on the level's colour ramp, as last written; empty while it wears no ramp. */
-  let tintPercent = ''
   /** The slider's track as the pass's read phase found it, for the pass's update of the slider. */
   let sliderBox: EffortTrackBox | null = null
   const effortHoverIntent = createHoverIntent(
@@ -64,6 +63,12 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   /** The box this level shares with the model's name (owned by the model picker). */
   function seatBox() {
     return typeof ui.model?.seatBox === 'function' ? ui.model.seatBox() : null
+  }
+
+  /** This level's own part of that box, the plate its pointer answers. */
+  function effortSeat() {
+    const part = typeof ui.model?.seatPart === 'function' ? ui.model.seatPart('effort') : null
+    return part ?? seatBox()
   }
 
   /** Whether the level's card stands open right now. */
@@ -195,7 +200,6 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     })
     // After the model's name, which the model picker keeps first in the box.
     box.appendChild(effortBtn)
-    tintPercent = ''
     return effortBtn
   }
 
@@ -205,13 +209,12 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       if (effortBtn.parentElement !== null) effortBtn.parentElement.removeChild(effortBtn)
       effortBtn = null
     }
-    tintPercent = ''
     closeEffortPopover()
   }
 
   /** Re-point the level's button and the slider at the seat in force (every pass). */
   function syncEffortControl() {
-    const box = seatBox()
+    const box = effortSeat()
     // No box to sit in: the level comes down (see hideEffortTrigger).
     if (box === null) {
       hideEffortTrigger()
@@ -232,22 +235,10 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     // write still mutates the DOM (textContent replaces the text node;
     // setAttribute queues a record the scheduler's observer sees).
     const ladder = effortSteps(info, MODEL_EFFORT_DEFAULT)
-    // Where the rung stands on the level's colour ramp, in percent. The
-    // stylesheet reads it only while the Composer tab's effort-accent row is on;
-    // a rung with no place on the ramp takes the mark and the property off, and
-    // the label keeps the resting ink.
-    const tint = effortTint(ladder.steps, ladder.index)
-    const percent = tint === null ? '' : String(Math.round(tint * 100))
-    if (percent !== tintPercent) {
-      if (percent === '') {
-        button.removeAttribute('data-tint')
-        button.style.removeProperty('--dsh-claude-effort-tint')
-      } else {
-        button.setAttribute('data-tint', '')
-        button.style.setProperty('--dsh-claude-effort-tint', percent)
-      }
-      tintPercent = percent
-    }
+    // Where the rung stands on the level's colour ramp. The stylesheet reads the
+    // tint only while the Composer tab's effort-accent row is on; a rung with no
+    // place on the ramp takes the mark off and keeps the resting ink.
+    paintEffortTint(button, ladder.steps, ladder.index)
     const labelEl = button.querySelector('.dsh-claude-effort-btn-label')
     if (labelEl !== null && labelEl.textContent !== info.label) labelEl.textContent = info.label
     setAttributeIfChanged(button, 'aria-label', `${copy('effortLabel')} ${info.label}`)
@@ -271,7 +262,6 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     effortBtn = null
     effortPop = null
     effortSlider = null
-    tintPercent = ''
     sliderBox = null
     unregisterPopover('effort')
   }

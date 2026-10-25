@@ -5,6 +5,15 @@ function byName(rows) {
   return (rows || []).reduce((all, row) => { all[row.name] = row; return all }, {})
 }
 
+/** Whether a computed `rgb()` is neutral enough to read as grey: no channel leads by more than a neutral host step. */
+function neutral(colour) {
+  if (typeof colour !== 'string') return false
+  const channels = colour.match(/[\d.]+/g)
+  if (channels === null || channels.length < 3) return false
+  const [r, g, b] = channels.slice(0, 3).map(Number)
+  return Math.max(r, g, b) - Math.min(r, g, b) <= 18
+}
+
 export default {
   /**
    * The model menu's rows and the peak rate meter every one of them carries: an
@@ -75,9 +84,9 @@ export default {
         picker.back !== undefined && picker.back.trigger === true && picker.back.hostMarked === true,
       JSON.stringify(picker))
     const seat = r.modelSeat || {}
-    check('the seat\'s own line carries the tag with the Flash model in force, with its own face',
+    check('the seat\'s own line carries the tag with the Flash model in force, on a neutral plate and ink',
       seat.text !== null && seat.text.includes('V4.1 Flash') && seat.text.includes('1017') &&
-        seat.tagBg !== null && seat.tagBg !== 'rgba(0, 0, 0, 0)',
+        seat.tagBg !== null && seat.tagBg !== 'rgba(0, 0, 0, 0)' && neutral(seat.tagBg) && neutral(seat.tagColor),
       JSON.stringify(seat))
   },
 }

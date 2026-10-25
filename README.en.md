@@ -48,7 +48,7 @@ The settings page switches between the two palettes; light and dark follow the s
   </tr>
 </table>
 
-> White canvas `#FFFFFF` with a `#FAFAFA` sidebar, blue-black `#13161D`, DeepSeek blue `#4D6BFE`; Deepy the pixel whale stands on the composer, in eight states:
+> Pale blue-white canvas `#FBFCFF` with a `#F7F9FF` sidebar, blue-black `#13161D`, DeepSeek blue `#4D6BFE`; Deepy the pixel whale stands on the composer, in eight states:
 
 <table>
   <tr>

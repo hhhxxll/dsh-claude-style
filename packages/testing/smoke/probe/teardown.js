@@ -63,6 +63,14 @@
       r.leftBrandProperties = Array.prototype.filter.call(document.body.style, function (name) { return name.indexOf('--dsh-claude-custom-') === 0 })
       r.leftStylesheet = !!document.getElementById('dsh-claude-style-style')
       if (probe.viewStrip) r.viewPill.left = probe.viewStrip.hasAttribute('data-dsh-claude-pill') || probe.viewStrip.hasAttribute('data-dsh-view-tabs') || probe.viewStrip.style.length > 0
+      if (probe.viewRow) {
+        // The row's own rules are off again: it centres nothing, takes presses,
+        // and the plate is back to the host's plain box with no pill on it.
+        var rowStyle = getComputedStyle(probe.viewRow.row)
+        var listStyle = getComputedStyle(probe.viewRow.list)
+        r.viewRow.left = rowStyle.justifyContent === 'center' || rowStyle.pointerEvents === 'none' ||
+          listStyle.borderTopLeftRadius === '7px' || listStyle.paddingLeft === '2px' || listStyle.backgroundColor !== 'rgba(0, 0, 0, 0)'
+      }
       if (r.search) {
         r.search.left = document.querySelectorAll('[data-dsh-claude-search-row], .dsh-claude-search-trigger, .dsh-claude-search-bar').length
         r.search.rootUnmounted = !!probe.searchRoot && probe.searchRoot.unmounted

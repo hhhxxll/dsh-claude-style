@@ -6,12 +6,14 @@ import {
   HEADER_TITLE_ROW_SELECTOR,
   HEADER_TITLE_SELECTOR,
   HEADER_UTILITIES_SELECTOR,
+  VIEW_TABS_LIST_SELECTOR,
   VIEW_TABS_STRIP_SELECTOR,
 } from '@dsh-claude-style/contracts/dom'
 import { observeMatches, observeSize } from '@dsh-claude-style/engine/bus'
 import { desktopBand } from '@dsh-claude-style/engine/desktop-band'
 import { findRightbarToggle, findWindowsMenu, hostSlots } from '@dsh-claude-style/engine/host'
 import { createStamp, setAttributeIfChanged } from '@dsh-claude-style/engine/dom'
+import { contentBox } from '../../shared/content-box'
 import { inPageBox, inPagePixels } from '../../shared/page-zoom'
 import type { FeatureUi } from '../../core/feature'
 import type { HostContext } from '@dsh-claude-style/engine/host'
@@ -292,6 +294,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     const utilities = row.querySelector<HTMLElement>(HEADER_UTILITIES_SELECTOR)
     const corner = row.querySelector<HTMLElement>(HEADER_CORNER_SELECTOR)
     const stripEl = header === null ? null : header.querySelector<HTMLElement>(VIEW_TABS_STRIP_SELECTOR)
+    const stripList = stripEl === null ? null : stripEl.querySelector<HTMLElement>(VIEW_TABS_LIST_SELECTOR)
     reading = {
       band: pageBand(band),
       width: pageWidth(),
@@ -302,7 +305,11 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       corner,
       stripEl,
       rowBox: rect(row),
-      stripBox: rect(stripEl),
+      // The strip's own box when the host draws the tablist as the strip itself,
+      // and the plate and overflow button standing in its row when it draws them
+      // inside one (shared/content-box.ts): the row spans the header, so its own
+      // box would reserve the window for the tabs.
+      stripBox: stripEl === null ? null : stripList === null ? rect(stripEl) : contentBox(stripEl),
       menuBox: rect(findWindowsMenu()),
       utilitiesBox: rect(utilities),
       cornerBox: rect(corner),
@@ -333,7 +340,9 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     // row; one still drawn in the header's own row takes nothing from it. Its
     // room is read off the width rather than the box: view-tabs centres it on
     // the window, this pass then moves it, and a fit decided against the moved
-    // box would answer differently on the next pass.
+    // box would answer differently on the next pass. The box is the strip's
+    // content (the plate and the overflow button), because the row the host
+    // draws them in spans the header (shared/content-box.ts).
     const stripEl = current.stripEl
     const stripBox = current.stripBox
     const inBand = stripBox !== null && stripBox.top < band.height

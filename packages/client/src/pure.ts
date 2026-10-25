@@ -44,6 +44,8 @@ export { HEAT_TIP_EDGE_ATTR, HEAT_TIP_SIDE_ATTR, HEAT_TIP_SIDE_BELOW, placeHeatT
 export { default as HOME_OVERVIEW_SHEET } from './features/home/home-overview.css?raw'
 export { HOME_REFRESH_FLOOR_MS, HOME_REFRESH_MS, homeRefreshDue } from './features/home/usage-refresh'
 export type { HomeRefreshReason, HomeUsageAge } from './features/home/usage-refresh'
+export { readColour } from './features/home-ripple/ripple-field'
+export type { Rgb } from './features/home-ripple/ripple-field'
 export { createWaveField } from './features/home-ripple/ripple-wave'
 export { installDeepseekBackground } from './features/deepseek-background/deepseek-background'
 export { shouldAnimateDeepseekBackground, DEEPSEEK_DRIFT_MS } from './features/deepseek-background/motion-state'
