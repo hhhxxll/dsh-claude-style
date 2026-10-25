@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-25",
+  "group": "improvements",
+  "order": 3,
+  "external": false,
+  "zh": "DeepSeek 背景开启时浅色主题的正文墨阶改为纯黑，关闭背景时恢复主题原墨阶。",
+  "en": "Paint the light scheme's copy in pure black while the DeepSeek background is on, and hand the theme's own ink ladder back when it is off."
+}

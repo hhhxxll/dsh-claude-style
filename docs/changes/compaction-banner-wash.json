@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-25",
+  "group": "fixes",
+  "order": 1,
+  "external": false,
+  "zh": "修复 DeepSeek 背景开启时压缩检查点横幅仍画一块不透明白底：横幅的置顶底色与悬停实底随水洗一同透明。",
+  "en": "Fix the compaction checkpoint banner keeping an opaque white plate while the DeepSeek background is on: its sticky fill and solid hover stand down with the wash."
+}
