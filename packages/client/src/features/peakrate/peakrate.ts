@@ -6,7 +6,7 @@ import type { HostContext } from '@dsh-claude-style/engine/host'
 import type { FeatureHandle } from '@dsh-claude-style/engine/scheduler'
 import type { FeatureUi } from '../../core/feature'
 import type manifest from './peakrate.manifest'
-import type { RateState } from '@dsh-claude-style/contracts/peakrate'
+import type { RateProfile, RateState } from '@dsh-claude-style/contracts/peakrate'
 
 /**
  * What the model picker reads off this feature: the rate for one row.
@@ -44,12 +44,32 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     return currentRate(profile, new Date())
   }
 
+  /**
+   * The profile each (provider, model) pair matched, per catalog generation:
+   * a full paint asks for every row of a four-digit catalog, and the match
+   * scans the whole price table each time it is answered from scratch. The
+   * cache dies with the generation, and the countdown is judged per call.
+   */
+  let matchEpoch = -1
+  const matchCache = new Map<string, RateProfile | undefined>()
+  function cachedProfile(provider: string, modelId: string): RateProfile | undefined {
+    const generation = peakRateGeneration()
+    if (generation !== matchEpoch) {
+      matchCache.clear()
+      matchEpoch = generation
+    }
+    const key = `${provider}\u0000${modelId}`
+    if (!matchCache.has(key)) matchCache.set(key, matchProfile(provider, modelId, peakProfiles()))
+    return matchCache.get(key)
+  }
+
   ui.peakrate = {
     sync() { loadPeakRate(Date.now()) },
     state,
     badge(provider, modelId) {
-      const judgement = state(provider, modelId)
-      return judgement === null ? null : buildRateBadge(judgement)
+      const profile = cachedProfile(provider, modelId)
+      if (profile === undefined) return null
+      return buildRateBadge(currentRate(profile, new Date()))
     },
     epoch: peakRateGeneration,
     teardown() {

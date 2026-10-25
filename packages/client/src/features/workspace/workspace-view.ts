@@ -7,6 +7,7 @@ import { observeMatches } from '@dsh-claude-style/engine/bus'
 import type { MatchList } from '@dsh-claude-style/engine/bus'
 import { buildElement, closestFrom, createStamp } from '@dsh-claude-style/engine/dom'
 import { removeStrayNodes } from '../../shared/popover'
+import { createHostToast } from '../../shared/host-toast'
 import { VIEW_SWITCH_CLASS } from '../../shared/segment-control'
 import type { HostAnswer } from '@dsh-claude-style/engine/resource'
 import { createSlidingPill } from '../../shared/sliding-pill'
@@ -42,9 +43,8 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
    */
   /** React roots holding the row actions, unmounted when the list is rebuilt. */
   let actionRoots: reactDom.Root[] = []
-  /** React root holding the archived-row notice, and the show count that keys it. */
-  let noticeRoot: reactDom.Root | null = null
-  let noticeSeq = 0
+  /** The host's notice channel for a clicked archived row. */
+  const toast = createHostToast()
   /** The section's view (active / archived), its heading and the host's tree, marked for workspace.css. */
   const viewStamp = createStamp('data-dsh-claude-ws-view')
   const labelStamp = createStamp('data-dsh-claude-ws-label')
@@ -212,14 +212,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
    * re-shows it.
    */
   function notifyToast(text: string) {
-    if (noticeRoot === null) noticeRoot = reactDom.createRoot(document.createElement('div'))
-    noticeSeq++
-    noticeRoot.render(React.createElement(primitives.Toast, {
-      key: `toast-${noticeSeq}`,
-      text,
-      icon: React.createElement(primitives.IconWarningOutlineRegular),
-      onDone() { if (noticeRoot !== null) noticeRoot.render(null) },
-    }))
+    toast.show({ text, icon: React.createElement(primitives.IconWarningOutlineRegular) })
   }
 
   /** The host's own notice for a clicked archived row (`toast.archivedNotOpenable`). */
@@ -481,10 +474,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       actionRoots[r].unmount()
     }
     actionRoots = []
-    if (noticeRoot !== null) {
-      noticeRoot.unmount()
-      noticeRoot = null
-    }
+    toast.dispose()
     if (unwatch !== null) {
       unwatch()
       unwatch = null

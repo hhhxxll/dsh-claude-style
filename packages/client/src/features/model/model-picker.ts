@@ -113,7 +113,11 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
           pending.catch(() => { /* the store's error surface covers a failure */ })
         }
       }
-      modelBodySig = ''
+      // The body's own signature decides whether the rows repaint: with the
+      // catalog unchanged the open shows the painted rows and the rate badges
+      // refresh in place. Rebuilding every row on every open was the
+      // four-digit-catalog open lag (issue #151's own experiment C: the cost
+      // tracks the catalog's size).
       renderModelBody()
     },
     createSub() {
@@ -175,36 +179,61 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
 
   /**
    * What the rows' rates depend on, in one value the render signatures carry.
-   * The catalog is the meter feature's (its generation moves when one arrives),
-   * and the minute only matters while a card is on screen — the countdown is
-   * drawn to the minute, and a card that is down is repainted by the opening
-   * pass anyway.
+   * The catalog is the meter feature's (its generation moves when one arrives).
+   * The minute is not part of it: a closed card is not repainted by the clock,
+   * and the minute reaches the rows through refreshRateBadges instead.
    */
   function rateSignature() {
     const peakrate = ui.peakrate
     if (peakrate === undefined) return ''
-    const up = cards.mainOpen() || cards.subOpen()
-    return up ? `${peakrate.epoch()}/${Math.floor(Date.now() / 60000)}` : `${peakrate.epoch()}`
+    return `${peakrate.epoch()}`
+  }
+
+  /**
+   * Swap both cards' rate meters for the current ones (rows.ts owns the rows
+   * and their identity). The badge is the one minute-sensitive part of a row
+   * (the countdown to the rate switch), and the card open and the minute
+   * rollover call this instead of the full paint: with a four-digit catalog
+   * the full paint is the open lag the feature cannot afford on every open.
+   */
+  function refreshRateBadges() {
+    modelRows.refreshRates()
   }
 
   /**
    * What a group's rows read as, in one string the render signatures carry: a
    * row's name is what its label draws, so a rename in the settings page has to
-   * reach the card (D79), and a vendor's rule reads it too.
+   * reach the card (D79), and a vendor's rule reads it too. The string is
+   * linear in the whole catalog, so it is keyed on the groups' identity: the
+   * store hands out a fresh snapshot per publish, and a scheduler pass that
+   * finds the same snapshot again reads the memo instead of rebuilding a
+   * four-digit-model string.
    */
+  let rowsSignatureGroups: HostModelGroup[] | null = null
+  let rowsSignatureText = ''
   function rowsSignature(groups: HostModelGroup[]) {
-    let sig = ''
-    for (let g = 0; g < groups.length; g++) {
-      sig += `;${groups[g].id}:`
-      for (let m = 0; m < groups[g].models.length; m++) sig += `${m === 0 ? '' : ','}${groups[g].models[m].id}=${groups[g].models[m].name}`
+    if (groups !== rowsSignatureGroups) {
+      let sig = ''
+      for (let g = 0; g < groups.length; g++) {
+        sig += `;${groups[g].id}:`
+        for (let m = 0; m < groups[g].models.length; m++) sig += `${m === 0 ? '' : ','}${groups[g].models[m].id}=${groups[g].models[m].name}`
+      }
+      rowsSignatureGroups = groups
+      rowsSignatureText = sig
     }
-    return sig
+    return rowsSignatureText
   }
 
-  /** Level 1: the provider sections, the divider, More models. */
-  function renderModelBody() {
+  /**
+   * Level 1: the provider sections, the divider, More models. Answers whether
+   * it painted: an unchanged signature keeps the painted rows standing, and
+   * the pass refreshes their rate badges in place instead — the one
+   * minute-sensitive part of a row (rows.ts's refreshRates). A badge whose
+   * words stand is written by no one, so a settled page stays settled.
+   */
+  function renderModelBody(): boolean {
     const modelBody = cards.body()
-    if (!modelBody) return
+    if (!modelBody) return false
     const snap = modelCatalog.snapshot()
     const status = snap ? snap.status : 'idle'
     const groups = (snap && snap.groups) || []
@@ -212,7 +241,8 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     let sig = [status, activeLocale(), current ? `${current.group.id}/${current.model.id}` : '', readPrefs().quickProviders.join(','), readPrefs().modelDescriptions !== false, rateSignature()].join('|')
     sig += rowsSignature(groups)
     if (sig === modelBodySig) {
-      return
+      modelRows.refreshRates()
+      return false
     }
     modelBodySig = sig
     while (modelBody.firstChild) modelBody.removeChild(modelBody.firstChild)
@@ -226,6 +256,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     if (!seated && modelCatalog.inFlight()) {
       modelBody.appendChild(buildElement('div', 'dsh-claude-popover-status', copy('loading')))
       layoutModelFooter(false)
+      return true
     } else {
       const sections = modelRows.levelOneSections(groups)
       if (sections.length === 0) {
@@ -279,6 +310,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
         layoutModelFooter(showMore)
       }
     }
+    return true
   }
 
   /**
@@ -379,7 +411,9 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       // own button into the second part.
       modelPart.appendChild(modelBtn)
     }
-    cards.ensureChrome()
+    // Fresh chrome is empty chrome: the body the last paint built is gone, so
+    // the next paint rebuilds the rows into the new one.
+    if (cards.ensureChrome() === true) modelBodySig = ''
 
     const snap = modelCatalog.snapshot()
     const current = modelCatalog.current(snap)

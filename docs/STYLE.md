@@ -130,6 +130,7 @@ card leaves unset.
 | `--dsw-alias-interactive-bg-active` | `accent-active` | `rgba(246, 136, 98, 0.26)` | `rgba(217, 119, 87, 0.3)` | `rgba(95, 124, 255, 0.26)` | `rgba(77, 107, 254, 0.3)` | host's own |  |
 | `--dsh-claude-hover-bg` | `hover-wash` | `rgba(6, 6, 6, 0.08)` | `rgba(255, 255, 255, 0.08)` | `rgba(4, 4, 6, 0.08)` | `rgba(251, 255, 255, 0.08)` | `var(--dsw-alias-interactive-bg-hover)` | hover wash |
 | `--dsh-claude-field-ring` | literal | `#2a78d6` | `#2a78d6` | `#2a78d6` | `#2a78d6` | `var(--dsw-alias-brand-primary)` | the ring around a field the reader is renaming in: the session title's own editor, drawn from the selection blue |
+| `--dsw-focus-ring-color` | literal | `rgba(20, 20, 19, 0.45)` | `rgba(250, 249, 245, 0.60)` | `rgba(20, 20, 19, 0.45)` | `rgba(250, 249, 245, 0.60)` | host's own | the keyboard focus ring: the host's own `:focus-visible` rules paint it, and the skin's fallback ring reads it |
 | `--dsh-claude-inline-code-bg` | `code-wash` | `rgba(6, 6, 6, 0.05)` | `rgba(255, 255, 255, 0.05)` | `rgba(4, 4, 6, 0.05)` | `rgba(251, 255, 255, 0.05)` | `var(--dsw-alias-markdown-inline-code)` | inline code fill |
 | `--dsh-claude-inline-code-fg` | card `code` | `#943333` | `#e8a08a` | `#0f1115` | `#eef1f8` | `var(--dsw-alias-label-primary)` | inline code ink |
 | `--dsh-claude-link` | `link` | `#184f95` | `#8ab4f8` | `#3b56d9` | `#8fa4ff` | `var(--dsw-alias-link)` | markdown links |
@@ -335,7 +336,11 @@ and scrolls to its end.
   black edge carries no cue, so the hairline and halo become bright ivory —
   the field visibly lights up instead of deepening. The footer tray below
   follows the same hairline so the two tiers stay one outline. Accent is never
-  used for focus strokes.
+  used for focus strokes. Every other control's keyboard ring is the host's own
+  `:focus-visible` rule painting `--dsw-focus-ring-color`, which the skin states
+  as the same ink; the skin's ring is a `:where()` fallback of no weight, so the
+  rule of whichever layer owns the control — this skin's, the host's, or another
+  plugin's `outline: none` — always wins.
 
 ## Motion
 

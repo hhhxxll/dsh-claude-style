@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { AUTO_POPOVER_ACCOUNT, AUTO_POPOVER_ALL, AUTO_POPOVER_OFF, BRAND_CLAUDE, BRAND_DEEPSEEK, PAGE_ZOOM_08, PAGE_ZOOM_1, PAGE_ZOOM_125, PAGE_ZOOM_15, PAGE_ZOOM_SYSTEM, USERNAME_MAX } from '../../constants'
+import { AUTO_POPOVER_ACCOUNT, AUTO_POPOVER_ALL, AUTO_POPOVER_OFF, BRAND_CLAUDE, BRAND_DEEPSEEK, PAGE_ZOOM_08, PAGE_ZOOM_1, PAGE_ZOOM_125, PAGE_ZOOM_15, PAGE_ZOOM_SYSTEM, PALETTE_COLORING_BRAND, PALETTE_COLORING_CUSTOM, USERNAME_MAX } from '../../constants'
 import { COMBINE_SVGS } from 'virtual:dsh-claude-style/generated'
+import { createHostToast } from '../../shared/host-toast'
 import type { Prefs } from '../../constants'
 import type { SegmentOption, SettingsTab, SettingsView } from './settings-controls'
 import { copy } from './copy'
@@ -15,6 +16,14 @@ import { copy } from './copy'
  * field's state.
  */
 export function createSettingsGeneralTab(): SettingsTab {
+  const toast = createHostToast()
+
+  /** The name of the colour card that is keeping the page's colours fixed. */
+  function paletteName(colouring: Prefs['paletteColors']) {
+    if (colouring === PALETTE_COLORING_CUSTOM) return copy('paletteCustom')
+    return colouring === BRAND_DEEPSEEK ? copy('brandDeepseek') : copy('brandClaude')
+  }
+
   /**
    * The theme style renders as a grid of large cards, each carrying the
    * brand's own mark: brands are presets, not sibling tiers of one setting.
@@ -42,7 +51,21 @@ export function createSettingsGeneralTab(): SettingsTab {
           'data-active': option.value === prefs.brand ? '' : undefined,
           'aria-pressed': option.value === prefs.brand ? 'true' : 'false',
           'aria-label': option.label,
-          onClick: () => { if (option.value !== prefs.brand) write({ brand: option.value }) },
+          onClick: () => {
+            if (option.value === prefs.brand) return
+            write({ brand: option.value })
+            if (prefs.paletteColors === PALETTE_COLORING_BRAND) return
+            toast.show({
+              text: copy('paletteFixed', { name: paletteName(prefs.paletteColors) }),
+              actions: [{
+                label: copy('paletteFollowBrand'),
+                onClick: () => {
+                  write({ paletteColors: PALETTE_COLORING_BRAND })
+                  toast.hide()
+                },
+              }],
+            })
+          },
         },
         option.value === BRAND_DEEPSEEK
           // DeepSeek's lockup is one piece of art that already draws the mark with its word.

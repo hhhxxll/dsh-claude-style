@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-24",
+  "group": "improvements",
+  "order": 0,
+  "external": false,
+  "zh": "改善主题风格切换的反馈：配色固定在某张颜色卡时，切换主题会提示「配色已被固定为…」，并可直接改为跟随品牌。",
+  "en": "Improve the feedback when switching theme style while the colours are pinned to a card: a toast names the pinned colours and offers to follow the brand again."
+}

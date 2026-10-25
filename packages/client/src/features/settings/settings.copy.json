@@ -46,6 +46,8 @@
   "brandInkText": { "zh": "文字色", "en": "Text colour" },
   "paletteCardsTitle": { "zh": "颜色卡", "en": "Colour cards" },
   "paletteCustom": { "zh": "自定义", "en": "Custom" },
+  "paletteFixed": { "zh": "配色已被固定为{name}。", "en": "The colours are fixed to {name}." },
+  "paletteFollowBrand": { "zh": "改为跟随品牌", "en": "Follow the brand" },
   "paletteSwatchAccent": { "zh": "强调色", "en": "Accent" },
   "paletteSwatchLight": { "zh": "浅色背景", "en": "Light background" },
   "paletteSwatchDark": { "zh": "深色背景", "en": "Dark background" },

@@ -70,6 +70,10 @@ export function createModelRows(options: {
   const closeSub = options.closeSub
   const openSub = options.openSub
   const rate = options.rate
+  /** Every row still standing, with the provider and model it names. */
+  const painted: { item: HTMLElement, provider: string, modelId: string }[] = []
+  /** The wall-clock minute the standing rows' meters were drawn at, or -1 before a paint. */
+  let paintedMinute = -1
 
   /**
    * The rule that separates one provider's models from the next. The provider
@@ -105,6 +109,12 @@ export function createModelRows(options: {
     // label's lockup. The scheduler's attributeFilter
     // does not watch data-*, so this write cannot re-trigger a pass.
     if (brand) item.setAttribute('data-brand', brand)
+    // The row joins the meter-refresh registry with its own identity: the rate
+    // badge is the one minute-sensitive part of a row, and the open and the
+    // minute rollover swap the meters in place rather than rebuilding every
+    // row (model-picker.ts).
+    painted.push({ item, provider: group.id, modelId: model.id })
+    paintedMinute = Math.floor(Date.now() / 60000)
     const copy = built.text
     // A model the host names with an empty string still reads as itself: the
     // row is picked by that id, so the label falls back to it.
@@ -220,12 +230,60 @@ export function createModelRows(options: {
     return out
   }
 
+  /**
+   * Refresh every standing row's rate meter in place, dropping the meters of
+   * rows whose build has left the document (a repaint elsewhere in the feature
+   * rebuilt their card). Level 1 and level 2 build their rows through the same
+   * builders, so one sweep covers both cards. A meter whose period and words
+   * stand already is written by no one: the refresh runs on the scheduler's
+   * own passes, and a settled page stays settled. The countdown and the period
+   * switch read on the wall clock's minute, so the sweep asks for nothing
+   * while the minute a paint drew at stands.
+   */
+  function refreshRates() {
+    const minute = Math.floor(Date.now() / 60000)
+    if (minute === paintedMinute || painted.length === 0) return
+    let standing = 0
+    for (let i = 0; i < painted.length; i++) {
+      const row = painted[i]!
+      if (!row.item.isConnected) continue
+      painted[standing++] = row
+      const meter = row.item.querySelector<HTMLElement>(':scope > .dsh-claude-peakrate')
+      const next = rate(row.provider, row.modelId)
+      if (next === null) {
+        meter?.remove()
+        continue
+      }
+      if (meter === null) {
+        row.item.insertBefore(next, row.item.lastElementChild)
+        continue
+      }
+      if (meter.getAttribute('data-period') !== next.getAttribute('data-period')) {
+        meter.setAttribute('data-period', next.getAttribute('data-period') ?? '')
+        const icon = meter.querySelector('.dsh-claude-peakrate-icon')
+        const iconNext = next.querySelector('.dsh-claude-peakrate-icon')
+        if (icon !== null && iconNext !== null && icon.innerHTML !== iconNext.innerHTML) icon.innerHTML = iconNext.innerHTML
+      }
+      const value = next.querySelector('.dsh-claude-peakrate-value')
+      const valueNow = meter.querySelector('.dsh-claude-peakrate-value')
+      if (value !== null && valueNow !== null && valueNow.textContent !== value.textContent) valueNow.textContent = value.textContent
+      const countdown = next.querySelector('.dsh-claude-peakrate-countdown')
+      const countdownNow = meter.querySelector('.dsh-claude-peakrate-countdown')
+      if (countdown === null) countdownNow?.remove()
+      else if (countdownNow === null) meter.appendChild(countdown)
+      else if (countdownNow.textContent !== countdown.textContent) countdownNow.textContent = countdown.textContent
+    }
+    painted.length = standing
+    paintedMinute = minute
+  }
+
   return {
     buildProviderRule,
     buildModelOption,
     buildCurrentOption,
     buildModelCell,
     levelOneSections,
-    remainingGroups
+    remainingGroups,
+    refreshRates
   }
 }

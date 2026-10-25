@@ -191,7 +191,9 @@ export function createModelCards(options: {
     }
   }
 
+  /** Whether this call built either card's nodes fresh; the caller drops its render signature. */
   function ensureModelChrome() {
+    let rebuilt = false
     // Idempotence guard, not just a null check: the picker's own teardown
     // sweep, or a hot-reload generation's stray sweep, can REMOVE the
     // popover node while the closure still references it. With a null-only
@@ -199,10 +201,11 @@ export function createModelCards(options: {
     // — the trigger then toggles a popover that is not in the document and
     // the picker silently loses its click effect. The account footer's
     // equivalent guard (footArea.contains) is the established pattern.
-    // Rebuilding also re-points the body and footer children; the render
-    // signature is dropped by the open that follows (options.onOpen), so the
-    // fresh nodes are painted before the card can be seen.
+    // Rebuilding also re-points the body and footer children; the rebuild is
+    // answered to the caller, whose next paint drops its render signature and
+    // fills the fresh nodes before the card can be seen.
     if (modelPop === null || modelPop.parentElement === null) {
+      rebuilt = true
       modelPop = document.createElement('div')
       modelPop.className = 'dsh-claude-popover-card dsh-claude-model-popover'
       setMenuPopoverOpen(modelPop, false)
@@ -240,6 +243,7 @@ export function createModelCards(options: {
       document.body.appendChild(modelPop)
     }
     if (modelSubPop === null || modelSubPop.parentElement === null) {
+      rebuilt = true
       modelSubPop = document.createElement('div')
       modelSubPop.className = 'dsh-claude-popover-card dsh-claude-model-popover dsh-claude-model-popover-sub'
       setMenuPopoverOpen(modelSubPop, false)
@@ -255,6 +259,7 @@ export function createModelCards(options: {
       modelSubPop.addEventListener('mouseleave', scheduleCloseModel)
       document.body.appendChild(modelSubPop)
     }
+    return rebuilt
   }
 
   return {

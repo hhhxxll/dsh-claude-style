@@ -312,19 +312,14 @@ body[data-dsh-claude-style]:not([data-ds-dark-theme])[data-dsh-window-blur] [dat
   background-color: rgb(209, 209, 208) !important;
 }
 
-body[data-dsh-claude-style] :is(button, input, textarea, select, [role="button"], [role="tab"], [role="treeitem"]) {
-  outline: none;
-}
-
-/* Keyboard focus ring: espresso ink on light, bright ivory on dark — a
-   near-black canvas gets a light ring. */
-body[data-dsh-claude-style] :is(button, input, textarea, select, [role="button"], [role="tab"], [role="treeitem"]):focus-visible {
-  outline: 2px solid rgba(20, 20, 19, 0.45);
+/* Keyboard focus ring for whatever draws none of its own: espresso ink on
+   light, bright ivory on dark. The whole selector sits in :where(), so the
+   ring weighs nothing and every rule written at ordinary weight wins — the
+   host's own per-control focus rules, the skin's, and another plugin's
+   `outline: none` on its own input (D43). */
+:where(body[data-dsh-claude-style] :is(button, input, textarea, select, [role="button"], [role="tab"], [role="treeitem"]):focus-visible) {
+  outline: 2px solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary));
   outline-offset: 1px;
-}
-
-body[data-dsh-claude-style][data-ds-dark-theme] :is(button, input, textarea, select, [role="button"], [role="tab"], [role="treeitem"]):focus-visible {
-  outline-color: rgba(250, 249, 245, 0.60);
 }
 
 /* ---------- the transcript pane's own axes ---------- */
