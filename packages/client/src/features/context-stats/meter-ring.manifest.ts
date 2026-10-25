@@ -10,7 +10,9 @@ export default {
   order: 72,
   // The ring stands in the row the seat box is laid out in, under the popover
   // position and under the compact footer whose figures ride the toolbar alone:
-  // the line of their own keeps the host's meter at the host's place.
+  // the line of their own keeps the host's meter at the host's place. With the
+  // picker off the ring stands at the slot's own end, after the host's model
+  // control, so the popover position does not require the picker.
   pref: 'statsPosition',
   prefValues: [STATS_POSITION_CONTEXT, STATS_POSITION_FOOTER],
   reads: ['model'],

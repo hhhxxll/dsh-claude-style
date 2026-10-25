@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-25",
+  "group": "fixes",
+  "order": 2,
+  "external": false,
+  "zh": "修复关闭重绘模型选择器时上下文占用圆环不挂载、宿主饼图掉落到输入栏下方的问题：圆环在模型座缺席时改挂到槽位末端，并保留关闭输入栏重绘时交还宿主仪表的行为。",
+  "en": "Fix the context meter disappearing when the model picker restyle is off and the host pie dropping below the composer: mount the ring at the end of the model slot when there is no seat box, while preserving the hand-back to the host when composer restyling is off."
+}

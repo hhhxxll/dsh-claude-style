@@ -1,8 +1,8 @@
-import { CONTEXT_DISPLAY_PIE, CONTEXT_DISPLAY_RING_BAND, SLOT_NODE_ATTR, STATS_POSITION_CONTEXT, STATS_POSITION_FOOTER } from '../../constants'
+import { COMPOSER_SCOPE_ALL, COMPOSER_SCOPE_CONVERSATION, COMPOSER_SCOPE_HERO, CONTEXT_DISPLAY_PIE, CONTEXT_DISPLAY_RING_BAND, SLOT_NODE_ATTR, STATS_POSITION_CONTEXT, STATS_POSITION_FOOTER } from '../../constants'
 import { DIALOG_TRIGGER_SELECTOR } from '@dsh-claude-style/contracts/dom'
 import { observeMatches, subscribeMutations } from '@dsh-claude-style/engine/bus'
-import { findModelSlot } from '@dsh-claude-style/engine/host'
-import { readPrefs } from '../../core/prefs'
+import { findHeroRoot, findModelSlot } from '@dsh-claude-style/engine/host'
+import { composerRestyleRetired, readPrefs } from '../../core/prefs'
 import { removeStrayNodes } from '../../shared/popover'
 import { setAttributeIfChanged } from '@dsh-claude-style/engine/dom'
 import { CONTEXT_STOPS, rampPosition, writeRamp } from './stats-ramp'
@@ -81,7 +81,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   }
 
   /** Build the ring once: the button, its ring and the number beside it, in the host's own anatomy. */
-  function ensureRing(slot: HTMLElement, seat: HTMLElement) {
+  function ensureRing(slot: HTMLElement, seat: HTMLElement | null) {
     if (ring === null) {
       const root = document.createElement('span')
       root.setAttribute(METER_RING_ATTR, '')
@@ -98,8 +98,16 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       ringFill = button.querySelector('circle.dsh-claude-meter-ring-fill')
       shown = null
     }
-    // After the seat box, which the model picker keeps first in the slot.
-    if (ring.parentElement !== slot || ring.previousElementSibling !== seat) slot.insertBefore(ring, seat.nextSibling)
+    // After the seat box the picker keeps first in the slot; with the picker
+    // off, at the slot's own end, after the host's model control.
+    // After the seat box the picker keeps first in the slot; with the picker
+    // off, at the slot's own end, after the host's model control. Both sides are
+    // read as element siblings: the slot holds text nodes too, and comparing
+    // against one would move the ring on every pass (D40, the pass must settle).
+    const placed = seat === null
+      ? ring.parentElement === slot && slot.lastElementChild === ring
+      : ring.parentElement === slot && ring.previousElementSibling === seat
+    if (!placed) slot.insertBefore(ring, seat === null ? null : seat.nextSibling)
   }
 
   /** The ring's own words and arc for the percentage it shows. */
@@ -191,19 +199,39 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   }
 
   /**
-   * Where the ring belongs: the row's own position, a seat box to stand behind,
-   * and a card the host has not drawn as the hero — the home page's composer
-   * keeps the host's line, as does the line of their own. The compact footer
+   * Whether the skin still owns the composer's row: the answer the composer
+   * feature reaches, read here from the preferences and the page rather than
+   * from the body attribute that feature writes on its own pass. Reading the
+   * attribute would drop the ring on any pass that ran before the composer's,
+   * and a ring that comes and goes moves the row's width under the wording
+   * beside it, frame by frame.
+   */
+  function composerOwned() {
+    if (composerRestyleRetired) return false
+    const scope = readPrefs().composerScope
+    const hero = findHeroRoot() !== null
+    return scope === COMPOSER_SCOPE_ALL || (hero ? scope === COMPOSER_SCOPE_HERO : scope === COMPOSER_SCOPE_CONVERSATION)
+  }
+
+  /**
+   * Where the ring belongs: the row's own position and a card the host has not
+   * drawn as the hero — the home page's composer keeps the host's line, as does
+   * the line of their own. The ring stands after the model seat the picker
+   * draws; with the picker off the slot holds the host's own model control
+   * alone, and the ring takes the row's same end after it. The compact footer
    * reads the same ring in the row, so its figures ride the toolbar alone.
    */
-  function placeOf() {
+  function placeOf(): { slot: HTMLElement; seat: HTMLElement | null } | null {
     const position = readPrefs().statsPosition
     if (position !== STATS_POSITION_CONTEXT && position !== STATS_POSITION_FOOTER) return null
-    const seat = typeof ui.model?.seatBox === 'function' ? ui.model.seatBox() : null
-    if (seat === null) return null
+    // The ring is part of the restyled composer: with the composer handed back
+    // to the host (the scope off, or the page out of the scope) the host's own
+    // meter comes back whole.
+    if (!composerOwned()) return null
     const slot = findModelSlot()
     const card = slot === null ? null : slot.closest<HTMLElement>('[data-composer-card]')
     if (slot === null || card === null || card.getAttribute('data-composer-variant') === 'hero') return null
+    const seat = typeof ui.model?.seatBox === 'function' ? ui.model.seatBox() : null
     return { slot, seat }
   }
 

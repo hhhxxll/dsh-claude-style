@@ -4,7 +4,9 @@
  * and the context meter's ring stands after that box, in the row's own flow. A
  * level's name changing width moves the box's left end and leaves the edge both
  * cards hang from where it was; a card too narrow for the row shortens the
- * model's name before it takes the ring out of the card.
+ * model's name before it takes the ring out of the card. The picker going off
+ * takes the seat and the level away and leaves the ring in the row, standing at
+ * the slot's own end.
  *
  * @capability effort-picker
  * @features effort, model, context-stats
@@ -72,11 +74,17 @@ export default spec({ page: 'effort', bands: ['phone', 'compact', 'wide'], densi
     t.expectThat.noHorizontalOverflow(await t.read.overflow(t.host('chat.scroller')), 'the conversation')
   })
 
-  test('switching the picker off hands the seat back whole, the level and the ring with it', async (t) => {
+  test('switching the picker off hands the seat back whole and the level with it, the ring staying in the row', async (t) => {
     await t.prefs({ modelPicker: false })
     t.expectThat.absent(await t.read.box(t.surface('model.seat')), 'the seat box')
     t.expectThat.absent(await t.read.box(t.surface('effort.trigger')), 'the level')
-    t.expectThat.absent(await t.read.box(t.surface('stats.meter-ring')), 'the ring')
+    t.expectThat.visible(await t.read.box(t.surface('stats.meter-ring')), 'the ring stands at the slot\'s own end without the seat')
+    t.expectThat.equal(await t.page.evaluate(([ringSelector, meterMark]) => {
+      const ring = document.querySelector(ringSelector)
+      const meter = document.querySelector(`[${meterMark}]`)
+      return ring !== null && ring.nextElementSibling === null && ring.parentElement !== null && ring.parentElement.lastElementChild === ring &&
+        (meter === null || getComputedStyle(meter).display === 'none')
+    }, [t.surface('stats.meter-ring'), t.surface.attribute('stats.context-meter')]), true, 'the ring is the slot\'s last child and the host meter stays unpainted')
     t.expectThat.visible(await boxOf(modelButton(t.page)), 'the host\'s own seat')
     t.expectThat.noHorizontalOverflow(await t.read.overflow(t.host('chat.scroller')), 'the conversation')
   })
