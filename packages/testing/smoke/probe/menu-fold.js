@@ -28,7 +28,7 @@
         var open = card()
         return open === null ? [] : Array.prototype.slice.call(open.querySelectorAll(HEADING))
       }
-      /** One provider of the card, as the reader sees it: its name, its state and its rows. */
+      /** One provider of the card, as the reader sees it: its name, its state, and what its rows really do on screen. */
       var read = function (heading) {
         var group = heading.closest('[data-menu-group]')
         var rows = Array.prototype.slice.call(group.querySelectorAll(ROW))
@@ -39,6 +39,9 @@
           label: heading.getAttribute('aria-label'),
           rows: rows.length,
           hidden: rows.filter(function (row) { return row.hasAttribute('hidden') }).length,
+          // The reading that matters: the host's own `.option` rule makes every
+          // row a flex box, which outranks the user agent's `[hidden]`.
+          drawn: rows.filter(function (row) { return row.checkVisibility({ visibilityProperty: true, opacityProperty: true }) }).length,
         }
       }
       var stateOf = function () { return headings().map(read) }
@@ -54,6 +57,11 @@
         seededState: seededState,
         headings: seededState.length,
         hiddenRows: seededState.reduce(function (sum, entry) { return sum + entry.hidden }, 0),
+        // The reading that catches a fold which only sets attributes: the host's
+        // own display:flex on a row outranks the user agent's [hidden].
+        drawnFoldedRows: seededState.reduce(function (sum, entry) {
+          return sum + (entry.folded === 'true' ? entry.drawn : 0)
+        }, 0),
       }
       // The second provider is the folded one: a press opens it, and a press
       // again folds it.
@@ -61,11 +69,13 @@
       foldedHeading.click()
       await sleep(150)
       var afterOpen = read(headings()[1])
-      r.menuFold.toggled = afterOpen.folded === 'false' && afterOpen.hidden === 0 ? 'open' : 'still folded'
+      // Under no query the folded rows are the only ones off the page: the
+      // page's own query mark is not on any row here.
+      r.menuFold.toggled = afterOpen.folded === 'false' && afterOpen.hidden === 0 && afterOpen.drawn === afterOpen.rows ? 'open' : 'still folded'
       foldedHeading.click()
       await sleep(150)
       var afterFold = read(headings()[1])
-      r.menuFold.toggledBack = afterFold.folded === 'true' && afterFold.hidden === afterFold.rows ? 'folded' : 'still open'
+      r.menuFold.toggledBack = afterFold.folded === 'true' && afterFold.hidden === afterFold.rows && afterFold.drawn === 0 ? 'folded' : 'still open'
       r.menuFold.foldedLabel = afterFold.label
       r.menuFold.openLabel = read(headings()[0]).label
       r.menuFold.expandedState = afterFold.expanded
@@ -74,7 +84,7 @@
       field.value = 'glm'
       field.dispatchEvent(new Event('input', { bubbles: true }))
       await sleep(200)
-      r.menuFold.queryOpened = stateOf().every(function (entry) { return entry.hidden === 0 })
+      r.menuFold.queryOpened = stateOf().every(function (entry) { return entry.hidden === 0 && entry.folded === 'false' })
       field.value = ''
       field.dispatchEvent(new Event('input', { bubbles: true }))
       await sleep(250)

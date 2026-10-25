@@ -102,8 +102,13 @@ export interface FoldAnnounce {
 
 /**
  * Write one group's state onto the card: the mark, the state a screen reader
- * hears, and the rows' own `hidden`. A group with nothing left to pick stays
- * open — its heading is the one line saying the provider stands in the menu.
+ * hears, and the rows' own hiding. A group with nothing left to pick stays open
+ * — its heading is the one line saying the provider stands in the menu.
+ *
+ * The rows carry the host's own `display: flex` (its `.option` rule), and
+ * `[hidden]` is a user-agent declaration: any author rule outranks it, so the
+ * attribute alone leaves every row on screen. The inline `display: none` is what
+ * actually folds them, and it leaves with the state.
  *
  * @param folded - what the group should stand as.
  * @returns whether it stands folded afterwards.
@@ -114,8 +119,14 @@ export function setGroupFolded(group: MenuGroup, folded: boolean, announce: Fold
   mark(group.heading, 'aria-expanded', next ? 'false' : 'true')
   mark(group.heading, 'aria-label', next ? announce.folded : announce.open)
   for (let index = 0; index < group.rows.length; index++) {
-    if (next) mark(group.rows[index], 'hidden', '')
-    else unmark(group.rows[index], 'hidden')
+    const row = group.rows[index]
+    if (next) {
+      mark(row, 'hidden', '')
+      if (row.style.display !== 'none') row.style.display = 'none'
+      continue
+    }
+    unmark(row, 'hidden')
+    if (row.style.display !== '') row.style.display = ''
   }
   return next
 }
@@ -131,14 +142,17 @@ export function wireHeading(heading: HTMLElement) {
 }
 
 /**
- * Take every mark this feature wrote off one card, and the rows' `hidden` with
+ * Take every mark this feature wrote off one card, and the rows' hiding with
  * them: a menu the feature leaves gets the host's own card back.
  */
 export function releaseGroups(groups: MenuGroup[]) {
   for (let index = 0; index < groups.length; index++) {
     const group = groups[index]
     for (const name of [FOLD_MARK, 'aria-expanded', 'aria-label', 'role', 'tabindex']) unmark(group.heading, name)
-    for (let row = 0; row < group.rows.length; row++) unmark(group.rows[row], 'hidden')
+    for (let row = 0; row < group.rows.length; row++) {
+      unmark(group.rows[row], 'hidden')
+      if (group.rows[row].style.display !== '') group.rows[row].style.display = ''
+    }
   }
 }
 

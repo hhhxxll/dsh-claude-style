@@ -15,8 +15,8 @@ export default {
     check('a press on a folded provider opens it, and a press again folds it',
       fold.toggled === 'open' && fold.toggledBack === 'folded', JSON.stringify({ toggled: fold.toggled, back: fold.toggledBack }))
     check('a folded provider keeps its heading and hides every row it names',
-      fold.hiddenRows > 0 && fold.headings === 2,
-      JSON.stringify({ hiddenRows: fold.hiddenRows, headings: fold.headings }))
+      fold.hiddenRows > 0 && fold.headings === 2 && fold.drawnFoldedRows === 0,
+      JSON.stringify({ hiddenRows: fold.hiddenRows, headings: fold.headings, drawnFoldedRows: fold.drawnFoldedRows }))
     check('the heading carries the state a screen reader reads',
       fold.foldedLabel !== null && fold.foldedLabel !== fold.openLabel && fold.expandedState === 'false',
       JSON.stringify({ folded: fold.foldedLabel, open: fold.openLabel, expanded: fold.expandedState }))

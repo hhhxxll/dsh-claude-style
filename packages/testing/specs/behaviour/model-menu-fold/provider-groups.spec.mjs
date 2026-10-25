@@ -23,7 +23,12 @@ async function openMenu(t) {
 }
 /**
  * The card's providers as the reader can read them: one entry per heading, with
- * the state the skin wrote on it and its rows' own state.
+ * the state the skin wrote on it and what its rows really do on screen.
+ *
+ * `drawn` is the reading that matters: an element's `[hidden]` is a user agent
+ * declaration and any author rule outranks it, so a fold that only sets the
+ * attribute leaves every row on screen. These rows carry the host's own
+ * `display: flex`, and only the drawn count can tell the two apart.
  */
 function providers(t) {
   return t.page.evaluate(([headingSelector, groupSelector, rowSelector, foldedMark]) => {
@@ -50,8 +55,9 @@ export default spec({ page: 'menu-fold' }, ({ test }) => {
     const groups = await providers(t)
     t.expectThat.equal(groups.length, 2, 'the card draws one heading per provider')
     t.expectThat.equal(groups[0].folded, 'false', 'the provider holding the model in force stands open')
+    t.expectThat.equal(groups[0].drawn, groups[0].rows, 'and every model of it is on the page')
     t.expectThat.equal(groups[1].folded, 'true', 'the other provider stands folded')
-    t.expectThat.equal(groups[1].hidden, groups[1].rows, 'a folded provider carries the fold on every row it names')
+    t.expectThat.equal(groups[1].drawn, 0, `a folded provider draws none of its rows (${groups[1].drawn} of ${groups[1].rows} still drawn)`)
   })
 
   test('a press on a folded provider opens it, and a press again folds it', async (t) => {
@@ -66,6 +72,7 @@ export default spec({ page: 'menu-fold' }, ({ test }) => {
     await t.settle()
     const folded = (await providers(t))[1]
     t.expectThat.equal(folded.folded, 'true', 'the second press folded it again')
+    t.expectThat.equal(folded.drawn, 0, `and its models leave the page again (${folded.drawn} still drawn)`)
     t.expectThat.visible(await t.read.box(t.surface('menuFold.heading')), 'a folded provider still draws a heading the reader can find')
   })
 
