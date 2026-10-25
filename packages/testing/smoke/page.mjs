@@ -469,13 +469,17 @@ function page(name, tier, cases, probe = PROBE) {
   var modelSeat = name === 'effort' || name === 'context-stats' || name === 'stats-compact' || name === 'stats-inline' || name === 'menu-fold'
     ? '<div data-slot="conversation.input.model" style="display:contents"><div class="_root_m_1"><button type="button" class="_trigger_m_1">' + MODEL_SEAT_NAME + '</button></div></div>'
     : ''
-  // The menu-fold page draws the host's own model menu over its seat. The first
-  // rule is the host's own `.option` box (display:flex on every row): an author
+  // The menu-fold page draws the host's own model menu over its seat, with the
+  // host's own metrics: the `.option` box makes every row a flex box (an author
   // declaration outranks the user agent's `[hidden]`, which is exactly why a
-  // fold that only set the attribute left the rows on screen. The second is the
-  // page's own mark for the rows a query does not reach.
+  // fold that only set the attribute left the rows on screen), and the group
+  // heading is the caption the host draws — 11px tertiary ink on a 16px line.
+  // The last rule is the page's own mark for the rows a query does not reach.
   var modelMenuStyle = name === 'menu-fold'
-    ? '<style>[role="menuitemradio"] { display: flex; } [data-filtered-out] { display: none !important; }</style>'
+    ? '<style>[role="menuitemradio"] { display: flex; }'
+      + ' [data-menu-group-heading] { padding: 4px 7px 2px; font-size: 11px; line-height: 16px; font-weight: 500;'
+      + ' color: var(--dsw-alias-label-tertiary, #91888a); }'
+      + ' [data-filtered-out] { display: none !important; }</style>'
     : ''
   // The hint the host's editor draws on an empty draft, inside the grow wrapper
   // beside the field, which is where the host renders it; and the rail

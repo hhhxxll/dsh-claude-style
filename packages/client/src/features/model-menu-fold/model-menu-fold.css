@@ -1,36 +1,42 @@
 /* ---------- The host's own model menu: provider groups folded ---------- */
-/* The heading a press folds. The host draws it as an inert line inside the
-   group's section; this sheet gives it the look and the pointer of a control
-   and the fold's own resting state. The row count is the heading's, worked out
-   by the feature (features/model-menu-fold/menu-groups.ts). */
+/* The heading a press folds. The host draws it as an inert caption inside the
+   group's section (11px, tertiary ink, sticky); this sheet gives it the look and
+   the pointer of a control and the fold's own resting state. The row count is
+   the heading's, worked out by the feature
+   (features/model-menu-fold/menu-groups.ts). */
 body[data-dsh-claude-style] [data-menu-group-heading] {
   cursor: pointer;
   user-select: none;
   display: flex;
   align-items: center;
-  gap: 6px;
+  /* The caption's own left inset is 7px, and the mark takes its room from that
+     edge: a 4px gap keeps the provider's name a mark's width from where the host
+     puts an unmarked one, rather than a whole word's. */
+  gap: 4px;
   border-radius: 6px;
   transition: color var(--dsh-claude-timing-feedback);
 }
 body[data-dsh-claude-style] [data-menu-group-heading]:hover {
   color: var(--dsw-alias-label-secondary, #70686a);
 }
-/* The disclosure mark: the same chevron the skin's own cards draw, turned to
-   point down while the group stands open. It is drawn before the name, so the
-   provider's own words stay where the host put them. */
+/* The disclosure mark: the same chevron the sidebar's own rows draw
+   (theme/sidebar.css), so a provider's name folds with the affordance the rest
+   of the skin already teaches. 9px against the caption's 11px face keeps it a
+   mark beside the words rather than a second line of them; it points down while
+   the group stands open and turns to point at the name while it is folded. The
+   ink is the heading's own, so the mark reads as part of the line. */
 body[data-dsh-claude-style] [data-menu-group-heading]::before {
   content: "";
   flex: none;
-  width: 0;
-  height: 0;
-  border-left: 4px solid currentColor;
-  border-top: 3.5px solid transparent;
-  border-bottom: 3.5px solid transparent;
-  transition: transform var(--dsh-claude-timing-feedback);
-  transform-origin: 40% 50%;
+  width: 9px;
+  height: 9px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27none%27 stroke=%27black%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M4 6l4 4 4-4%27/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27none%27 stroke=%27black%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M4 6l4 4 4-4%27/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform var(--dsh-claude-duration-surface) var(--dsh-claude-ease-in-out);
 }
 body[data-dsh-claude-style] [data-menu-group-heading][data-dsh-claude-menu-group-folded="true"]::before {
-  transform: rotate(90deg);
+  transform: rotate(-90deg);
 }
 /* The reader's animation choice, resolved onto <body> (D40): reduced takes the
    turn away and the mark lands where the state says. */
