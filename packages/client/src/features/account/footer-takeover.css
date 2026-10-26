@@ -158,6 +158,62 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-clau
   display: none;
 }
 
+/* ---------- Windows titlebar, collapsed: the footer's own corner ----------
+   Every rail rule above was unreachable on the Windows desktop shell. There the
+   host takes the column to zero width when it collapses and hides the footer
+   outright — SidebarRoot.module.css carries
+   `[data-windows-titlebar] .<collapsed> .<footArea> { display: none }` — so the
+   36px account row those rules shape was never painted, and the window's
+   bottom-left corner stayed empty. The host still renders the footer (only its
+   `display` is taken away), so the skin gives the box back and pins it to that
+   corner instead of putting it back in the flow, where it would push a
+   zero-width column around. The size and the inset are the titlebar's own
+   collapse toggle's: left 12px, 28px square, so the avatar centres on the same
+   26px column as the toggle above it (that button is `position: fixed; left:
+   12px; width: 28px` in the same host sheet). Only the account row inside the
+   footer is meant to show, and the takeover rules above already collapsed the
+   rest to nothing. */
+html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] [data-dsh-claude-part~="foot-area"] {
+  display: flex;
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+  background: transparent;
+  overflow: visible;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--dsh-claude-layer-chrome);
+}
+/* The corner is the window's, not the column's: the sidebar column is zero wide
+   there, so the row keeps its square here rather than the rail's 36px one. The
+   box is a fixed square, not an auto one: the footer stacks settingsArea and
+   footerActions vertically, and with only a width given the row measured 28x46
+   with the avatar riding high in it. The height pins the square and the two
+   centrings swallow whatever the collapsed children still contribute. */
+html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] [data-dsh-claude-part~="foot-area"] > [data-dsh-claude-part~="settings-area"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] [data-dsh-claude-account-host-row],
+html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+}
+/* The corner has no column behind it to clip against, and the popover is
+   anchored to the row by scripts/popover placement anyway. */
+html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-popover {
+  width: 220px;
+}
+
 /* Embedded footer widgets: display-only plugin entries (progress bars,
    status panels — the cost-meter balance/quota stack is the known case)
    cannot collapse into a text menu item, so overrides.js embeds a live clone

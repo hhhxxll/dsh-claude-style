@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-26",
+  "group": "improvements",
+  "order": 6,
+  "external": false,
+  "zh": "Windows 桌面端折叠侧栏后，左下角重新画出账号头像：它占窗口的 28 像素方块，与标题栏里的折叠按钮同列，点一下照常打开账号菜单。此前宿主的标题栏样式把整个底部区域藏掉了，那一整块一直是空的。",
+  "en": "Bring the account avatar back to the bottom-left corner of the Windows desktop window once the sidebar is collapsed: a 28px square sitting in the same column as the title bar's collapse toggle, opening the account menu on a press. The host's title bar stylesheet hides that whole footer on Windows, so the corner stayed empty."
+}
