@@ -172,6 +172,10 @@ card leaves unset.
 | `--dsh-claude-chip` | `chip` | `#f9f9f9` | — | `#f5f6f9` | — | `var(--dsw-specific-selector)` | segmented control and switch at rest |
 | `--dsh-claude-meter-peak` | literal | `#a4621d` | `#e2a45f` | `#a4621d` | `#e2a45f` | `var(--dsw-alias-state-warn-label)` | the peak rate badge: the expensive end of a provider's own billing clock |
 | `--dsh-claude-meter-valley` | literal | `#3d7550` | `#8cbf96` | `#3d7550` | `#8cbf96` | `var(--dsw-alias-state-success-primary)` | the off-peak rate badge, and the dated promotions priced below it |
+| `--dsh-claude-account-running` | literal | `#5b8dd9` | `#7ba7e8` | `#5b8dd9` | `#7ba7e8` | `var(--dsw-alias-state-business-primary)` | the ring around the account's face while a turn is running: the one state that means wait, not read |
+| `--dsh-claude-account-waiting` | literal | `#a4621d` | `#e2a45f` | `#a4621d` | `#e2a45f` | `var(--dsw-alias-state-warn-label)` | the ring around the account's face when a session waits on the reader: a permission prompt, a question, a plan to approve |
+| `--dsh-claude-account-done` | literal | `#3d7550` | `#8cbf96` | `#3d7550` | `#8cbf96` | `var(--dsw-alias-state-success-primary)` | the ring around the account's face when a session finished a turn nobody has looked at yet |
+| `--dsh-claude-account-failed` | literal | `#c0392b` | `#e8776a` | `#c0392b` | `#e8776a` | `var(--dsw-alias-state-error-primary)` | the ring around the account's face when a session's turn failed or was blocked, held until that session succeeds |
 <!-- /generated:tokens -->
 
 **Host token bindings.** The skin supplies its palette through the host's own

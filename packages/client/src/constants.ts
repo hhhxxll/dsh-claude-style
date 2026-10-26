@@ -372,6 +372,21 @@ export const ACCOUNT_ARMED_ATTR = 'data-dsh-claude-account-armed'
  */
 export const ACCOUNT_READY_ATTR = 'data-dsh-claude-account-ready'
 /**
+ * Carried by the ring around the account's face, and its value is what the ring
+ * reports: `running`, `waiting`, `done` or `failed`.
+ *
+ * The ring is the skin's own span (the host row's `::after` is already the
+ * chevron), so it needs a hook of its own for the stylesheet and for the
+ * behaviour spec to read.
+ */
+export const ACCOUNT_RING_ATTR = 'data-dsh-claude-account-ring'
+/**
+ * Stamped on the account row while its ring reports a session the reader has
+ * not looked at yet: a press then goes to that session instead of opening the
+ * account card (features/account/account-ring.ts).
+ */
+export const ACCOUNT_RING_PRESS_ATTR = 'data-dsh-claude-account-ring-press'
+/**
  * Stamped on the host's shared menu card while it is the hero row's picker
  * (the workspace chip or the agent-preset seat opened it). The host portals
  * that card to <body> with no marker of its own, so the stylesheet cannot

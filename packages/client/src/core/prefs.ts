@@ -138,6 +138,10 @@ const MIRRORS = [
   // a factor, so the page keeps the size the system and the host give it.
   { key: 'pageZoom', attr: PAGE_ZOOM_ATTR, value: (prefs: Prefs) => prefs.pageZoom === PAGE_ZOOM_SYSTEM ? false : prefs.pageZoom },
   { key: 'collapseFooter', attr: FOOTER_ATTR, value: (prefs: Prefs) => prefs.collapseFooter && !footerTakeoverRetired },
+  // The ring's setting is not mirrored: the state the ring reports and the
+  // setting that decides whether it reports at all are different things, and
+  // the one attribute name the stylesheet reads belongs to the state
+  // (features/account/account-ring.ts writes it on the span).
 ] as const satisfies readonly PrefMirror[]
 
 /** Every attribute the mirror writes, plus the animation answer `writeMotionAttribute` resolves. */

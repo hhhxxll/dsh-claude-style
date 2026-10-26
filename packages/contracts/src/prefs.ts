@@ -196,6 +196,16 @@ export const AUTO_POPOVER_ALL = 'all'
 export const AUTO_POPOVER_SCOPES = [AUTO_POPOVER_OFF, AUTO_POPOVER_ACCOUNT, AUTO_POPOVER_ALL] as const
 
 /**
+ * What the ring around the account's face reports: nothing, the sessions that
+ * want the reader back (a turn that failed, one waiting on them, one that
+ * finished unread), or those together with a turn still running.
+ */
+export const ACCOUNT_RING_OFF = 'off'
+export const ACCOUNT_RING_ALERTS = 'alerts'
+export const ACCOUNT_RING_ALL = 'all'
+export const ACCOUNT_RINGS = [ACCOUNT_RING_OFF, ACCOUNT_RING_ALERTS, ACCOUNT_RING_ALL] as const
+
+/**
  * How large the page is drawn: `system` leaves it at the size the system gives
  * it, and every other value scales the whole page by that factor (the stylesheet
  * writes it as a `zoom`, so the page lays out in a smaller space and every
@@ -267,6 +277,8 @@ export const PREFS = {
   /** An earlier build stored the two words; `precise` is what the switch being on means. */
   statusDetail: { type: 'boolean', default: true, legacy: { precise: true, simple: false } },
   collapseFooter: { type: 'boolean', default: true },
+  /** What the ring around the account's face reports; it stands under the account area's own switch. */
+  accountRing: { type: 'choice', values: ACCOUNT_RINGS, default: ACCOUNT_RING_ALERTS },
   /** It was a boolean before it grew its choices. */
   autoPopover: { type: 'choice', values: AUTO_POPOVER_SCOPES, default: AUTO_POPOVER_ALL, legacy: { true: AUTO_POPOVER_ALL, false: AUTO_POPOVER_OFF } },
   composerScope: { type: 'choice', values: COMPOSER_SCOPES, default: COMPOSER_SCOPE_ALL },

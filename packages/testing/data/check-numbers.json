@@ -430,6 +430,31 @@
         0
       ]
     },
+    "packages/testing/smoke/cases/account-ring.mjs": {
+      "the row starts bare: the setting ships as `alerts`, so nothing is drawn until a session has news": [
+        0
+      ],
+      "the ring stands around the face, not beside it: the same centre and a box wider than the image": [
+        1
+      ],
+      "a press on an unread finish opens that session, and the account menu stays shut": [
+        0,
+        1
+      ],
+      "a turn that failed keeps the ring up and names the session it stands for": [
+        0
+      ],
+      "a press on a failure goes to the session that failed instead of opening the menu": [
+        0,
+        1
+      ],
+      "the setting off hands the row back bare, and back on it reports again": [
+        0
+      ],
+      "with nothing asking, the press is the host's again: the account menu opens over the row": [
+        0
+      ]
+    },
     "packages/testing/smoke/cases/agent.mjs": {
       "the tier reads as a Claude name, not as its machine id": [
         0,

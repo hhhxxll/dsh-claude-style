@@ -40,6 +40,7 @@ const STAND_IN_PARTS = [
   'empty-sessions.js',
   'turn-nav.js',
   'mascot.js',
+  'account-ring.js',
   'stats-projections.js',
   'workspaces.js',
   'sessions.js',
@@ -85,6 +86,7 @@ const PROBE_PARTS = [
   'sidebar-layout.js',
   'model-meter.js',
   'menu-fold.js',
+  'account-ring.js',
   'peer.js',
   'teardown.js',
 ]
@@ -133,13 +135,24 @@ function page(name, tier, cases, probe = PROBE) {
   var footerActions = '<div class="_footerActions_x_1"><div data-slot="sidebar.footer.action"><button id="plugin-action" aria-label="Cost meter" data-cordis-badge="3" style="box-sizing:border-box;display:flex;align-items:center;width:100%;height:42px;padding:0 10px;background:transparent;border:none"><svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"></circle></svg></button><div class="_balance_p_1" role="group"><span>Balance 10.07</span><div role="progressbar" aria-valuenow="40"></div></div></div></div>'
   var footCard = '<div data-dsh-usage-foot-card=""><div class="_usageCard_u_1"><button type="button" aria-label="Open usage settings"><svg viewBox="0 0 16 16"><path d="M2.5 12.5h11"></path></svg><span>Today 3.49M tokens</span></button></div></div>'
   var footDialog = '<dialog id="plugin-foot-dialog" class="_notice_n_1" aria-label="New version notice"><header class="_noticeHead_n_1"><strong>New version</strong><button type="button" aria-label="Close">×</button></header><div class="_noticeBody_n_1"><p>Combined sidebar card</p></div></dialog>'
-  var footer = name === 'desktop'
+  //
+  // The account ring's page is the second one: the ring stands around the host's
+  // own account row (features/account/account-ring.ts), so that page needs the
+  // same footer, and nothing else of this one.
+  var hostFooter = name === 'desktop' || name === 'account-ring'
+  // The host's trigger carries the account's own picture above its name (ui-shell's
+  // AccountMenu), and the ring stands around that picture rather than around the
+  // row, so the page that reads the ring draws one.
+  var accountFace = name === 'account-ring'
+    ? '<img alt="" src="' + PNG_1PX + '" width="18" height="18">'
+    : ''
+  var footer = hostFooter
     ? '<div class="_footArea_x_1">' + footerActions + footCard + footDialog +
         '<div class="_settingsArea_x_1"><div data-slot="sidebar.settings"><div class="_triggerRow_s_1">' +
           '<div data-slot="settings.launcher"><div class="_root_a_1"><span>' +
             // data-signed-out is the host's own mark on the account trigger (ui-shell's
             // AccountMenu), read off a live desktop instance.
-            '<button id="host-account" data-signed-out="false" aria-label="Account menu" aria-haspopup="menu" aria-expanded="false">Ada</button>' +
+            '<button id="host-account" data-signed-out="false" aria-label="Account menu" aria-haspopup="menu" aria-expanded="false">' + accountFace + 'Ada</button>' +
           '</span></div></div>' +
           '<button aria-label="Retry update">Retry update</button>' +
         '</div></div></div>' +
@@ -500,7 +513,7 @@ function page(name, tier, cases, probe = PROBE) {
   // The column's width and height are pinned so the account menu cases read
   // where the host's portal lands against a footer that stands at the window's
   // bottom, in the column a reader's sidebar has.
-  var sidebarStyle = name === 'desktop'
+  var sidebarStyle = hostFooter
     ? '<style>' +
         '[data-slot="sidebar"] { width: 280px; height: 800px; display: flex; flex-direction: column; }' +
         '._root_x_1 { flex: 1; min-height: 0; display: flex; flex-direction: column; }' +

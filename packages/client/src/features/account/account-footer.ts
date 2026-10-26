@@ -5,6 +5,7 @@ import { createFooterMirror } from './footer-mirror'
 import { createHostAccountMenu } from './host-menu'
 import { createHostMenuPlacement } from './menu-placement'
 import { createAccountProfile } from './profile'
+import { createAccountRing } from './account-ring'
 import { createAccountRows } from './rows'
 import { createAccountSurface } from './surface'
 import type { AccountSurfaceMode } from './surface'
@@ -47,6 +48,17 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   const HOST_ROW_ATTR = 'data-dsh-claude-account-host-row'
   const profile = createAccountProfile(ctx, () => {
     if (typeof ui.schedule === 'function') ui.schedule()
+  })
+  /**
+   * The ring around the face, which reports a session elsewhere that wants the
+   * reader. It repaints itself on every host change and asks the scheduler for
+   * a pass only when the reading changes, so the tooltip and the press gate are
+   * settled before a press arrives.
+   */
+  const ring = createAccountRing(ctx, {
+    onChange() {
+      if (typeof ui.schedule === 'function') ui.schedule()
+    },
   })
   // The host path's hover intent. The host owns its menu and unmounts it on
   // close, so this drives the host's trigger and dismisses the menu with the
@@ -214,16 +226,26 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     closeSurface()
   }
 
+  /** The four listeners the skin binds on the host's row, plus the ring's press gate. */
+  interface HostRowBindings {
+    reach: (e: Event) => void
+    catch: (e: Event) => void
+    enter: () => void
+    leave: () => void
+    press: () => void
+  }
+
   /**
    * The host row's bindings as this generation installed them, so the teardown
    * can take them off again. The token alone keeps a generation from binding the
    * same node twice; a node the host keeps across generations (its own account
    * row) would otherwise collect one set of listeners per switch.
    */
-  const hostRowBindings = new Map<HTMLElement, { catch: (e: Event) => void, enter: () => void, leave: () => void, press: () => void }>()
+  const hostRowBindings = new Map<HTMLElement, HostRowBindings>()
 
-  /** Take one row's four listeners off, and its token with them. */
-  function takeHostRowBindings(row: HTMLElement, bindings: { catch: (e: Event) => void, enter: () => void, leave: () => void, press: () => void }) {
+  /** Take one row's listeners off, and its token with them. */
+  function takeHostRowBindings(row: HTMLElement, bindings: HostRowBindings) {
+    row.removeEventListener('click', bindings.reach, true)
     row.removeEventListener('click', bindings.catch, true)
     row.removeEventListener('mouseenter', bindings.enter)
     row.removeEventListener('mouseleave', bindings.leave)
@@ -276,6 +298,15 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
       if (!pressKeepsAccountOpen()) return
       e.stopPropagation()
     }
+    // A ring standing for a session the reader has not read yet turns the press
+    // into a way there: it runs ahead of both the host's toggle and the skin's
+    // own open, and a press it answers reaches neither. Stopping the immediate
+    // propagation is what keeps a second listener on this same row quiet.
+    const reach = (e: Event) => {
+      if (!ring.jump()) return
+      e.preventDefault()
+      e.stopImmediatePropagation()
+    }
     // The row's own click opens the menu too (autoPopover off, or a press
     // before the hover delay elapsed). A listener on the row runs in the
     // target phase, ahead of the host's own delegated onClick, so the armed
@@ -283,12 +314,12 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     const press = () => {
       armAccountMenu()
     }
+    row.addEventListener('click', reach, true)
     row.addEventListener('click', stop, true)
     row.addEventListener('mouseenter', enter)
     row.addEventListener('mouseleave', leave)
     row.addEventListener('click', press)
-    hostRowBindings.set(row, { catch: stop, enter, leave, press })
-  }
+    hostRowBindings.set(row, { reach, catch: stop, enter, leave, press })  }
 
   /**
    * The host mounts and unmounts its menu around each open. Entering the
@@ -461,6 +492,9 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
     const entryRow = surface.mode() === 'host' ? hostTrigger : drawer.btn()
     syncAccountRowBox(entryRow, footArea)
     if (hostTrigger !== null) bindHostRowHover(hostTrigger)
+    // The ring stands on the entry row either way: the host's own row on the
+    // host path, the skin's button on the drawer path.
+    ring.sync(entryRow, readPrefs())
 
     // The host's footer entries are hidden in place on every pass, drawer or
     // no drawer: the host re-renders them, and a pass that skipped this left
@@ -519,6 +553,7 @@ export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
   }
   return () => {
     profile.stop()
+    ring.stop()
     unregisterPopover('account')
     dropAccountFooter(findFootArea())
   }

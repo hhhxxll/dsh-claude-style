@@ -3,5 +3,10 @@
   "accountSettingsRow": { "zh": "设置", "en": "Settings" },
   "footerPluginRow": { "zh": "插件", "en": "Plugin" },
   "collapseTitle": { "zh": "重绘账户区", "en": "Redraw the account area" },
-  "collapseDesc": { "zh": "设置入口收进账户弹层。", "en": "The settings entry moves into the account popover." }
+  "collapseDesc": { "zh": "设置入口收进账户弹层。", "en": "The settings entry moves into the account popover." },
+  "ringTitle": { "zh": "头像状态环", "en": "Status ring on the avatar" },
+  "ringDesc": { "zh": "别的会话有情况时，头像外围亮一圈；点它直接过去。", "en": "A ring around the avatar when another session wants you; press it to go there." },
+  "ringOff": { "zh": "关闭", "en": "Off" },
+  "ringAlerts": { "zh": "完成与失败", "en": "Finished and failed" },
+  "ringAll": { "zh": "全部，含进行中", "en": "Everything, running included" }
 }

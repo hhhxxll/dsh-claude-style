@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-26",
+  "group": "new",
+  "order": 6,
+  "external": false,
+  "zh": "新增账号头像外围的状态环（设置「侧栏 → 重绘账户区 → 状态环」，可选关闭 / 只提示完成与失败 / 全部含进行中，默认只提示完成与失败）：环上环下有事的会话——跑完没读留一圈静态细环、等你操作的用琥珀色、出错的留红色直到那个会话下次跑通；环亮时点头像直接跳到那个会话，同时清掉标记，头像随即回到打开账号菜单的原行为；`prefers-reduced-motion` 下只留颜色不动画。",
+  "en": "Add a state ring around the account's face (Settings → Sidebar → redraw the account area → state ring, off / unread finishes and failures / every state including running; unread finishes and failures by default): the ring says which session has news — an unread finish leaves a still hairline, a turn waiting on the reader shows amber, a failed turn stays red until that session works again; while the ring is up, a press on the face goes to that session and clears the mark, so the press opens the account menu again, and `prefers-reduced-motion` keeps the colour without the breathing."
+}

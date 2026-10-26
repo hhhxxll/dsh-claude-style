@@ -13,8 +13,9 @@ import chat from './cases/chat.mjs'
 import mascot from './cases/mascot.mjs'
 import model from './cases/model.mjs'
 import menuFold from './cases/menu-fold.mjs'
+import accountRing from './cases/account-ring.mjs'
 import peer from './cases/peer.mjs'
 
-const CASES = { ...shell, ...stats, ...settings, ...agent, ...chat, ...mascot, ...model, ...menuFold, ...peer }
+const CASES = { ...shell, ...stats, ...settings, ...agent, ...chat, ...mascot, ...model, ...menuFold, ...accountRing, ...peer }
 
 export { CASES }

@@ -13,6 +13,7 @@
   var sessions = host.sessions
   var workspacesService = host.workspacesService
   var deepy = host.deepy
+  var accountRing = host.accountRing
   var turnNav = host.turnNav
   var waitChat = host.waitChat
   var localeService = host.localeService
@@ -60,7 +61,8 @@
       if (name === 'modelDirectories') return host.modelDirectories
       if (name === 'workspaces') return workspacesService
       if (name === 'uiConversation') return deepy !== undefined ? deepy.conversation : turnNav !== undefined ? turnNav.conversation : waitChat
-      if (name === 'uiSession') return deepy !== undefined ? deepy.uiSession : CASE === 'session-title' ? { current: { value: { key: 'smoke-session' } } } : undefined
+      if (name === 'uiSession') return deepy !== undefined ? deepy.uiSession : accountRing !== undefined ? accountRing.uiSession : CASE === 'session-title' ? { current: { value: { key: 'smoke-session' } } } : undefined
+      if (name === 'uiWorkspace') return accountRing !== undefined ? accountRing.uiWorkspace : undefined
       if (name === 'locale') return localeService
       if (name === 'slots') return slotRegistry
       return undefined

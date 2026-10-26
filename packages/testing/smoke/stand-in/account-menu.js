@@ -62,7 +62,15 @@
     if (menuViewport) fillHostRows()
   }
   var accountTrigger = document.getElementById('host-account')
-  if (accountTrigger) accountTrigger.addEventListener('click', function () {
+  // The host opens its menu from a listener delegated above the trigger (its
+  // own React root), not from a listener on the row itself: a capture-phase
+  // handler on the row therefore runs first and can keep a press away from it.
+  // Binding this on the row would hide that order and let the menu open behind
+  // a press the skin meant to answer elsewhere.
+  if (accountTrigger) document.addEventListener('click', function (e) {
+    if (e.defaultPrevented) return
+    var target = e.target instanceof Element ? e.target : null
+    if (target === null || target.closest('#host-account') === null) return
     if (menu) { closeHostMenu(); return }
     accountTrigger.setAttribute('aria-expanded', 'true')
     // The host's real Menu DOM (ui-primitives/Menu.tsx): a role=menu portal to

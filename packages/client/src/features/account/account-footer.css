@@ -23,6 +23,9 @@ body[data-dsh-claude-style] .dsh-claude-account-btn {
   cursor: pointer;
   user-select: none;
   background: transparent;
+  /* The ring is drawn outside the row's box, so the row is its containing
+     block rather than the foot area above it. */
+  position: relative;
   transition: background-color var(--dsh-claude-timing-feedback);
 }
 body[data-dsh-claude-style] .dsh-claude-account-btn:hover,
@@ -253,6 +256,9 @@ body[data-dsh-claude-style] .dsh-claude-account-popover .dsh-claude-popover-item
    Claude row. features/account/account-footer.ts marks it with
    [data-dsh-claude-account-host-row]. */
 body[data-dsh-claude-style] [data-dsh-claude-account-host-row] {
+  /* The ring is drawn outside the row's box, so the row is what it is placed
+     against (features/account/account-ring.ts appends it here). */
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -490,4 +496,72 @@ body[data-dsh-claude-style] .dsh-claude-account-popover-body {
   max-height: 360px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+/* ---------- The ring around the face ---------- */
+/* features/account/account-ring.ts mounts this span on the entry row and writes
+   the state it reports into [data-dsh-claude-account-ring]; everything here is
+   the paint. The face itself cannot carry it: .dsh-claude-account-avatar has
+   `overflow: hidden`, so a shadow or a border on it would be cut square, and
+   the host row's ::after is already the chevron.
+
+   The span is 24px around an 18px face: 3px of air either side, then a 1.5px
+   line. Its place is the face's, which the row's own geometry fixes — 8px of
+   padding in the wide sidebar, a centred face in the rail's 36px and 28px
+   boxes — so three rules cover every shape the row takes and nothing is
+   measured at runtime. */
+body[data-dsh-claude-style] .dsh-claude-account-ring {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  box-sizing: border-box;
+  border: 1.5px solid transparent;
+  border-radius: 50%;
+  corner-shape: round;
+  pointer-events: none;
+  /* The rail's footer is a fixed 28px box and the ring is drawn past the row's
+     own edges: keeping it in the row's paint order keeps it out of the way of
+     the card the row anchors. */
+  z-index: 0;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-ring {
+  left: 6px;
+}
+html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-ring {
+  left: 2px;
+}
+body[data-dsh-claude-style] .dsh-claude-account-ring[data-dsh-claude-account-ring="running"] {
+  border-color: var(--dsh-claude-account-running);
+  animation: dsh-claude-pulse var(--dsh-claude-period-breathe) var(--dsh-claude-ease-in-out) infinite;
+}
+/* A finished or a failed turn is news the reader can read at a glance, so the
+   ring breathes three times as it arrives and then stays: the shared pulse,
+   stopped, is the static ring. */
+body[data-dsh-claude-style] .dsh-claude-account-ring[data-dsh-claude-account-ring="done"],
+body[data-dsh-claude-style] .dsh-claude-account-ring[data-dsh-claude-account-ring="failed"],
+body[data-dsh-claude-style] .dsh-claude-account-ring[data-dsh-claude-account-ring="waiting"] {
+  animation: dsh-claude-pulse var(--dsh-claude-period-breathe) var(--dsh-claude-ease-in-out) 3;
+}
+body[data-dsh-claude-style] .dsh-claude-account-ring[data-dsh-claude-account-ring="waiting"] {
+  border-color: var(--dsh-claude-account-waiting);
+}
+body[data-dsh-claude-style] .dsh-claude-account-ring[data-dsh-claude-account-ring="done"] {
+  border-color: var(--dsh-claude-account-done);
+}
+body[data-dsh-claude-style] .dsh-claude-account-ring[data-dsh-claude-account-ring="failed"] {
+  border-color: var(--dsh-claude-account-failed);
+}
+/* A ring the reader may press answers a press: the row says so, and the face
+   steps aside a little so the ring is what the pointer lands on. */
+body[data-dsh-claude-style] [data-dsh-claude-account-ring-press] {
+  cursor: pointer;
+}
+/* The pulse runs on opacity, which is the one thing that reads as a breath at
+   every size; a reader who asked for less motion gets the ring already at
+   rest. */
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-account-ring {
+  animation: none;
 }
