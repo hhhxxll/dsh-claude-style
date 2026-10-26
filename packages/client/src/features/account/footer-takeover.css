@@ -106,21 +106,25 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-clau
   right: auto;
   bottom: auto;
   top: auto;
-  width: 220px;
-  max-width: min(220px, calc(var(--dsh-claude-page-width, 100vw) - 16px));
+  width: 200px;
+  max-width: min(200px, calc(var(--dsh-claude-page-width, 100vw) - 16px));
   transform-origin: bottom left;
 }
 /* The host's own account menu in the rail: the card's width follows the account
    row, which is a 36px icon there, so the measured width would leave a 36px
    card. The drawer's rail width above is the floor for both.
+   That width is 200px, not the 220px the row itself would take: the longest
+   label in the card ("Restart DeepSeek Harness") ends well short of it, so the
+   columns past that were painted and never read. account-footer.css caps the
+   wide sidebar's card the same way, so one number rules both states.
    The host mounts this menu on <body>, outside the sidebar, so no rule that
    names a sidebar ancestor can reach it — that is why the collapsed rail kept a
    36px card. The collapse attribute on the layout frame is the same fact read
    from the outside: packages/engine/src/parts-table.ts marks the body with it
    (data-dsh-claude-holds="sidebar-rail") and this rule reads that mark. */
 body[data-dsh-claude-style][data-dsh-claude-holds~="sidebar-rail"] [data-dsh-claude-account-menu] {
-  width: 220px;
-  max-width: min(220px, calc(var(--dsh-claude-page-width, 100vw) - 16px));
+  width: 200px;
+  max-width: min(200px, calc(var(--dsh-claude-page-width, 100vw) - 16px));
 }
 /* In the rail the account button is the only control; the settings entry lives
    in the popover. The settings container is zero-sized rather than hidden (its
@@ -200,7 +204,7 @@ html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-t
 /* The corner has no column behind it to clip against, and the popover is
    anchored to the row by scripts/popover placement anyway. */
 html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-popover {
-  width: 220px;
+  width: 200px;
 }
 
 /* Embedded footer widgets: display-only plugin entries (progress bars,

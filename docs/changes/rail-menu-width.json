@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-26",
+  "group": "improvements",
+  "order": 7,
+  "external": false,
+  "zh": "账号菜单缩到 200px。原先展开态跟着账号行宽走（约 264px），折叠态固定 220px，两种状态都比卡片里最长的文字宽出一大截，右半边空着；现在统一取「账号行宽」与 200px 中的小者，折叠态固定 200px，卡片右边只留下本该有的内边距。",
+  "en": "The account menu is 200px wide. In the wide sidebar it used to follow the account row's width (about 264px) and in the rail it was a fixed 220px, both well past the longest label in the card and leaving the right half empty; the width is now the smaller of the row width and 200px, and the rail's card is a flat 200px, so only the padding the card is supposed to have remains on the right."
+}

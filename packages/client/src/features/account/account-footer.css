@@ -333,7 +333,7 @@ body[data-dsh-claude-style] .dsh-claude-account-inject {
    behaviour. The marker sits on the card itself, so every selector is scoped to
    it and no other host menu is reached. */
 body[data-dsh-claude-style] [data-dsh-claude-account-menu] {
-  width: var(--dsh-claude-account-width, 260px);
+  width: min(var(--dsh-claude-account-width, 260px), 200px);
   min-width: 0;
   max-width: none;
   box-sizing: border-box;

@@ -1,6 +1,11 @@
 import { MARKUP, SKIN_FACE, SKIN_HAT, same, check, contrast, basicChecks, commonChecks } from './_shared.mjs'
 import { deferredWanted, SHIPPED_PREFS } from '../shared.mjs'
 
+// The skin's own ceiling for the host's account card: the longest row in it
+// ("Restart DeepSeek Harness") leaves the card at 200px, so a wider sidebar
+// would only paint columns no label reaches.
+const CARD_MAX_WIDTH = 200
+
 export default {
   // The auto mode cases: the ladder follows the host catalog, so a third-party
   // permission tier is a first-class row.
@@ -215,9 +220,12 @@ export default {
     check('the account width variable is the account row box width',
       r.accountWidthVar === Math.round(r.hostRowWidth) + 'px',
       JSON.stringify({ variable: r.accountWidthVar, row: r.hostRowWidth }))
-    check('the host menu card is as wide as the account row',
-      r.menuCardWidth !== null && Math.round(r.menuCardWidth) === Math.round(r.hostRowWidth),
-      JSON.stringify({ card: r.menuCardWidth, row: r.hostRowWidth }))
+    // The card follows the row down but stops at CARD_MAX_WIDTH: past that the
+    // extra columns belong to no label in the card, they are just empty fill.
+    check('the host menu card follows the account row, stopping at its own ceiling',
+      r.menuCardWidth !== null &&
+        Math.round(r.menuCardWidth) === Math.min(Math.round(r.hostRowWidth), CARD_MAX_WIDTH),
+      JSON.stringify({ card: r.menuCardWidth, row: r.hostRowWidth, ceiling: CARD_MAX_WIDTH }))
     check('hovering the host account row opens the host menu; leaving it closes',
       r.hoverOpenedMenu === true && r.hoverClosedMenu === true,
       JSON.stringify({ opened: r.hoverOpenedMenu, closed: r.hoverClosedMenu }))
