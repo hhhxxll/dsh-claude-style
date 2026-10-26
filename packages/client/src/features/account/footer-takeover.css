@@ -79,11 +79,20 @@ body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-pa
 }
 
 /* Collapsed rail mode adaptations */
+/* The rail's row is a circle, not a rounded square. The hover plate is the row
+   itself (account-footer.css paints its background on :hover), so the row's own
+   radius is what that plate looks like — a 6px square around an 18px round
+   avatar reads as a chip behind a circle. `corner-shape: round` is not
+   redundant: the document inherits `superellipse(1.5)`, which renders a 50%
+   radius as a squircle rather than a circle (the avatar itself carries both, at
+   account-footer.css's `.dsh-claude-account-avatar`). */
 body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-btn {
   width: 36px;
   height: 36px;
   padding: 0;
   justify-content: center;
+  border-radius: 50%;
+  corner-shape: round;
 }
 body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-avatar {
   margin-right: 0;
@@ -138,7 +147,7 @@ body[data-dsh-claude-style][data-dsh-claude-holds~="sidebar-rail"] [data-dsh-cla
 body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] [data-dsh-claude-part~="foot-area"] [data-dsh-claude-part~="settings-area"] :is(button, [data-dsh-claude-part~="settings-trigger"]):not([data-dsh-claude-account-host-row]):not([data-dsh-claude-holds~="account-row"]) {
   display: none;
 }
-/* The rail's host account row is a 36px square with neither label nor chevron,
+/* The rail's host account row is a 36px circle with neither label nor chevron,
    matching the self-built trigger's rail shape. */
 body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] [data-dsh-claude-account-host-row] {
   width: 36px;
@@ -146,6 +155,8 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-clau
   padding: 0;
   justify-content: center;
   font-size: 0;
+  border-radius: 50%;
+  corner-shape: round;
 }
 body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] [data-dsh-claude-account-host-row]::after {
   display: none;
@@ -199,7 +210,8 @@ html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-t
 html[data-windows-titlebar] body[data-dsh-claude-style][data-dsh-claude-footer-takeover] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-btn {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: 50%;
+  corner-shape: round;
 }
 /* The corner has no column behind it to clip against, and the popover is
    anchored to the row by scripts/popover placement anyway. */

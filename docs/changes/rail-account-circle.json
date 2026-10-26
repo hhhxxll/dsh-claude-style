@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-26",
+  "group": "improvements",
+  "order": 8,
+  "external": false,
+  "zh": "折叠侧栏的账号行，悬停底色从圆角方块改成与头像同心的圆形：行的 `border-radius` 与 `corner-shape` 都跟着头像走，36px 的行里那块底色正落在 18px 的头像上，28px 的窄边版同理。",
+  "en": "The rail's account row hovers as a circle around the face rather than a rounded square: the row's `border-radius` and `corner-shape` follow the avatar, so in the 36px row the plate lands on the 18px face and the 28px titlebar variant does the same."
+}
