@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-26",
+  "group": "fixes",
+  "order": 5,
+  "external": false,
+  "zh": "折叠侧栏后点开的账号菜单原先开在头像右边，横跨在正在读的正文上；现在和展开态一样开在头像上方、左边对齐，悬停放行的那条缝也跟着挪到卡片底下，把指针从头像移到菜单时不会中途关掉。",
+  "en": "The account menu opened from the collapsed rail used to appear beside the avatar, laid across the conversation being read; it now opens above it and left-aligned, exactly like the wide sidebar's card, and the hover bridge moved under the card so the pointer can travel from the avatar into the menu without the card closing on the way."
+}

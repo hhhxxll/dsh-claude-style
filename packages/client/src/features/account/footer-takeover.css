@@ -122,17 +122,6 @@ body[data-dsh-claude-style][data-dsh-claude-holds~="sidebar-rail"] [data-dsh-cla
   width: 220px;
   max-width: min(220px, calc(var(--dsh-claude-page-width, 100vw) - 16px));
 }
-/* The rail opens the panel beside the trigger, not above it, so the hover bridge
-   has to span the horizontal gap: the base rule's downward strip would sit under
-   the panel and leave the pointer's 8px crossing uncovered. */
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-root"][data-dsh-claude-part~="sidebar-collapsed"] .dsh-claude-account-popover::after {
-  top: 0;
-  bottom: 0;
-  left: auto;
-  right: 100%;
-  width: 12px;
-  height: auto;
-}
 /* In the rail the account button is the only control; the settings entry lives
    in the popover. The settings container is zero-sized rather than hidden (its
    dialog must stay reachable), which is enough while the sidebar is wide — the

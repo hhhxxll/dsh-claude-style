@@ -13,8 +13,10 @@ import { positionAnchoredPopover } from '../../shared/popover'
  * and past the window's edge (issue #91). This answers the geometry the host
  * meant, computed in the card's own space: the shared anchoring reads the
  * trigger and the window at the page's scale and the card at its layout height
- * — above the row and left-aligned with it, or beside it while the sidebar is a
- * rail, the way the self-built drawer sits.
+ * — above the row and left-aligned with it, in the rail too: the rail's row sits
+ * in the window's bottom-left corner, so a card opened sideways would lie across
+ * the conversation the reader is reading, while one opened above it grows out of
+ * the corner they just pressed.
  *
  * The declarations are `important` inline because the host keeps writing its own
  * placement as plain inline styles on later frames; the watch puts the answer
@@ -29,18 +31,16 @@ export function createHostMenuPlacement(options: { trigger(): HTMLElement | null
   /** Takes down the watch on the open card, while one is up. */
   let stopWatching: (() => void) | null = null
 
-  /** The sidebar collapsed into its rail, where a card opens beside the row. */
-  function inRail(element: Element) {
-    return element.closest('[data-dsh-claude-part~="sidebar-collapsed"]') !== null
-  }
-
   /** Put the card where the host meant it. */
   function place(menu: HTMLElement) {
     const trigger = options.trigger()
     if (trigger === null || menu.offsetWidth === 0 || menu.offsetHeight === 0) return
-    positionAnchoredPopover(trigger, menu, inRail(trigger)
-      ? { side: 'right', important: true }
-      : { side: 'above-left', gap: GAP, important: true })
+    // One placement for both states. The rail's row is a 28px square against the
+    // window's bottom-left corner, so a card opened beside it (the older answer)
+    // lay across the conversation and left the pointer travelling through the
+    // page to reach it; above the row it opens over the corner the reader just
+    // pressed, which is where the wide sidebar's card already went.
+    positionAnchoredPopover(trigger, menu, { side: 'above-left', gap: GAP, important: true })
   }
 
   function unwatch() {

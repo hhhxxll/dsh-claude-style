@@ -89,7 +89,7 @@ export function createAccountDrawer(options: {
    *
    * In the rail the popover is `position: fixed` (features/account/account-footer.css): the sidebar
    * column clips its overflow, so an absolutely positioned panel would be cut
-   * off at the 56px rail edge and never seen. Its coordinates therefore have
+   * off at the rail edge and never seen. Its coordinates therefore have
    * to be resolved here — the same contract the model picker's popovers use.
    * The declarations are written `important` because the stylesheet anchors
    * the wide-sidebar popover with `!important` as well, and an author
@@ -105,10 +105,13 @@ export function createAccountDrawer(options: {
       accountPopover.style.removeProperty('top')
       return
     }
-    positionAnchoredPopover(accountBtn, accountPopover, { side: 'right', important: true })
+    // Above the row, left-aligned: the rail's row stands in the window's
+    // bottom-left corner, so the card opens over the corner the reader pressed
+    // instead of across the conversation — the same side the wide sidebar uses.
+    positionAnchoredPopover(accountBtn, accountPopover, { side: 'above-left', gap: 4, important: true })
   }
 
-  /** The sidebar collapsed into its rail, where a card opens beside the row. */
+  /** The sidebar collapsed into its rail, where a card opens over the row. */
   function inRail(element: Element) {
     return element.closest('[data-dsh-claude-part~="sidebar-collapsed"]') !== null
   }

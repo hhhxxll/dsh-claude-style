@@ -128,7 +128,11 @@ body[data-dsh-claude-style] .dsh-claude-account-popover {
      measurable for the placement. It grows out of the account row below it. */
   transform-origin: bottom left;
 }
-/* Hover bridge between trigger and popover */
+/* Hover bridge between trigger and popover. The card opens above its row in
+   both states — the wide sidebar and the collapsed rail alike — so the gap this
+   has to cover is the one under the card, between its bottom edge and the row's
+   top edge. A card that had to flip below its row (no room above) puts this
+   strip over the row's face instead; the 12px height reaches the row either way. */
 body[data-dsh-claude-style] .dsh-claude-account-popover::after {
   content: "";
   position: absolute;
